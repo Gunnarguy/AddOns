@@ -1,0 +1,17 @@
+<Ui>
+    <Script file="Libraries\LibStub\LibStub.lua"/>
+    <Script file="Libraries\LibUIDropDownMenu\LibUIDropDownMenu.lua"/>
+    <Script file="Libraries\LibCallbackHandler-1.0\CallbackHandler-1.0.lua"/>
+    <Script file="Libraries\LibDataBroker-1.1\LibDataBroker-1.1.lua"/>
+    <Script file="Ranker.lua"/>
+    <Frame name="RankerFrame">
+        <Scripts>
+            <OnLoad>
+                Ranker:OnLoadHandler(self)
+            </OnLoad>
+            <OnEvent>
+                Ranker:OnEventHandler(self, event, arg1, ...)
+            </OnEvent>
+        </Scripts>
+    </Frame>
+</Ui>

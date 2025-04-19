@@ -1,0 +1,8 @@
+## Interface: 11501
+## Title: Extra Swing Counter
+## Notes: Tracks separate procs for Flurry Axe and Reckoning
+## Author: YourName
+## Version: 2.1
+## SavedVariables: ExtraSwingCounterDB
+
+ExtraSwingCounter.lua

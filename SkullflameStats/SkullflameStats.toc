@@ -1,0 +1,7 @@
+## Interface: 11403
+## Title: SkullflameStats
+## Notes: Tracks Skullflame Shield and Flamestrike
+## Author: YourName
+## Version: 1.0
+
+SkullflameStats.lua

@@ -1,0 +1,8 @@
+## Interface: 11403
+## Title: Fiery Blaze Tracker
+## Notes: Tracks damage dealt by Fiery Blaze Enchant
+## Author: YourName
+## Version: 1.0
+## SavedVariables: FieryBlazeTrackerDB
+
+FieryBlazeTracker.lua

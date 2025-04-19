@@ -1,0 +1,8 @@
+## Interface: 11307
+## Title: WarcraftLogs Link
+## Notes: Adds a WarcraftLogs link to the player context menu.
+## Author: numberoneplayerkillerhero
+## Version: 1.1
+## SavedVariables: regionMap, hasAddedWarcraftLogsLink
+
+index.lua

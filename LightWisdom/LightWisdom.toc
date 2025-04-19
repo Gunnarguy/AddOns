@@ -1,0 +1,8 @@
+## Interface: 11501
+## Title: LightWisdomStats
+## Notes: Tracks Judgement of Light/Wisdom statistics
+## Author: YourName
+## Version: 1.2.0
+## SavedVariables: LWS_DB
+
+LightWisdom.lua

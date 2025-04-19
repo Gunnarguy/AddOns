@@ -1,0 +1,29 @@
+## Interface: 11507
+## Title: |cff71FFC9SinStats|r
+## Author: Sinba
+## Notes : Character Stats
+## Version: 5.9161
+## X-Website: https://www.curseforge.com/wow/addons/sinstats
+## X-Curse-Project-ID: 389802
+## SavedVariables: SinStatsDB
+
+Locales\Core.lua
+Locales\Classic\enUS.lua
+embeds.xml
+SinStats.lua
+HUD.lua
+Widgets.lua
+Config.lua
+Classic.lua
+HUDEvents.lua
+Stats\Classic\IDTables.lua
+Stats\Classic\Talents.lua
+Stats\Classic\Updater.lua
+Stats\Classic\SinLive.lua
+Stats\Classic\Melee.lua
+Stats\Classic\Ranged.lua
+Stats\Classic\Defensive.lua
+Stats\Classic\Spells.lua
+Stats\Classic\Resistance.lua
+Stats\Classic\Misc.lua
+

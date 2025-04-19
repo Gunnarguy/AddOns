@@ -1,0 +1,8 @@
+## Interface: 11403
+## Title: GratefulSpirit
+## Notes: Tracks and highlights the benefits of the Spirit stat in Classic Era.
+## Author: Gunnar
+## Version: 1.0
+## SavedVariables: GratefulSpiritData
+
+GratefulSpirit.lua

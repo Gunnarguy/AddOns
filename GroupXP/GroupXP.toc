@@ -1,0 +1,11 @@
+## Interface: 11500
+## Title: Group XP
+## Author: Clamchowder, Kekshaus
+## Notes: See your parties XP, and request people with the addons xp with !xp command
+## Version: 2.7.0.2
+## SavedVariables: GROUPXPDATA
+libs/ChatThrottleLib.lua
+main.lua
+options.lua
+bars.lua
+pulls.lua

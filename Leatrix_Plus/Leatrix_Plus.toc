@@ -1,0 +1,28 @@
+## Interface: 11507
+
+## Title: Leatrix Plus
+## Title-zhCN: Leatrix Plus [|cffeda55f功能百宝箱|r]
+## Title-zhTW: Leatrix Plus [|cffeda55f功能百寶箱|r]
+
+## Notes: Quality of life addon.
+## Notes-esES: Addon para calidad de vida.
+## Notes-esMX: Addon para calidad de vida.
+## Notes-frFR: Add-on pour la qualité de vie.
+## Notes-ptBR: Addon para qualidade de vida.
+## Notes-zhCN: 哆啦A梦的百宝袋
+## Notes-zhTW: 哆啦A夢的百寶袋
+
+## Version: 1.15.84
+## Author: Leatrix
+## SavedVariables: LeaPlusDB
+
+## OptionalDeps: Leatrix_enUS, ElvUI
+
+## X-Curse-Project-ID: 94855
+
+Leatrix_Plus_Library.lua
+Leatrix_Plus_Locale.lua
+Leatrix_Plus_Flight_Alliance.lua
+Leatrix_Plus_Flight_Horde.lua
+Leatrix_Plus.xml
+Leatrix_Plus.lua

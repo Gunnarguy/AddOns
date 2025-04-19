@@ -1,0 +1,8 @@
+## Interface: 11403
+## Title: Odd Hand Tracker
+## Notes: Tracks activations of Spell ID 18803
+## Author: Gunnar
+## Version: 1.0
+## SavedVariables: OddHandTrackerDB
+
+OddHandTracker.lua

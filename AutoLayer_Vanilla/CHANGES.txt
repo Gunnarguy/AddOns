@@ -1,0 +1,16 @@
+lightweight tag 096b1fa399cf5118ac00e6592fa07ba1d219a30f 1.6.1-release
+Author:	GitHub <noreply@github.com>
+Date:	Mon Apr 14 15:24:08 2025 +0200
+
+commit 76fee9d9348a1835e0d346806d0b5e98d503f435
+Author: Adam Hartley <BytesGuy@users.noreply.github.com>
+Date:   Mon Apr 14 12:49:24 2025 +0100
+
+    fix: register hopper frame so it closes with esc key
+
+commit 76fee9d9348a1835e0d346806d0b5e98d503f435
+Author: Adam Hartley <BytesGuy@users.noreply.github.com>
+Date:   Mon Apr 14 12:49:24 2025 +0100
+
+    fix: register hopper frame so it closes with esc key
+

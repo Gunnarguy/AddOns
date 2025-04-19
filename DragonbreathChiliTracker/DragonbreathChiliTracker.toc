@@ -1,0 +1,8 @@
+## Interface: 11501
+## Title: DragonbreathChiliTracker
+## Notes: Tracks damage done by Dragonbreath Chili
+## Author: YourName
+## Version: 1.3.0
+## SavedVariables: DragonbreathChiliTrackerDB
+
+DragonbreathChiliTracker.lua

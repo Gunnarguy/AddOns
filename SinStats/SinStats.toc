@@ -1,0 +1,33 @@
+## Interface: 110100
+## Title: |cff71FFC9SinStats|r
+## Author: Sinba
+## Notes : Character Stats
+## Version: 5.9161
+## IconTexture: Interface\AddOns\SinStats\Textures\MiniMap.blp
+## X-License: All Rights Reserved
+## Category: Combat
+## X-Website: https://www.curseforge.com/wow/addons/sinstats
+## X-Curse-Project-ID: 389802
+## SavedVariables: SinStatsDB
+
+Locales\Core.lua
+Locales\Retail\enUS.lua
+Locales\Retail\zhCN.lua
+Locales\Retail\koKR.lua
+embeds.xml
+SinStats.lua
+HUD.lua
+Widgets.lua
+Config.lua
+Retail.lua
+HUDEvents.lua
+Stats\Retail\IDTables.lua
+Stats\Retail\Talents.lua
+Stats\Retail\Updater.lua
+Stats\Retail\SinLive.lua
+Stats\Retail\Enhancement.lua
+Stats\Retail\Physical.lua
+Stats\Retail\Spell.lua
+Stats\Retail\Currency.lua
+Stats\Retail\Misc.lua
+
