@@ -2150,7 +2150,7 @@ function app:BuildSearchResponseForField(groups, field)
 end
 
 -- Dynamic Popouts for Quest Chains and other Groups
-local function OnInitForPopout(self, group)
+local function OnInitForPopout(self, questID, group)
 	if group.questID or group.sourceQuests then
 		local mainQuest = CloneReference(group);
 		if group.parent then mainQuest.sourceParent = group.parent; end
@@ -2600,7 +2600,7 @@ function app:CreateMiniListForGroup(group)
 		AllowCompleteSound = true,
 		--Debugging = true,
 		OnInit = function(self)
-			OnInitForPopout(self, (group.OnPopout and group:OnPopout()) or group);
+			OnInitForPopout(self, questID, (group.OnPopout and group:OnPopout()) or group);
 		end,
 		OnLoad = function(self, settings)
 			self.dynamic = true;

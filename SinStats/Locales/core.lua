@@ -78,6 +78,7 @@ if WOW_PROJECT_ID == WOW_PROJECT_MAINLINE then
 	Ns.WanTwilightLink = "|T"..getSpell(394083)..":0|t"..C_Spell.GetSpellLink(394083).."   "
 	Ns.HuntersMarkLink = "|T"..getSpell(257284)..":0|t"..C_Spell.GetSpellLink(257284).."   "
 	Ns.RazorLink = "|T"..getSpell(51714)..":0|t"..C_Spell.GetSpellLink(51714).."   "
+	Ns.StashLink = "|T"..getSpell(1216211)..":0|t"..C_Spell.GetSpellLink(1216211).."   "
 	Ns.KejLink = "|T".. getCurrency(3056)..":0|t"..C_CurrencyInfo.GetCurrencyLink(3056)
 	Ns.WeathLink = "|T".. getCurrency(3107)..":0|t"..C_CurrencyInfo.GetCurrencyLink(3107)
 	Ns.CarvedLink = "|T".. getCurrency(3108)..":0|t"..C_CurrencyInfo.GetCurrencyLink(3108)
@@ -107,7 +108,7 @@ if WOW_PROJECT_ID == WOW_PROJECT_MAINLINE then
 	Ns.MarketLink = "|T".. getCurrency(3226)..":0|t"..C_CurrencyInfo.GetCurrencyLink(3226)
 	Ns.DarkfuseLink = "|T".. getCurrency(3177)..":0|t"..C_CurrencyInfo.GetCurrencyLink(3177)
 	Ns.GallaLink = "|T".. getCurrency(3136)..":0|t"..C_CurrencyInfo.GetCurrencyLink(3136)
-	Ns.StashLink = "|T"..getSpell(1216211)..":0|t"..C_Spell.GetSpellLink(1216211).."   "
+	Ns.RadianceLink = "|T".. getCurrency(3283)..":0|t"..C_CurrencyInfo.GetCurrencyLink(3283)
 	Ns.SparkLink = "|T".. getItem(230906)..":0|t"
 	Ns.CinderLink = "|T".. getItem(225557)..":0|t"
 

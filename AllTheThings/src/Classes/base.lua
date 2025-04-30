@@ -215,6 +215,7 @@ local DefaultFields = {
 			DelayedCallback(function(t)
 				-- app.PrintDebug("__cantry:done",app:SearchLink(t))
 				t.__canretry = false
+				t.HasRetried = true
 			end, CAN_RETRY_DURATION_SEC, t)
 		elseif canretry == false then
 			-- group has been marked to stop retrying, but it can be re-tried later

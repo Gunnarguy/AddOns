@@ -93,6 +93,7 @@ local function ExpandGroupsRecursively(group, expanded, manual)
 		end
 	end
 end
+app.ExpandGroupsRecursively = ExpandGroupsRecursively
 local VisibilityFilter, SortGroup
 local function ProcessGroup(data, object)
 	if not VisibilityFilter(object) then return end
@@ -167,7 +168,7 @@ local function UpdateWindow(self, force, got)
 				-- only add this info row if there is actually nothing visible in the list
 				-- always a header row
 				-- print("any data",#self.Container,#rowData,#data)
-				if #rowData < 2 then
+				if #rowData < 2 and not app.ThingKeys[data.key] then
 					rowData[#rowData + 1] = app.CreateRawText(L.NO_ENTRIES, {
 						description = L.NO_ENTRIES_DESC,
 						collectible = 1,
@@ -1195,7 +1196,7 @@ app.TrySearchAHForGroup = function(group)
 	-- local itemID = group.itemID
 	-- if itemID then
 	local name, link = group.name, group.link or group.silentLink
-	if name and HandleModifiedItemClick(link) then
+	if name and app.HandleModifiedItemClick(link) then
 		local AH = app.AH
 		if not AH then AH = {} app.AH = AH end
 		-- AuctionFrameBrowse_Search();	-- doesn't exist
@@ -1614,7 +1615,7 @@ app.AddEventHandler("RowOnClick", function(self, button)
 					-- Not at the Auction House
 					-- If this reference has a link, then attempt to preview the appearance or write to the chat window.
 					local link = reference.link or reference.silentLink;
-					if (link and HandleModifiedItemClick(link)) or ChatEdit_InsertLink(link) then return true; end
+					if app.HandleModifiedItemClick(link) or ChatEdit_InsertLink(link) then return true; end
 
 					if button == "LeftButton" then
 						-- Default behavior is to Refresh Collections.
@@ -1640,8 +1641,8 @@ app.AddEventHandler("RowOnClick", function(self, button)
 					return true;
 				else
 					local link = reference.link or reference.silentLink;
-					if link and HandleModifiedItemClick(link) then
-						return true;
+					if app.HandleModifiedItemClick(link) then
+						return true
 					end
 				end
 

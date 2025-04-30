@@ -178,6 +178,25 @@ function Ns.FunctionList.Gallagio(HUD, data, options, ...)
 end
 ------------------------------------------------
 
+-- Flame's Radiance
+function Ns.FunctionList.Radiance(HUD, data, options, ...)
+
+	local renown = C_MajorFactions.GetMajorFactionData(2688)
+	local returnText
+
+	if renown == nil then renown = 0 end
+
+	local percent = renown.renownReputationEarned
+
+	percent = (percent * 0.04)
+	returnText = renown.renownLevel
+
+	if options.Display_Percentage then returnText = renown.renownLevel .. " (" .. ("%.0f%%"):format(percent) .. ")" end
+
+	HUD:UpdateText(data, returnText)
+end
+------------------------------------------------
+
 -- The Cartels of Undermine
 function Ns.FunctionList.Cartels(HUD, data, options, ...)
 

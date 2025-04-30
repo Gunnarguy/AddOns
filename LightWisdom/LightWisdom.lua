@@ -226,13 +226,14 @@ end
 local function CreateUI()
     -- Create the main stats frame with a backdrop
     local f = CreateFrame("Frame", "LWS_StatsFrame", UIParent, "BackdropTemplate")
-    f:SetSize(200, 140)
+    f:SetSize(200, 140) -- Keep size or adjust as needed
     f:SetScale(LWS_DB.scale)
     
     -- Enable frame movement - critical for drag functionality
     f:SetMovable(true)
     f:SetClampedToScreen(true)
-    f:EnableMouse(true)
+    -- Keep mouse enabled so hover events work even when locked
+    f:EnableMouse(true) 
     
     -- Fix position setting by ensuring proper anchor format
     local pos = LWS_DB.position
@@ -246,64 +247,63 @@ local function CreateUI()
         LWS_DB.position = {"CENTER", UIParent, "CENTER", 0, 0}
     end
     
-    -- Set visual appearance of the frame
+    -- Set visual appearance of the frame - Use a simpler backdrop
     f:SetBackdrop({
-        bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
-        edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
-        tile = true, tileSize = 16, edgeSize = 16,
-        insets = { left = 4, right = 4, top = 4, bottom = 4 }
+        bgFile = "Interface\\Tooltips\\UI-Tooltip-Background", -- Flat background texture
+        edgeFile = nil, -- No border edge
+        tile = false,
+        tileSize = 16,
+        edgeSize = 0, -- No edge size
+        insets = { left = 2, right = 2, top = 2, bottom = 2 } -- Minimal insets
     })
-    f:SetBackdropColor(0, 0, 0, 0.8)
+    -- Adjust backdrop color and transparency (e.g., slightly darker)
+    f:SetBackdropColor(0.1, 0.1, 0.1, 0.85) 
     
     -- ===== DRAGGABLE HEADER SECTION =====
-    -- Create a more visible header bar for dragging
+    -- Create a header bar for dragging
     local header = CreateFrame("Frame", nil, f)
-    header:SetHeight(25) -- Taller for easier dragging
-    header:SetPoint("TOPLEFT", f, "TOPLEFT", 4, -4) -- Inset slightly for visual appeal
-    header:SetPoint("TOPRIGHT", f, "TOPRIGHT", -4, -4)
-    header:EnableMouse(true) -- Crucial for capturing mouse events
+    header:SetHeight(20) -- Slightly shorter header
+    header:SetPoint("TOPLEFT", f, "TOPLEFT", 2, -2) -- Align with new insets
+    header:SetPoint("TOPRIGHT", f, "TOPRIGHT", -2, -2)
+    -- Header needs mouse enabled to catch drag events when frame is unlocked
+    header:EnableMouse(true) 
     
-    -- Add a more noticeable texture to the header
+    -- Use a subtle texture or color for the header background
     local headerBg = header:CreateTexture(nil, "BACKGROUND")
     headerBg:SetAllPoints()
-    headerBg:SetTexture("Interface\\PaperDollInfoFrame\\UI-Character-Tab-Highlight")
-    headerBg:SetBlendMode("ADD")
-    headerBg:SetVertexColor(0.6, 0.6, 1.0, 0.7) -- Brighter blue color
-    headerBg:SetShown(not LWS_DB.locked)
+    -- Use a semi-transparent dark color instead of a bright texture
+    headerBg:SetColorTexture(0.2, 0.2, 0.2, 0.5) 
+    -- Header background is only shown when unlocked
+    headerBg:SetShown(not LWS_DB.locked) 
     f.headerTexture = headerBg -- Store reference for toggling
     
-    -- Add a subtle grip texture to suggest draggable
+    -- Grip texture is removed/hidden (existing code)
     local grip = header:CreateTexture(nil, "OVERLAY")
-    grip:SetTexture("Interface\\AddOns\\LightWisdom\\grip")
-    grip:SetSize(16, 16)
-    grip:SetPoint("LEFT", header, "LEFT", 5, 0)
-    grip:SetVertexColor(1, 1, 1, 0.7)
-    grip:SetShown(not LWS_DB.locked)
+    grip:Hide() 
+    grip:SetShown(false) 
     f.gripTexture = grip
     
     -- ===== DRAGGING BEHAVIOR =====
-    -- Set up the actual drag functionality on the header
+    -- Only allow dragging if the frame is NOT locked
     header:SetScript("OnMouseDown", function(self, button)
-        if button == "LeftButton" and not LWS_DB.locked then
-            -- This is the critical function call that enables dragging
+        -- Check lock status *before* starting movement
+        if button == "LeftButton" and not LWS_DB.locked then 
             f:StartMoving()
             f.isMoving = true
         end
     end)
     
+    -- OnMouseUp remains the same (stops moving and saves position)
     header:SetScript("OnMouseUp", function(self, button)
         if button == "LeftButton" and f.isMoving then
-            -- Stop the movement and save the new position
             f:StopMovingOrSizing()
             f.isMoving = false
-            
-            -- Save position in a format that works with SetPoint
             local point, _, relativePoint, x, y = f:GetPoint()
             LWS_DB.position = {point, UIParent, relativePoint, x, y}
         end
     end)
     
-    -- Ensure dragging stops if the cursor leaves the frame while dragging
+    -- OnHide remains the same
     header:SetScript("OnHide", function(self)
         if f.isMoving then
             f:StopMovingOrSizing()
@@ -311,84 +311,111 @@ local function CreateUI()
         end
     end)
     
-    -- Change cursor when hovering over the header to indicate draggability
+    -- Change cursor only when unlocked
     header:SetScript("OnEnter", function(self)
         if not LWS_DB.locked then
             SetCursor("CAST_CURSOR")
         end
     end)
     
+    -- OnLeave remains the same
     header:SetScript("OnLeave", function(self)
         if not f.isMoving then
             ResetCursor()
         end
     end)
     
-    -- Title and Debuff Indicators
+    -- Title - Adjust position slightly due to header/inset changes (existing code)
     local title = f:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    title:SetPoint("TOP", 0, -12) -- Adjusted position to work with header
+    title:SetPoint("TOP", 0, -6) 
     title:SetText("|cFF00FF96Light & Wisdom Stats|r")
+
+    -- ===== BOTTOM-LEFT ANCHOR (Visual Only) =====
+    local anchor = f:CreateTexture(nil, "OVERLAY")
+    anchor:SetSize(12, 12) -- Small visual indicator
+    anchor:SetPoint("BOTTOMLEFT", f, "BOTTOMLEFT", 4, 4) -- Position in the corner, respecting insets
+    -- Use a simple texture, e.g., a square or corner piece
+    anchor:SetTexture("Interface\\ChatFrame\\ChatFrameGrip") -- Re-use a grip-like texture
+    anchor:SetVertexColor(0.8, 0.8, 0.8, 0.6) -- Make it semi-transparent grey
+    -- Anchor is only shown when unlocked
+    anchor:SetShown(not LWS_DB.locked) 
+    f.anchorTexture = anchor -- Store reference
+
+    -- ===== HOVER LOCK BUTTON =====
+    local hoverLockBtn = CreateFrame("Button", nil, f)
+    hoverLockBtn:SetSize(18, 18) -- Small button
+    hoverLockBtn:SetPoint("TOPRIGHT", f, "TOPRIGHT", -5, -3) -- Position in the corner
     
-    -- Control Buttons - moved to be more visually separate from header
-    local lockBtn = CreateFrame("Button", nil, f, "UIPanelButtonTemplate")
-    lockBtn:SetSize(20, 20) -- Slightly larger for better clickability
-    lockBtn:SetPoint("TOPRIGHT", f, "TOPRIGHT", -12, -12)
-    lockBtn:SetText("L")
-    lockBtn:SetScript("OnClick", function()
-        -- Toggle lock state and update visual indicators
+    -- Set textures for locked and unlocked states
+    local tex = hoverLockBtn:CreateTexture(nil, "ARTWORK")
+    tex:SetAllPoints()
+    hoverLockBtn.texture = tex
+    
+    local function UpdateLockButtonTexture()
+        if LWS_DB.locked then
+            -- Use a 'locked' icon texture
+            hoverLockBtn.texture:SetTexture("Interface\\Buttons\\UI-Panel-Lock-Button-Down") 
+        else
+            -- Use an 'unlocked' icon texture
+            hoverLockBtn.texture:SetTexture("Interface\\Buttons\\UI-Panel-Lock-Button-Up") 
+        end
+    end
+    UpdateLockButtonTexture() -- Set initial texture
+
+    hoverLockBtn:SetScript("OnClick", function()
         LWS_DB.locked = not LWS_DB.locked
-        f.headerTexture:SetShown(not LWS_DB.locked)
-        f.gripTexture:SetShown(not LWS_DB.locked)
+        UpdateLockButtonTexture() -- Update icon
+        f.headerTexture:SetShown(not LWS_DB.locked) -- Show/hide drag header bg
+        f.anchorTexture:SetShown(not LWS_DB.locked) -- Show/hide bottom-left anchor
         print("Light & Wisdom Stats Frame " .. (LWS_DB.locked and "|cFFFF0000Locked|r" or "|cFF00FF00Unlocked|r"))
-    end)
-    CreateTooltip(lockBtn, "Lock/Unlock", "Toggle frame dragging")
-    
-    -- Reset button
-    local resetBtn = CreateFrame("Button", nil, f, "UIPanelButtonTemplate")
-    resetBtn:SetSize(20, 20)
-    resetBtn:SetPoint("RIGHT", lockBtn, "LEFT", -5, 0)
-    resetBtn:SetText("R")
-
-    -- Create reset menu directly instead of using StaticPopup
-    resetBtn:SetScript("OnClick", function()
-        -- Create dropdown menu for reset options
-        local menu = {
-            { text = "Reset Options", isTitle = true, notCheckable = true },
-            { text = "Combat Stats", notCheckable = true, func = function() 
-                LWS_DB.combat = { healing = 0, mana = 0, startTime = GetTime(), inCombat = LWS_DB.combat.inCombat }
-                UpdateDisplay()
-                print("|cFF00FF96Light & Wisdom Stats:|r Combat stats reset")
-            end },
-            { text = "Session Stats", notCheckable = true, func = function()
-                LWS_DB.session = { healing = 0, mana = 0, startTime = GetTime() }
-                UpdateDisplay()
-                print("|cFF00FF96Light & Wisdom Stats:|r Session stats reset") 
-            end },
-            { text = "All-Time Stats", notCheckable = true, func = function() 
-                LWS_DB.allTime = { healing = 0, mana = 0 }
-                UpdateDisplay()
-                print("|cFF00FF96Light & Wisdom Stats:|r All-time stats reset")
-            end },
-            { text = "Cancel", notCheckable = true, func = function() end },
-        }
-        
-        -- Show dropdown menu at cursor position
-        EasyMenu(menu, CreateFrame("Frame", "LWSResetMenu", UIParent, "UIDropDownMenuTemplate"), "cursor", 0, 0, "MENU")
+        -- No need to change f:EnableMouse here, dragging is handled by header's OnMouseDown
     end)
 
-    CreateTooltip(resetBtn, "Reset", "Click to reset statistics")
+    -- Initially hide the button (set alpha to 0)
+    hoverLockBtn:SetAlpha(0) 
+    f.hoverLockBtn = hoverLockBtn -- Store reference if needed elsewhere
+
+    -- Fade In/Out Logic for Hover Button
+    f:SetScript("OnEnter", function(self)
+        -- Fade in the lock button when mouse enters the main frame
+        UIFrameFadeIn(self.hoverLockBtn, 0.2, self.hoverLockBtn:GetAlpha(), 1) 
+    end)
+
+    f:SetScript("OnLeave", function(self)
+        -- Fade out the lock button when mouse leaves the main frame,
+        -- but only if the mouse isn't moving onto the button itself.
+        local currentMouseFocus = GetMouseFocus()
+        if currentMouseFocus ~= self.hoverLockBtn then
+            UIFrameFadeOut(self.hoverLockBtn, 0.3, self.hoverLockBtn:GetAlpha(), 0) 
+        end
+    end)
+
+    hoverLockBtn:SetScript("OnEnter", function(self)
+        -- Keep the button visible (cancel fade out) when mouse is over it
+        UIFrameFadeIn(self, 0.1, self:GetAlpha(), 1) 
+    end)
+
+    hoverLockBtn:SetScript("OnLeave", function(self)
+        -- Fade out the button when the mouse leaves it
+        UIFrameFadeOut(self, 0.3, self:GetAlpha(), 0) 
+    end)
+
+    CreateTooltip(hoverLockBtn, "Lock/Unlock Frame", "Click to toggle frame movement.")
+
+    -- REMOVED 'L' and 'R' buttons and their logic (including EasyMenu call)
     
-    -- Add a status message that displays on first load
+    -- Status message (existing code, text updated slightly)
     C_Timer.After(1, function()
         if not LWS_DB.showedDragTip then
-            print("|cFF00FF96Light & Wisdom Stats:|r Frame is |cFF00FF00unlocked|r. Drag the blue header to move it.")
+            print("|cFF00FF96Light & Wisdom Stats:|r Frame is |cFF00FF00unlocked|r. Drag the header area (when visible) or use the lock icon.") 
             LWS_DB.showedDragTip = true
         end
     end)
     
-    -- The rest of the UI elements (indicators, stats, etc.)
+    -- Debuff Indicators - Adjust vertical position
+    local indicatorYOffset = -28 -- Position below title/header area
     local jolIndicator = f:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    jolIndicator:SetPoint("TOPLEFT", 10, -35) -- Adjusted for header
+    jolIndicator:SetPoint("TOPLEFT", 10, indicatorYOffset) 
     jolIndicator:SetText("JoL:")
     f.jolIndicator = jolIndicator
     
@@ -397,31 +424,32 @@ local function CreateUI()
     jowIndicator:SetText("JoW:")
     f.jowIndicator = jowIndicator
     
+    -- Tooltip frames for indicators (existing code)
     local jolFrame = CreateFrame("Frame", nil, f)
     jolFrame:SetAllPoints(jolIndicator)
-    CreateTooltip(jolFrame, "Judgement of Light", 
-        "Green = Active, Red = Inactive\nHeals the attacker when active.")
+    CreateTooltip(jolFrame, "Judgement of Light", "Green = Active, Red = Inactive\nHeals the attacker when active.")
     
     local jowFrame = CreateFrame("Frame", nil, f)
     jowFrame:SetAllPoints(jowIndicator)
-    CreateTooltip(jowFrame, "Judgement of Wisdom", 
-        "Green = Active, Red = Inactive\nRestores mana when active.")
+    CreateTooltip(jowFrame, "Judgement of Wisdom", "Green = Active, Red = Inactive\nRestores mana when active.")
     
-    -- Headers
+    -- Headers - Adjust vertical position
+    local headerYOffset = indicatorYOffset - 18 -- Position below indicators
     local col1X, col2X = 80, 150
-    for _, header in ipairs({ { text = "Healing", x = col1X }, { text = "Mana", x = col2X } }) do
+    for _, headerData in ipairs({ { text = "Healing", x = col1X }, { text = "Mana", x = col2X } }) do
         local h = f:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-        h:SetPoint("TOP", f, "TOP", header.x - f:GetWidth() / 2, -45)
-        h:SetText(header.text)
+        -- Anchor relative to TOPLEFT for consistency with other elements
+        h:SetPoint("TOPLEFT", f, "TOPLEFT", headerData.x - 20, headerYOffset) 
+        h:SetText(headerData.text)
     end
     
-    -- Stat Rows
+    -- Stat Rows - Adjust starting vertical position
     local entries = {
         { label = "Combat:",   key = "combat" },
         { label = "Session:",  key = "session" },
         { label = "All-Time:", key = "allTime" }
     }
-    local rowY = -65
+    local rowY = headerYOffset - 18 -- Start below headers
     for _, entry in ipairs(entries) do
         local rowLabel = f:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
         rowLabel:SetPoint("TOPLEFT", 10, rowY)
@@ -436,10 +464,10 @@ local function CreateUI()
         mana:SetText("0")
         
         table.insert(textWidgets, { key = entry.key, healing = healing, mana = mana })
-        rowY = rowY - 18
+        rowY = rowY - 18 -- Increment Y offset for next row
     end
     
-    -- Rate Display
+    -- Rate Display - Positioned below stat rows
     local rateLabel = f:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     rateLabel:SetPoint("TOPLEFT", 10, rowY)
     rateLabel:SetText("Per Min:")
@@ -454,6 +482,7 @@ local function CreateUI()
     
     table.insert(textWidgets, { key = "rates", healing = healingRate, mana = manaRate })
     
+    -- Tooltip for rate display (existing code)
     local rateTooltipFrame = CreateFrame("Frame", nil, f)
     rateTooltipFrame:SetSize(50, 20)
     rateTooltipFrame:SetPoint("TOPLEFT", rateLabel, "TOPLEFT", -2, 2)
@@ -487,34 +516,49 @@ function LWSDropDownMenu_Initialize(frame, level)
         info.func = function() statsFrame:SetShown(not statsFrame:IsShown()) end
         UIDropDownMenu_AddButton(info, level)
         
-        -- Lock/unlock window option
-        info.text = "Lock/Unlock Window"
+        -- Lock/unlock window option (now redundant with hover button, but keep for accessibility?)
+        -- Or repurpose/remove. Let's keep it for now.
+        info.text = LWS_DB.locked and "Unlock Window" or "Lock Window" -- Dynamic text
         info.func = function()
-            LWS_DB.locked = not LWS_DB.locked
-            statsFrame:EnableMouse(not LWS_DB.locked)
-            print("Light & Wisdom Stats Frame " .. (LWS_DB.locked and "|cFFFF0000Locked|r" or "|cFF00FF00Unlocked|r"))
+            -- Call the hover button's OnClick logic to keep things consistent
+            if statsFrame and statsFrame.hoverLockBtn then
+                statsFrame.hoverLockBtn:Click() 
+            end
+            -- Fallback if button doesn't exist for some reason
+            -- LWS_DB.locked = not LWS_DB.locked
+            -- if statsFrame then statsFrame.headerTexture:SetShown(not LWS_DB.locked) end
+            -- print("Light & Wisdom Stats Frame " .. (LWS_DB.locked and "|cFFFF0000Locked|r" or "|cFF00FF00Unlocked|r"))
         end
         UIDropDownMenu_AddButton(info, level)
         
-        -- Reset Stats submenu option
+        -- Reset Stats submenu option (Moved from 'R' button)
         info.text = "Reset Stats"
         info.hasArrow = true       -- Indicates this item has a submenu
         info.notCheckable = true
-        info.value = "RESET_MENU"  -- Important! This value identifies the submenu
+        info.value = "RESET_MENU"  -- Value to identify this submenu
         info.func = nil            -- No function for menu items with submenus
         UIDropDownMenu_AddButton(info, level)
+
+        -- Add Scale option here? Or keep as slash command only. Keep as slash for now.
         
     elseif level == 2 then
         -- Submenu items (level 2)
         -- Check which submenu we're showing based on the parent menu value
         if UIDROPDOWNMENU_MENU_VALUE == "RESET_MENU" then
+            info.text = "Reset Which Stats?" -- Submenu Title
+            info.isTitle = true
             info.notCheckable = true
-            info.hasArrow = false
+            UIDropDownMenu_AddButton(info, level)
+
+            info.isTitle = false
+            info.notCheckable = true
+            info.hasArrow = false -- These are action items
             
             -- Reset Combat Stats option
             info.text = "Reset Combat Stats"
             info.func = function()
                 LWS_DB.combat = { healing = 0, mana = 0, startTime = GetTime(), inCombat = LWS_DB.combat.inCombat }
+                LWS_DB.rates = { healing = 0, mana = 0 } -- Also reset rates tied to combat
                 UpdateDisplay()
                 print("|cFF00FF96Light & Wisdom Stats:|r Combat stats reset")
             end
@@ -538,6 +582,7 @@ function LWSDropDownMenu_Initialize(frame, level)
             end
             UIDropDownMenu_AddButton(info, level)
         end
+        -- Add other submenus here if needed using elseif UIDROPDOWNMENU_MENU_VALUE == "OTHER_MENU"
     end
 end
 
@@ -726,34 +771,3 @@ SlashCmdList["LWS"] = function(msg)
         print("/lw minimap - Toggle minimap button")
     end
 end
-
-------------------------------
--- 10. Reset Confirmation   --
-------------------------------
-StaticPopupDialogs["LWS_RESET_CONFIRM"] = {
-    text = "Which statistics do you want to reset?",
-    button1 = "Combat",
-    button2 = "Session", 
-    button3 = "All-Time",
-    button4 = "Cancel",
-    OnButton1 = function()
-        LWS_DB.combat = { healing = 0, mana = 0, startTime = GetTime(), inCombat = LWS_DB.combat.inCombat }
-        UpdateDisplay()
-        print("|cFF00FF96Light & Wisdom Stats:|r Combat stats reset")
-    end,
-    OnButton2 = function()
-        LWS_DB.session = { healing = 0, mana = 0, startTime = GetTime() }
-        UpdateDisplay()
-        print("|cFF00FF96Light & Wisdom Stats:|r Session stats reset")
-    end,
-    OnButton3 = function()
-        LWS_DB.allTime = { healing = 0, mana = 0 }
-        UpdateDisplay()
-        print("|cFF00FF96Light & Wisdom Stats:|r All-Time stats reset")
-    end,
-    timeout = 0,
-    whileDead = true,
-    hideOnEscape = true,
-    preferredIndex = 3,  
-    showAlert = true,    -- Makes the dialog more noticeable
-}

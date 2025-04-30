@@ -1033,10 +1033,24 @@ end
 function Ranker:VersionCheck(versionReceived, rankerVersion)
   if rankerVersion == versionReceived then return false end
   local yearRec, monthRec, dayRec, iterationRec = strsplit(".", versionReceived)
+  if not (yearRec and monthRec and dayRec and iterationRec) then return false end 
+  yearRec = tonumber(yearRec)
+  monthRec = tonumber(monthRec)
+  dayRec = tonumber(dayRec)
+  iterationRec = tonumber(iterationRec)
+  if not (yearRec and monthRec and dayRec and iterationRec) then return false end
   local dateRec = time({ ["day"] = dayRec, ["month"] = monthRec, ["year"] = yearRec })
+  if not dateRec then return false end
   iterationRec = iterationRec * 1
   local year, month, day, iteration = strsplit(".", rankerVersion)
+  if not (year and month and day and iteration) then return false end
+  year = tonumber(year)
+  month = tonumber(month)
+  day = tonumber(day)
+  iteration = tonumber(iteration)
+  if not (year and month and day and iteration) then return false end
   local date = time({ ["day"] = day, ["month"] = month, ["year"] = year })
+  if not date then return false end
   iteration = iteration * 1
   if dateRec == nil then return false end
   if dateRec > date then return true end

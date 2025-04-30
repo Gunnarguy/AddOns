@@ -250,10 +250,16 @@ if not C_QuestLog_IsComplete then
 end
 
 -- Quest Links
+local GetQuestLinkForObject
+do
 local GetQuestLink = GetQuestLink;
-local function GetQuestLinkForObject(t)
+local CustomQuestLinkFormat = "|cffffff00|Hquest:%d:%d|h[%s]|h|r [quest:%d]"
+GetQuestLinkForObject = function(t)
 	local questID = t.questID;
-	if questID then return GetQuestLink(questID) or ("[" .. t.name .. " (".. questID .. ")]"); end
+	if questID then return GetQuestLink(questID)
+		-- technically the second number value is some other value to make the link actually usable
+		or CustomQuestLinkFormat:format(questID,app.Level,t.name,questID) end
+end
 end
 
 -- Quest Completion Lib
@@ -399,16 +405,16 @@ local CompletedQuests = setmetatable({}, {
 	-- Retail __newindex
 	or function(t, questID, state)
 		if not questID then return end
-		RetailDirtyQuests[#RetailDirtyQuests + 1] = questID
 		if state then
-			if not RetailRawQuests[questID] then
-				RetailRawQuests[questID] = state;
-				PrintQuestInfoViaCallback(questID);
-			end
+			if RetailRawQuests[questID] then return end
+
+			RetailRawQuests[questID] = state
+			PrintQuestInfoViaCallback(questID)
 		else
-			RetailRawQuests[questID] = nil;
-			PrintQuestInfoViaCallback(questID, false);
+			RetailRawQuests[questID] = nil
+			PrintQuestInfoViaCallback(questID, false)
 		end
+		RetailDirtyQuests[#RetailDirtyQuests + 1] = questID
 		-- Way too much overhead to assume this should be done every time a key is changed
 		if not BatchRefresh then
 			app.SetCached("Quests", questID, state)
@@ -923,61 +929,62 @@ if app.IsRetail then
 		if not freshCompletes or #freshCompletes == 0 then
 			return;
 		end
-		-- app.PrintDebug("QCQ",#freshCompletes,#CompleteQuestSequence)
-		local oldReportSetting = app.Settings:GetTooltipSetting("Report:CompletedQuests");
+		-- app.PrintDebug("QCQ",#freshCompletes,#CompleteQuestSequence,app.IsReady and "IS READY" or "NOT READY")
+		local oldReportSetting = DoQuestPrints
 		-- check if Blizzard is being dumb / should we print a summary instead of individual lines
 		local questDiff = #freshCompletes - #CompleteQuestSequence;
 		local manyQuests = #CompleteQuestSequence == 0
-		if app.IsReady and oldReportSetting and #CompleteQuestSequence > 0 then
+		if oldReportSetting and not manyQuests then
 			if questDiff > 50 then
 				manyQuests = true;
 				app.print(questDiff,"Quests Completed");
 			elseif questDiff < -50 then
 				manyQuests = true;
-				app.print(questDiff,"Quests Unflagged");
+				app.print(-1 * questDiff,"Quests Unflagged");
 			end
 		end
 		-- don't report quest completions if there's too many or we have yet to get initial quest completion
 		if manyQuests then
-			app.Settings:SetTooltipSetting("Report:CompletedQuests", false);
+			DoQuestPrints = nil
 		end
 
 		-- Dual Step tracking method
 		-- app.PrintDebug("DualStep")
-		local Ci, Ni = 1, 1;
-		local c, n = CompleteQuestSequence[Ci] or MAX, freshCompletes[Ni] or MAX;
+		local Ci, Ni = 1, 1
+		local c, n = CompleteQuestSequence[Ci] or MAX, freshCompletes[Ni] or MAX
 		while c ~= MAX or n ~= MAX do
 			-- same questID, complete and new, no change
 			if c == n then
-				Ci = Ci + 1;
-				Ni = Ni + 1;
-				c, n = CompleteQuestSequence[Ci] or MAX, freshCompletes[Ni] or MAX;
+				Ci = Ci + 1
+				Ni = Ni + 1
+				c, n = CompleteQuestSequence[Ci] or MAX, freshCompletes[Ni] or MAX
 			else
 				if c < n then
 					-- unflagged quest
-					CompletedQuests[c] = nil;
+					CompletedQuests[c] = nil
 					UnflaggedQuests[c] = true
-					Ci = Ci + 1;
-					c = CompleteQuestSequence[Ci] or MAX;
+					Ci = Ci + 1
+					c = CompleteQuestSequence[Ci] or MAX
 				else
 					-- new completed quest
-					CompletedQuests[n] = true;
-					Ni = Ni + 1;
-					n = freshCompletes[Ni] or MAX;
+					CompletedQuests[n] = true
+					Ni = Ni + 1
+					n = freshCompletes[Ni] or MAX
 				end
 			end
 		end
-		CompleteQuestSequence = freshCompletes;
+		CompleteQuestSequence = freshCompletes
 		-- app.PrintDebugPrior("---")
-
-		if manyQuests then
-			app.Settings:SetTooltipSetting("Report:CompletedQuests", oldReportSetting);
-		end
+		-- app.__CQS = CompleteQuestSequence
 
 		if #RetailDirtyQuests > 0 then
 			app.SetBatchCached("Quests", RetailRawQuests, 1)
 			app.SetBatchCached("Quests", UnflaggedQuests)
 			wipe(UnflaggedQuests)
+		end
+
+		if manyQuests then
+			DoQuestPrints = oldReportSetting
 		end
 
 		BatchRefresh = nil
@@ -1337,6 +1344,15 @@ local criteriaFuncs = {
 		local group = app.SearchForObject("sourceID", sourceID, "field") or app.CreateItemSource(sourceID)
         return group.link or group.text or RETRIEVING_DATA;
     end,
+
+    toyID = function(toyID)
+		return app.IsAccountCached("Toys", toyID)
+	end,
+	label_toyID = L.LOCK_CRITERIA_TOY_LABEL or "Known Toy",
+    text_toyID = function(toyID)
+		local group = app.SearchForObject("toyID", toyID, "field") or app.CreateToy(toyID)
+        return group.link or group.text or RETRIEVING_DATA;
+    end,
 };
 app.AddEventHandler("OnLoad", function()
 	criteriaFuncs.text_spellID = app.GetSpellName
@@ -1344,6 +1360,8 @@ end)
 local AWQuestLockers = setmetatable({
 	-- sourceID is account-wide, so any lock via that will lock account-wide
 	sourceID = app.ReturnTrue,
+	-- toyID is account-wide, so any lock via that will lock account-wide
+	toyID = app.ReturnTrue,
 	-- achID is possibly account-wide, so lock could also mean quest is locked account-wide
 	achID = function(id)
 		local ach = Search("achievementID", id, "field")

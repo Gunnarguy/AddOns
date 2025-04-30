@@ -1,115 +1,105 @@
 # AllTheThings
 
-## [4.3.11](https://github.com/ATTWoWAddon/AllTheThings/tree/4.3.11) (2025-03-28)
-[Full Changelog](https://github.com/ATTWoWAddon/AllTheThings/compare/4.3.10...4.3.11) [Previous Releases](https://github.com/ATTWoWAddon/AllTheThings/releases)
+## [4.4.2](https://github.com/ATTWoWAddon/AllTheThings/tree/4.4.2) (2025-04-27)
+[Full Changelog](https://github.com/ATTWoWAddon/AllTheThings/compare/4.4.1...4.4.2) [Previous Releases](https://github.com/ATTWoWAddon/AllTheThings/releases)
 
-- [Config] Update for SoD P8.  
-- [DB] SoD: Add raid: Scarlet Enclave.  
-    Scarlet Enclave is a new raid introduced in SoD P8.  
-- [Logic] Retail: Slight improvement to collected check for Criteria based on completed Achievement  
-- [Logic] Adjusted app.LocalizeGlobal to fit its purpose and usage more accurately  
-    [Logic] Fixed a few calls to app.LocalizeGlobal which would fail to assign an initial value  
-- [Logic] Removed static filterID's for defined Classes [This doesn't change any filtering since these filterID's can't be toggled by the User so they're always un-filtered, and having a filterID returned just slows down regular filter checks with a 100% true outcome]  
-- [Parser] Fixed PresetsDB to use direct keys instead of ambiguous arrays (also don't need to define 'false' when defining keys directly)  
-- [Parser] Retail: Consolidated the PresetsDB setup  
-- [DB] Added 'sourceAchievements' to Argent Tournament data  
-    [DB] Retail: Removed extraneous custom logic from Argent Tournament for Retail now that 'sourceAchievements' are handled inherently  
-- [Logic] Retail: Required Achievements (sourceAchievements) are now shown in popouts if applicable  
-- [Logic] Cleaned up and localized some Event handling logic for those itty-bitty performance improvements  
-- [Logic] Retail: Migrated 'sourceAchievements' to information type within Achievements module  
-- [Parser] Another tiny whitespace reduction in DB function exports (not compiled)  
-    [Parser] TODO for 'WithRequiredAchievement' OnTooltip function remediation  
-- [Parser] Cleaned up a few trailing-comma situations from ReferenceDB exports  
-- [Parser] Compressed ReferenceDBs are now slightly more compressed  
-    [Parser] Messages about missing data in sharedData or bubbleDown are now considered errors  
-- [DB] Fixed a preprocessor which caused 'crs' to disappear for 4.0.3. to 10.1.7 parses  
-- [DB] Sourced 'Faithless Wingrider's Focus'  
-- [DB] Some coords and ignored object  
-- [Contrib] Object coord checks can be relative now (sometimes we list object with no coords inside object with accurate coords if the situation calls for it)  
-- [Locale] Fix misc.  
-- Nazjatar and parsed  
-- [Logic] Refactored a few places to utilize .keyval directly  
-- [Logic] Retail: Fill now utilizes ForceFillDB to ignore skipping previously-filled matched groups  
-- [Parser] Added a 'ForceFillDB' which is a set of Things which are allowed to be filled even when encountered multiple times within the same Fill context. [Initially used for Naxx tokens since they show under their Source boss & Gluth, so typically only one boss would then fill the respective Token within the minilist]  
-- [Logic] Added base Class field 'keyval' since it seems pretty common we need to use the key value of a group (not replaced usages yet)  
-- [DB] Fixed Warosh's name  
-- [Logic] Minor improvements to Build Search Response performance  
-    [Logic] Fixed display in /att filters when searching for 'nil' in a field  
-- [Contrib] The Runecarver's Oubliette is a tiny map  
-- [DB] Cleaned up handling for 'Chronicle of Lost Memories' so the symlink is only listed in one place (maybe idea for future to compress symlinks which are shared)  
-- [Logic] Retail: min/max reputation now only show in tooltips when accurate for all Sources of a Thing  
-- [DB] Couple more Korthia updates & a use for Soul Cinders?!  
-- [Logic] Retail: Revised how certain learnable Things are skipped during Fill to cover more situations where this behavior is desirable  
-- [DB] Refactored 'Primal Invocation Extract' and related Glimmer structure to actually represent how it works in game  
-- [Parser] Fixed an issue with the name() shortcut when using implicit groups within it  
-- [Parser] Added an 'itemDropHQT' shortcut for making an HQT group based on the HQT triggered when an Item drops  
-- Fix some reported errors  
-- Sort many HQTs  
-- [Logic] Retail: Fixed another potential data alignment issue for recipeID's over 1M  
-    [Logic] Retail: No longer fills 'purchases' under collected Toys when they are not the Root of the Fill operation (i.e. no longer see that you need some Currency to buy a Toy you already have because the Toy is needed for something else you don't have yet)  
-- [Logic] Retail: Tracked down a niche issue where Items crafted via RecipeIDs over 1M would show the wrong Contains content only in Tooltips  
-- Adjust Honor Achievement timelines  
-- [Parser] Fixed an issue where the NonRepeatField logic was ignoring the parent's field value when removing the single consistent value across all child groups (e.g. this resolves many 'awp' situations where it resolved to the parent's value in game when the child groups had a different value when parsed)  
-- Regenerating missing files  
-- Classic: Fixed an issue with the Account Management window.  
-- Sort Recipes  
-- Harvest: 11.1.5.60179  
-- Harvest: 11.1.5.60067  
-- Harvest: 11.1.5.60008  
-- Harvest: 11.1.5.59919  
-- Harvest: 11.1.0.60228  
-- Harvest: 11.1.0.60189  
-- Harvest: 11.1.0.60037  
-- Harvest: 11.1.0.59888  
-- Harvest: 4.4.2.60192  
-- Harvest: 4.4.2.60142  
-- Harvest: 4.4.2.59962  
-- Harvest: 3.4.4.60190  
-- Harvest: 3.4.4.60063  
-- Harvest: 3.4.4.60003  
-- Harvest: 3.4.4.59887  
-- Harvest: 3.4.4.59853  
-- Harvest: 3.4.4.59817  
-- Harvest: 1.15.7.60191  
-- Harvest: 1.15.7.60141  
-- Harvest: 1.15.7.60013  
-- Harvest: 1.15.7.60000  
-- Harvest: 1.15.7.59856  
-- [Parser] Fixed Living Branch itemID to mark uncollectible  
-- Updated Object Harvester to look for mx and tw languages on WoWHead.  
-- [Timeline] Add build number for 1.15.7.  
-- Add new LoU renown quest, reduce sourcing of market research/CHETT cards, fix some reported errors  
-- [DB] Moved Stygian Lockbox to actual Location where it's pickpocketed  
-- [Logic] Some indentation reduction in quest handling  
-- [Logic] Retail: Fixed text about item failing to load from persisting when the Item does actually load  
-- Grrrr - Parse after new objects plus contrib stuffs  
-- [DB] Getting some unsorted Cata necks and fingers sorted  
-- Fix some reported errors  
-- [Logic] Bumped CanRetry to 3 sec (from 2 sec) & added a testing method to allow adjusting the value for any needed user testing  
-    [Logic] Retail: Items no longer default their link to the default item name when failing to return item info after the CanRetry duration. Also, we no longer block CanRetry on Items once they fail to populate valid Server data (this way they should re-try themselves later if viewed again in a list)  
-- Update 11.1.5 Timelines  
-- Oh yeah there are tournament banners available, go sign up before it's too late  
-- [DB] q:65622 is also an HQT not linked to Criteria  
-- [DB] q:65005 seems to truly be an HQT, not linked to Criteria  
-- Fix some reported errors  
-- [Cata/Retail] Properly mark Jezebel Bican's location as HFP, instead of Dalaran (#1955)  
-    Properly mark Jezebel Bican's location as HFP, instead of Dalaran  
-- [Parser] Retail: Adjusted hierarchical handling for awp/rwp fields (recommend updating Classic configs in the same manner)  
-- Added COMMON\_QUALITY\_TRANSMOGS to the parser config files.  
-- Classic: Fixed a bug with the dynamic recipe lists where they seemingly ignored important filtering requirements.  
-- [Parser] AchievementDB for TWW no longer provides unique data (over WagoDB files) for parse and will now be ignored  
-    [Parser] NonRepeatField hierarchical logic no longer removes parent field values which differ from child field values  
-    [DB] Updated WagoDB files (no apparent changes)  
-- [DB] Adjusted 'Kirtonos the Herald' timeline bubbledown for accuracy  
-- [DB] 'Camp Winterhoof' and 'Help for Camp Winterhoof' are mutually exclusive outside of Party Sync  
-- Fixed a couple of BOP crafted blacksmithing items not having a requirement for blacksmithing on them.  
-- Fixed a couple of BOP crafted leatherworking items not having a requirement for leatherworking on them.  
-- [DB] Fixed contract Account wide quests & 'Undermined Delves' is not AW  
-- Kalimdor/Feralas: Refactor code to eliminate duplicate keys  
-    - Added/Updated some descriptions and coordinates  
-- [Misc.] Sort locale order.  
-- [TOC] Add esMX localization.  
-- [Locale] Separate esMX from es to mx.  
-- Update es.lua (#1954)  
-- Classic: Updated a number of windows to preload their data container.  
-- Renamed the "Sync" window to "Account Management".  
+- [Locale] Update zhTW.  
+- more aq stuff  
+- Deleted the unused EnsembleDB file.  
+- Parser: Attempting to include AllowableRace from the ItemSearchName table.  
+    Deleted a number of classic only itemDB sources that are no longer needed.  
+- more TempleofAQ Sod Stuff  
+- "A Taste of Home" is not Evoker-only  
+- Parser: Now assigning Relic types.  
+- gilded scarab can be put into the sod version  
+- added aq20-40raid to SoD based on wowhead infos  
+- Parser: Now only allowing the classes that are in ALL\_CLASSES to be included in the classes table within ItemSourceNames.  
+- Merge branch 'master' of https://github.com/ATTWoWAddon/AllTheThings  
+- Revert "testing aq stuff"  
+- [Locale] Update esES. (#1969)  
+    * [Locale] Added spanish translations in various headers  
+    * Solved Error on spanish locale #1972  
+- testing aq stuff  
+- Parser: Added AllowableClass from the ItemSearchNames wago data table. Facing is a float.  
+- Retail: Apparently also uses the Phases settings file?  
+- MISTS: Added Skill Level Requirements for Mists of Pandaria recipes.  
+- Parser: Added ItemSearchName from Wago. (eventually I'd like to kill our old itemDB implementations)  
+- Parser: Now trimming the english flight path names.  
+- Parser: Item now passes along its lvl data to ItemDB from Wago.  
+- Parser: Fixed an issue with TaxiNode parsing.  
+- Parser: Now utilizing Wago database files for TaxiNodes. (Default Flight Path Names)  
+- Simplifed the Update Wago Build files batch files and also added missing ItemEffect files.  
+- [DB] Gave HQT 86695 a name (90134 and 90752 are still sus...)  
+- [DB] Removed the unused AchievementDB modules. (We use Wago's database files now)  
+- Parser: Updated the GlyphDB to use Wago files instead of a processed lua DB module that requires additional work.  
+- MISTS: Fixed which encounter logic to use.  
+- MISTS: Fixed which tooltip renderer to use.  
+- Classic: Fixed a logic bug involving SearchForField not always returning a container as it had previously done so.  
+- MISTS: Removed some achievement references from the Loremaster achievement based on expansion.  
+- MISTS: Removed invalid achievement criteria from outdoor zones.  
+- Parser: Removed sourceID assignments from Rings and Necklaces.  
+- Phases should NOT be the default settings page.  
+- MISTS: Added Mists of Pandaria database for testing on the MOP Classic Beta.  
+    [DB] Rebuilt all databases.  
+- Cata: Swoopy is a Flying type.  
+- Classic: Added placeholder timeline data for Brawler's Guild.  
+- Classic: Now including Wago files for Item, ModifierTree, SpellEffect, TransmogSet (if applicable)  
+- Added a missing timeline value to some Children's Week pets. (Someone needs to fix this section)  
+- Classic: Now using ItemModifiedAppearance from Wago Tools instead of using harvested sourceIDs.  
+- [DB] More account wide quests I noticed  
+- Removed duplicated regex and cleanup batch files.  
+- took me 10minutes to find this error lol  
+- added all alch sod p6 recipes  
+    sourced all the common goods that all the recipes I added require  
+- Deleted the unused ItemAppearance wago data. (This is just for visual appearance, not for anything useful.)  
+- finished mining, 4 tailoring items  
+- Moved all WAGO files out of Parser/DATAS/00 - DB/Wago to the new .wago folder. Included Wago data for all expansions that already have Wago data modules available. Retail config now points to The War Within's Wago folder.  
+- final missing )  
+- parsing, missing something somewhere  
+- added all p6 sod engineering recipes  
+- added all enchanting recipes from build xx 15.5.57537  
+- MISTS: Updated Phase assignments for Dungeons and Outdoor Zones.  
+    Classic: Moved phase activatations to their own expansion specific pages.  
+- added all p6 enchanting aq items  
+- added 7 tailoring items  
+- more sod tailoring patterns  
+- razorbramble items added  
+    i have to do small commits or they conflict with crieve  
+- parsing  
+    correct some 1.15.6 to 1.15.5  
+    added LW armor kits sod  
+- MISTS: Changed all references to MOP\_PHASE\_ONE to MOP\_PHASE\_LANDFALL.  
+- added phase 6 sod recipes that drop in aq  
+    alch&bs recipes can now be tracked and have their crafted items sourced  
+- Moved a number of mapID constants into variables.  
+- MISTS: Updated mapIDs.  
+- Fixed a logic error for instances that exist but don't have a dungeon journal entry yet. (MOP Classic)  
+- Fixed some logic errors for MOP Classic. (MOP uses Retail functions)  
+- Update some Nightfall rares and quests  
+- Re-add Cartels of Undermine faction, fix some reported errors  
+- updated mdi toy  
+    toy is no longer available  
+    MDI is also now always the great push format. updated the description to reflect that  
+- removed another layer, so its only 7 layers deep and not 9  
+    added achievementsheader  
+- removed 1 layering of gobo rep  
+- parse  
+- nvm defender had both quests, stipend is reso crystals  
+- renown 10 quests  
+- missed some weapons in sym(idk how)  
+- [Parser] Retail: Adjusted objective conversion logic to happen later, and only perform on item/object/npc which are not already Sourced  
+- Update \_\_auto-sources.lua  
+- Add Flame's Radiance renown 5 quest  
+- drop mark of honor from 1 quest  
+- better note  
+- found 2 pets for the childreen week update  
+- added new source ids  
+- [Logic] Retail: Most Dynamic groups expand a bit more reliably when generated (Professions and Currency still refuse to behave)  
+- cloak share isnt a thing  
+- added description for multi unlock of the arathi crusader set. But does any1 see them? probably not  
+- arathi weapons cant be bought  
+    boss gives 42%  
+- Trial of Style Icon update  
+- [Logic] Retail: Root Dynamic category now marked as source ignored  
+- [Logic] Dynamic runner now does 1 dynamic group per frame instead of 5  
+- [Logic] Retail: Lots of small performance improvements for Search logic & fixed one huge oversight causing every search to perform a full scan instead of a cached-search  

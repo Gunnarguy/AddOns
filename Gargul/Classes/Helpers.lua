@@ -420,16 +420,12 @@ local lastClickTime;
 --- the native HandleModifiedItemClick method instead so that you also have support for linking items to chat for example
 ---@param itemLink string
 ---@param mouseButtonPressed string|nil
----@param callback function|nil Some actions (like award) support a callback
+---@param callback? Some actions (like award) support a callback
 function GL:handleItemClick(itemLink, mouseButtonPressed, callback)
-    GL:debug("GL:handleItemClick");
-
-    if (not itemLink
-        or type(itemLink) ~= "string"
+    if (not GL:isValidItemLink(itemLink)
         or (mouseButtonPressed
             and mouseButtonPressed ~= "LeftButton"
         )
-        or not GL:getItemIDFromLink(itemLink)
     ) then
         return;
     end
@@ -869,7 +865,7 @@ function GL:popupMessage(text)
     end
 
     Window.DiscordURL:SetText(GL.Data.Constants.discordURL);
-    text = string.format("%s\n|c00FFF569%s|r", text, L.TUTORIAL_MORE_HELP);
+    text = string.format("%s\n|c00FFF569%s|r", text, L["Need more help?"]);
     Window.Text:SetText(text);
 
     -- Fit the window to its contents
@@ -1147,7 +1143,7 @@ function GL:frameMessage(message)
     -- Create a container/parent frame
     local MessageFrame = AceGUI:Create("Frame");
     MessageFrame:SetCallback("OnClose", function(widget) GL.Interface:release(widget); end);
-    MessageFrame:SetTitle((L.WINDOW_HEADER):format(GL.version));
+    MessageFrame:SetTitle((L["Gargul v%s"]):format(GL.version));
     MessageFrame:SetStatusText("");
     MessageFrame:SetLayout("Flow");
     MessageFrame:SetWidth(600);
@@ -1332,8 +1328,14 @@ end
 ---
 --- @param itemLink string The string to validate as an item link.
 --- @return boolean isValid
+--- 
+--- @test classic
+--- /dump _G.Gargul:isValidItemLink('|cffa335ee|Hitem:19019:::::::::::::|h[Thunderfury, Blessed Blade of the Windseeker]|h|r')
+--- 
+--- @test retail
+--- /dump _G.Gargul:isValidItemLink('|cnIQ5:|Hitem:19019:::::::::::::|h[Thunderfury, Blessed Blade of the Windseeker]|h|r')
 function GL:isValidItemLink(itemLink)
-    return type(itemLink) == "string" and itemLink:match("^|c[%x]+|Hitem:%d+:.-|h%[.-%]|h|r$") ~= nil
+    return type(itemLink) == "string" and GL:getItemInfoInstant(itemLink) ~= nil;
 end
 
 --- The onItemLoadDo helper accepts one or more item ids or item links
@@ -1685,47 +1687,47 @@ function GL:itemModifiers(itemLinkOrID)
     GL.TooltipFrame:ClearLines();
 
     local ItemModPatterns = {
-        agility = ITEM_MOD_AGILITY,
-        armor_penetration_rating = ITEM_MOD_ARMOR_PENETRATION_RATING,
-        attack_power = ITEM_MOD_ATTACK_POWER,
-        block_rating = ITEM_MOD_BLOCK_RATING,
-        crit_melee_rating = ITEM_MOD_CRIT_MELEE_RATING,
-        crit_ranged_rating = ITEM_MOD_CRIT_RANGED_RATING,
-        crit_rating = ITEM_MOD_CRIT_RATING,
-        crit_spell_rating = ITEM_MOD_CRIT_SPELL_RATING,
-        crit_taken_melee_rating = ITEM_MOD_CRIT_TAKEN_MELEE_RATING,
-        crit_taken_ranged_rating = ITEM_MOD_CRIT_TAKEN_RANGED_RATING,
-        crit_taken_rating = ITEM_MOD_CRIT_TAKEN_RATING,
-        crit_taken_spell_rating = ITEM_MOD_CRIT_TAKEN_SPELL_RATING,
-        defense_skill_rating = ITEM_MOD_DEFENSE_SKILL_RATING,
-        dodge_rating = ITEM_MOD_DODGE_RATING,
-        expertise_rating = ITEM_MOD_EXPERTISE_RATING,
-        feral_attack_power = ITEM_MOD_FERAL_ATTACK_POWER,
-        haste_melee_rating = ITEM_MOD_HASTE_MELEE_RATING,
-        haste_ranged_rating = ITEM_MOD_HASTE_RANGED_RATING,
-        haste_rating = ITEM_MOD_HASTE_RATING,
-        haste_spell_rating = ITEM_MOD_HASTE_SPELL_RATING,
-        health = ITEM_MOD_HEALTH,
-        hit_melee_rating = ITEM_MOD_HIT_MELEE_RATING,
-        hit_ranged_rating = ITEM_MOD_HIT_RANGED_RATING,
-        hit_rating = ITEM_MOD_HIT_RATING,
-        hit_spell_rating = ITEM_MOD_HIT_SPELL_RATING,
-        hit_taken_melee_rating = ITEM_MOD_HIT_TAKEN_MELEE_RATING,
-        hit_taken_ranged_rating = ITEM_MOD_HIT_TAKEN_RANGED_RATING,
-        hit_taken_rating = ITEM_MOD_HIT_TAKEN_RATING,
-        hit_taken_spell_rating = ITEM_MOD_HIT_TAKEN_SPELL_RATING,
-        intellect = ITEM_MOD_INTELLECT,
-        mana = ITEM_MOD_MANA,
-        mana_regeneration = ITEM_MOD_MANA_REGENERATION,
-        parry_rating = ITEM_MOD_PARRY_RATING,
-        ranged_attack_power = ITEM_MOD_RANGED_ATTACK_POWER,
-        resilience_rating = ITEM_MOD_RESILIENCE_RATING,
-        spell_damage_done = ITEM_MOD_SPELL_DAMAGE_DONE,
-        spell_healing_done = ITEM_MOD_SPELL_HEALING_DONE,
-        spell_power = ITEM_MOD_SPELL_POWER,
-        spirit = ITEM_MOD_SPIRIT,
-        stamina = ITEM_MOD_STAMINA,
-        strength = ITEM_MOD_STRENGTH,
+        agility = _G.ITEM_MOD_AGILITY,
+        armor_penetration_rating = _G.ITEM_MOD_ARMOR_PENETRATION_RATING,
+        attack_power = _G.ITEM_MOD_ATTACK_POWER,
+        block_rating = _G.ITEM_MOD_BLOCK_RATING,
+        crit_melee_rating = _G.ITEM_MOD_CRIT_MELEE_RATING,
+        crit_ranged_rating = _G.ITEM_MOD_CRIT_RANGED_RATING,
+        crit_rating = _G.ITEM_MOD_CRIT_RATING,
+        crit_spell_rating = _G.ITEM_MOD_CRIT_SPELL_RATING,
+        crit_taken_melee_rating = _G.ITEM_MOD_CRIT_TAKEN_MELEE_RATING,
+        crit_taken_ranged_rating = _G.ITEM_MOD_CRIT_TAKEN_RANGED_RATING,
+        crit_taken_rating = _G.ITEM_MOD_CRIT_TAKEN_RATING,
+        crit_taken_spell_rating = _G.ITEM_MOD_CRIT_TAKEN_SPELL_RATING,
+        defense_skill_rating = _G.ITEM_MOD_DEFENSE_SKILL_RATING,
+        dodge_rating = _G.ITEM_MOD_DODGE_RATING,
+        expertise_rating = _G.ITEM_MOD_EXPERTISE_RATING,
+        feral_attack_power = _G.ITEM_MOD_FERAL_ATTACK_POWER,
+        haste_melee_rating = _G.ITEM_MOD_HASTE_MELEE_RATING,
+        haste_ranged_rating = _G.ITEM_MOD_HASTE_RANGED_RATING,
+        haste_rating = _G.ITEM_MOD_HASTE_RATING,
+        haste_spell_rating = _G.ITEM_MOD_HASTE_SPELL_RATING,
+        health = _G.ITEM_MOD_HEALTH,
+        hit_melee_rating = _G.ITEM_MOD_HIT_MELEE_RATING,
+        hit_ranged_rating = _G.ITEM_MOD_HIT_RANGED_RATING,
+        hit_rating = _G.ITEM_MOD_HIT_RATING,
+        hit_spell_rating = _G.ITEM_MOD_HIT_SPELL_RATING,
+        hit_taken_melee_rating = _G.ITEM_MOD_HIT_TAKEN_MELEE_RATING,
+        hit_taken_ranged_rating = _G.ITEM_MOD_HIT_TAKEN_RANGED_RATING,
+        hit_taken_rating = _G.ITEM_MOD_HIT_TAKEN_RATING,
+        hit_taken_spell_rating = _G.ITEM_MOD_HIT_TAKEN_SPELL_RATING,
+        intellect = _G.ITEM_MOD_INTELLECT,
+        mana = _G.ITEM_MOD_MANA,
+        mana_regeneration = _G.ITEM_MOD_MANA_REGENERATION,
+        parry_rating = _G.ITEM_MOD_PARRY_RATING,
+        ranged_attack_power = _G.ITEM_MOD_RANGED_ATTACK_POWER,
+        resilience_rating = _G.ITEM_MOD_RESILIENCE_RATING,
+        spell_damage_done = _G.ITEM_MOD_SPELL_DAMAGE_DONE,
+        spell_healing_done = _G.ITEM_MOD_SPELL_HEALING_DONE,
+        spell_power = _G.ITEM_MOD_SPELL_POWER,
+        spirit = _G.ITEM_MOD_SPIRIT,
+        stamina = _G.ITEM_MOD_STAMINA,
+        strength = _G.ITEM_MOD_STRENGTH,
     }
 
     local Patterns = {};
@@ -2294,7 +2296,7 @@ function GL:getItemIDFromLink(itemLink)
         return false;
     end
 
-    local _, itemID = strsplit(":", itemLink);
+    local itemID = string.match(itemLink, "Hitem:(%d+):");
     itemID = tonumber(itemID);
 
     if (not itemID) then
@@ -2515,9 +2517,9 @@ function GL:copperToMoney(copper, Separators, includeEmpty, separatorBeforeUnit)
     copper = self:floor(copper, 4);
 
     if (not separatorBeforeUnit) then
-        DefaultSeparators = { L.GOLD_INDICATOR .. " ", L.SILVER_INDICATOR .. " ", L.COPPER_INDICATOR .. " " };
+        DefaultSeparators = { L["g"] .. " ", L["s"] .. " ", L["c"] .. " " };
     else
-        DefaultSeparators = { " " .. L.GOLD_INDICATOR, " " .. L.SILVER_INDICATOR, " " .. L.COPPER_INDICATOR };
+        DefaultSeparators = { " " .. L["g"], " " .. L["s"], " " .. L["c"] };
     end
 
     Separators = Separators or {};

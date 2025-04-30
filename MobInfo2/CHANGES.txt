@@ -1,8 +1,9 @@
 ------------------------------------------------------------------------
-r377 | ileclerk | 2025-02-21 13:36:33 +0000 (Fri, 21 Feb 2025) | 1 line
+r379 | ileclerk | 2025-04-22 16:47:18 +0000 (Tue, 22 Apr 2025) | 1 line
 Changed paths:
-   M /trunk/MobInfo2-Cata.toc
+   M /trunk/MobInfo2-Vanilla.toc
+   M /trunk/MobInfo2.toc
 
-Bumped cata version to .2
+version updates
 ------------------------------------------------------------------------
 

@@ -231,6 +231,12 @@ L["CartelsMenu"] = "Cartels Undermine"
 L["CartelsTip"] = ""
 L["CartelsDescription"] = L["TipsAndInfo"] .. "Displays the renown rank of " .. Ns.CartelLink
 
+L["Radiance"] = "Flame"
+L["RadianceAbrev"] = "Fr"
+L["RadianceMenu"] = "Flame's Radiance"
+L["RadianceTip"] = ""
+L["RadianceDescription"] = L["TipsAndInfo"] .. "Displays the renown rank of " .. Ns.RadianceLink
+
 L["Dornogal"] = "Dorno"
 L["DornogalAbrev"] = "Dor"
 L["DornogalMenu"] = "Dornogal"

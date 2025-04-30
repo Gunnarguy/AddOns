@@ -1,19 +1,19 @@
-## Interface: 11505, 11506
-## Title: Gargul |c00967FD2v7.6.22|r
-## Title-deDE: Gargul |c00967FD2v7.6.22|r
-## Title-esES: Gargul |c00967FD2v7.6.22|r
-## Title-esMX: Gargul |c00967FD2v7.6.22|r
-## Title-frFR: Gargul |c00967FD2v7.6.22|r
-## Title-itIT: Gargul |c00967FD2v7.6.22|r
-## Title-koKR: Gargul |c00967FD2v7.6.22|r
-## Title-ptBR: Gargul |c00967FD2v7.6.22|r
-## Title-ruRU: Gargul |c00967FD2v7.6.22|r
-## Title-zhCN: Gargul |c00967FD2v7.6.22|r
-## Title-zhTW: Gargul |c00967FD2v7.6.22|r
+## Interface: 11507, 11508
+## Title: Gargul |c00967FD2v7.6.24|r
+## Title-deDE: Gargul |c00967FD2v7.6.24|r
+## Title-esES: Gargul |c00967FD2v7.6.24|r
+## Title-esMX: Gargul |c00967FD2v7.6.24|r
+## Title-frFR: Gargul |c00967FD2v7.6.24|r
+## Title-itIT: Gargul |c00967FD2v7.6.24|r
+## Title-koKR: Gargul |c00967FD2v7.6.24|r
+## Title-ptBR: Gargul |c00967FD2v7.6.24|r
+## Title-ruRU: Gargul |c00967FD2v7.6.24|r
+## Title-zhCN: Gargul |c00967FD2v7.6.24|r
+## Title-zhTW: Gargul |c00967FD2v7.6.24|r
 ## Notes: Loot addon that supports GDKP, softres sr, thatsmybis tmb, auto looting, +1 tracking and much more
 ## IconTexture: Interface\AddOns\Gargul\Assets\Buttons\minimap
 ## Author: Zhorax - Firemaw
-## Version: 7.6.22
+## Version: 7.6.24
 ## DefaultState: enabled
 ## SavedVariables: GargulDB
 ## X-Donate: https://www.patreon.com/gargul
@@ -28,7 +28,6 @@ libraries.xml
 bootstrap.lua
 
 # Localizations
-Data/Localizations/en.lua
 Data/Localizations/cn.lua
 Data/Localizations/de.lua
 Data/Localizations/es.lua

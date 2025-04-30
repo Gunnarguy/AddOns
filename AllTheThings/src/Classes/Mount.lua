@@ -85,6 +85,12 @@ do
 		return app.EmptyTable;
 	end
 
+	local PerCharacterMountSpells = {
+		[148970] = 1,	-- Felsteed (Green)
+		[148972] = 1,	-- Dreadsteed (Green)
+		[241857] = 1,	-- Druid Lunarwing
+		[231437] = 1,	-- Druid Lunarwing (Owl)
+	}
 	app.CreateMount = app.CreateClass(CLASSNAME, KEY, {
 		CACHE = function() return CACHE end,
 		_cache = function(t)
@@ -141,13 +147,10 @@ do
 			if t.itemID then return ("i:%d"):format(t.itemID); end
 			if t.parent and t.parent.itemID then return ("i:%d"):format(t.parent.itemID); end
 		end,
+		perCharacter = function(t)
+			return PerCharacterMountSpells[t.mountID]
+		end
 	})
-	local PerCharacterMountSpells = {
-		[148970] = 1,	-- Felsteed (Green)
-		[148972] = 1,	-- Dreadsteed (Green)
-		[241857] = 1,	-- Druid Lunarwing
-		[231437] = 1,	-- Druid Lunarwing (Owl)
-	}
 	app.AddEventHandler("OnRefreshCollections", function()
 		local acct, char, none = {}, {}, {}
 		local IsSpellKnown = app.IsSpellKnownHelper

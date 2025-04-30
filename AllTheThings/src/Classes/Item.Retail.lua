@@ -238,6 +238,21 @@ app.ImportRawLink = function(group, rawlink, ignoreSource)
 		end
 	end
 end
+-- Removes the color and hyperlink text/formatting from the link string
+local function CleanLink(link)
+	if not link then return link end
+	local cleaned = link:lower():gsub("|c[a-z0-9:]+|?h?",""):gsub("|h%[.+","")
+	-- :gsub("|cniq[0-9]:[|h]+","")
+	-- :gsub("|r","")
+	-- app.PrintDebug("CleanLink",link,cleaned)
+	-- wanted this to just work to grab the portion of the link which contains the useful data, but
+	-- it started being dumb, maybe review later
+	-- local cleaned = link:match("[a-z]+[iI]?[dD]?:[%-?%d:]+")
+	return cleaned
+end
+local api = {}
+app.Modules.Item = api
+api.CleanLink = CleanLink
 
 -- TODO: Once Item information is stored in a single source table, this mechanism can reference that instead of using a cache table here
 local CLASS = "Item"
@@ -299,10 +314,8 @@ local function default_link(t)
 			t.modID = nil;
 		end
 		-- app.PrintDebug("default_link",itemLink,modID,bonusID)
-		if bonusID and modID then
+		if bonusID then
 			itemLink = ("item:%d:::::::::::%d:1:%d:"):format(itemLink, modID, bonusID);
-		elseif bonusID then
-			itemLink = ("item:%d::::::::::::1:%d:"):format(itemLink, bonusID);
 		elseif modID then
 			-- bonusID 3524 seems to imply "use ModID to determine SourceID" since without it, everything with ModID resolves as the base SourceID from links
 			itemLink = ("item:%d:::::::::::%d:1:3524:"):format(itemLink, modID);
@@ -422,7 +435,7 @@ local itemFields = {
 	bonuses = function(t)
 		local link = t.link
 		if IsRetrieving(link) then return end
-		local itemVals = {(":"):split(link)}
+		local itemVals = {(":"):split(CleanLink(link))}
 
 		-- BonusID count
 		local bonusCount = tonumber(itemVals[14])
@@ -452,6 +465,9 @@ local itemFields = {
 		local merge = t.__merge
 		if not merge then return end
 		return merge.isUpgrade
+	end,
+	itemString = function(t)
+		return CleanLink(t.rawlink or t.link)
 	end,
 };
 -- Module imports

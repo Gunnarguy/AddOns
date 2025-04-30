@@ -471,6 +471,7 @@
 				["0.46:0.40:0.43:0.25:0.31:0.69:0.42:0.79"] = 778, -- Astranaar, Auberdine, Feathermoon, Cenarion Hold
 				["0.46:0.40:0.43:0.25:0.53:0.26:0.65:0.23"] = 439, -- Astranaar, Auberdine, Talonbranch Glade, Everlook
 				["0.46:0.40:0.61:0.40:0.61:0.55:0.64:0.67:0.40:0.51"] = 715, -- Astranaar, Talrendis Point, Ratchet, Theramore, Nijel's Point
+				["0.46:0.40:0.43:0.25:0.40:0.51:0.64:0.67:0.60:0.81:0.50:0.76"] = 1006, -- Astranaar, Auberdine, Nijel's Point, Theramore, Gadgetzan, Marshal's Refuge
 
 				-- Alliance: Auberdine (Darkshore)
 				["0.43:0.25:0.61:0.40:0.61:0.55:0.64:0.67:0.60:0.81"] = 689, -- Auberdine, Talrendis Point, Ratchet, Theramore, Gadgetzan

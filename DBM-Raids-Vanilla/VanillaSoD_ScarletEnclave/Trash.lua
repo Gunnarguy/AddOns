@@ -5,13 +5,15 @@ local L		= mod:GetLocalizedStrings()
 
 mod.statTypes = "normal,heroic,mythic"
 
-mod:SetRevision("20250416215958")
+mod:SetRevision("20250423221724")
 mod:SetZone(2856)
 mod.isTrashMod = true
+mod.isTrashModBossFightAllowed = true -- ENCOUNTER_END is somewhat unreliable in this raud, see all the terrible 10min+ logs for random fights on WCL that are just trash
 
 mod:RegisterEvents(
 	"SPELL_AURA_APPLIED 1232703",
 	"SPELL_CAST_START 1232703",
+	"SPELL_CAST_SUCCESS 1227435",
 	"SPELL_DAMAGE 1232703",
 	"SPELL_MISSED 1232703",
 	"DAMAGE_SHIELD 1232703",
@@ -20,6 +22,7 @@ mod:RegisterEvents(
 	"UNIT_ENTERING_VEHICLE player",
 	"UNIT_SPELLCAST_START_UNFILTERED"
 )
+
 
 local flightTimer = mod:NewIntermissionTimer(0, nil, "%s", true, "FlightTimer", nil, "136106")
 flightTimer.startLarge = true
@@ -30,10 +33,23 @@ local specWarnShield			= mod:NewSpecialWarningReflect(1232703, nil, nil, nil, 1,
 
 -- Whirlwind, important for melees
 local specWarnWhirlwind			= mod:NewSpecialWarningDodge(1232678, nil, nil, 2, 1, 8)
-local timerWhirlwindCast		= mod:NewCastNPTimer(2, 1232678)
+local timerWhirlwindCast		= mod:NewCastNPTimer(6, 1232678) -- 2 sec cast, 4 sec active, just stay away the whole time
+
+-- Balnazzar kill RP, this starts a ~2.5 seconds after ENCOUNTER_END fires so don't move this to the Balnazzar mod, otherwise it gets caught by delayed stop
+local timerBalnazzarRP = mod:NewIntermissionTimer(48.2, 1227435)
 
 -- Consecration
-mod:NewGtfo{antiSpam = 5, spell = 1233069, spellAura = 1233069, spellPeriodicDamage = 1233069}
+mod:NewGtfo{antiSpam = 5, spell = 1233069}
+-- Blizzard, uses old spell ID from Sapphiron
+mod:NewGtfo{antiSpam = 5, spell = 28547}
+
+
+function mod:SPELL_CAST_SUCCESS(args)
+	if args:IsSpell(1227435) then
+		timerBalnazzarRP:Start()
+	end
+end
+
 
 function mod:WarnReflect(name)
 	if self:AntiSpam(10, "Shield") then
@@ -89,6 +105,8 @@ function mod:UNIT_ENTERING_VEHICLE(uId)
 				flightTimer:Start(19.2, L.CentralTower)
 			elseif lastGossipSelected == 133775 then
 				flightTimer:Start(12.8, L.Prison) -- 11.17 flight time, but you drop from somewhat high in the air
+			elseif lastGossipSelected == 133547 then
+				flightTimer:Start(26.7, L.Cathedral)
 			end
 		end
 		lastGossipSelected = nil

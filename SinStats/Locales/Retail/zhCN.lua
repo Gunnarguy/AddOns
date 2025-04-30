@@ -233,6 +233,12 @@ L["CartelsMenu"] = "安德麦财阀"
 L["CartelsTip"] = ""
 L["CartelsDescription"] = L["TipsAndInfo"] .. "显示名望：" .. Ns.CartelLink
 
+L["Radiance"] = "圣焰之耀"
+L["RadianceAbrev"] = "圣焰之耀"
+L["RadianceMenu"] = "圣焰之耀"
+L["RadianceTip"] = ""
+L["RadianceDescription"] = L["TipsAndInfo"] .. "显示名望：" .. Ns.RadianceLink
+
 L["Dornogal"] = "多恩诺嘉尔议会"
 L["DornogalAbrev"] = "多恩诺嘉尔"
 L["DornogalMenu"] = "多恩诺嘉尔议会"

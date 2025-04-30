@@ -230,6 +230,12 @@ L["CartelsMenu"] = "언더마인 무역회사 연합"
 L["CartelsTip"] = ""
 L["CartelsDescription"] = L["TipsAndInfo"] .. "명성 순위를 표시합니다 " .. Ns.CartelLink
 
+L["Radiance"] = "불꽃의 광휘"
+L["RadianceAbrev"] = "불꽃"
+L["RadianceMenu"] = "불꽃의 광휘"
+L["RadianceTip"] = ""
+L["RadianceDescription"] = L["TipsAndInfo"] .. "명성 순위를 표시합니다 " .. Ns.RadianceLink
+
 L["Dornogal"] = "도르노갈"
 L["DornogalAbrev"] = "도르노갈"
 L["DornogalMenu"] = "도르노갈 의회"

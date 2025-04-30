@@ -73,12 +73,18 @@ local function DoReport(reporttype, id)
 		app.print(app:Linkify("Contributor Report: "..dialogID, app.Colors.ChatLinkError, "dialog:" .. dialogID));
 		app.Audio:PlayReportSound();
 	end
+
+	-- due to complications with multiple reports in one session of one object, we will only support
+	-- the first report of a given ID for now
+	reportData.REPORTED = true
 end
 
 local function AddReportData(reporttype, id, data)
 	-- app.PrintDebug("Contributor.AddReportData",reporttype,id)
 	-- app.PrintTable(data)
 	local reportData = Reports[reporttype][id]
+	if reportData.REPORTED then app.PrintDebug("Duplicate Report Ignored",reporttype,id) return end
+
 	if type(data) == "table" then
 		for k,v in pairs(data) do
 			reportData[k] = v
@@ -98,6 +104,12 @@ end
 -- Used to override the precision of coord accuracy based on irregularly sized maps
 -- typically we don't want the report to trigger even when interacting from max range
 -- so can adjust here
+-- To determine the proper value to put into this table:
+-- 1) Go to the map in question with the ability to interact with an object/quest in the zone
+-- 2) Stutter-step to the maximum distance which allows valid interaction
+-- 3) Interact with the object/quest (this should trigger a contrib report link, if not use /att report-reset and try again)
+-- 4) Check the 'coord distance' reported, and round it up to the next whole number
+-- 5) That number goes into this table for the mapID
 local MapPrecisionOverrides = {
 	 [629] = 3,	-- Aegwynn's Gallery
 	[1164] = 3,	-- Dazar'alor
@@ -164,8 +176,20 @@ MobileDB.Creature = {
 	  [2545] = true,	-- "Pretty Boy" Duncan
 	  [2608] = true,	-- Commander Amaren
 	 [14626] = true,	-- Taskmaster Scrange
+	 [18927] = true,	-- Human Commoner
+	 [19148] = true,	-- Dwarf Commoner
+	 [19169] = true,	-- Blood Elf Commoner
+	 [19171] = true,	-- Draenei Commoner
+	 [19172] = true,	-- Gnome Commoner
+	 [19173] = true,	-- Night Elf Commoner
+	 [19175] = true,	-- Orc Commoner
+	 [19176] = true,	-- Tauren Commoner
+	 [19177] = true,	-- Troll Commoner
+	 [19178] = true,	-- Forsaken Commoner
+	 [20102] = true,	-- Goblin Commoner
 	 [19644] = true,	-- Image of Archmage Vargoth
 	 [19935] = true,	-- Soridormi
+	 [19936] = true,	-- Arazmodu
 	 [23870] = true,	-- Ember Clutch Ancient
 	 [26206] = true,	-- Keristrasza
 	 [29795] = true,	-- Kolitra Deathweaver (Orgrim's Hammer)
@@ -177,6 +201,7 @@ MobileDB.Creature = {
 	 [34653] = true,	-- Bountiful Table Hostess
 	 [37172] = true,	-- Detective Snap Snagglebolt
 	 [38066] = true,	-- Inspector Snip Snagglebolt
+	 [41058] = true,	-- Spirit of Tony Two-Tusk
 	 [41638] = true,	-- Houndmaster Jonathan
 	 [42736] = true,	-- Lashtail Hatchling
 	 [43300] = true,	-- Messner
@@ -188,6 +213,7 @@ MobileDB.Creature = {
 	 [43929] = true,	-- Blingtron 4000
 	 [44043] = true,	-- Kinnel
 	 [44100] = true,	-- Goris
+	 [45277] = true,	-- Feralas Sentinel
 	 [45451] = true,	-- Argus Highbeacon
 	 [45574] = true,	-- Vex'tul
 	 [45736] = true,	-- Deacon Andaal
@@ -208,8 +234,21 @@ MobileDB.Creature = {
 	 [79836] = true,	-- Gez'la
 	 [79867] = true,	-- Orgek Ironhand <Blacksmith>
 	 [83858] = true,	-- Khadgar's Servant
+	 [84247] = true,	-- Lumber Lord Oktron <Work Orders>
+	 [85414] = true,	-- Alexi Barov
+	 [86629] = true,	-- Raza'kul
+	 [86677] = true,	-- Kuros
+	 [86682] = true,	-- Retired Gorian Centurion(Tormmok)
 	 [86806] = true,	-- Ancient Trading Mechanism
+	 [86927] = true,	-- Stormshield Death Knight(Delvar Ironfist)
+	 [86933] = true,	-- Warspear Magus(Vivianne)
+	 [86934] = true,	-- Sha'tari Defender(Defender Illona)
+	 [86945] = true,	-- Sunsworn Warlock(Aeda Brightdawn)
+	 [86946] = true,	-- Outcast Talonpriest(Talonpriest Ishaal)
+	 [86964] = true,	-- Bloodmane Earthbinder(Leorajh)
+	 [86979] = true,	-- Tormak the Scarred <Stable Master>
 	 [87206] = true,	-- Ancient Trading Mechanism
+	 [87242] = true,	-- Sage Paluna
 	 [87991] = true,	-- Cro Threadstrong
 	 [87992] = true,	-- Olaf
 	 [87994] = true,	-- Moroes <Tower Steward>
@@ -235,14 +274,17 @@ MobileDB.Creature = {
 	 [88025] = true,	-- Mylune
 	 [88026] = true,	-- John J. Keeshan
 	 [88027] = true,	-- Impsy
+	 [90474] = true,	-- Kor'vas Bloodthorn
 	 [96038] = true,	-- Rivermane Shaman
 	[101527] = true,	-- Blingtron 6000
 	[105637] = true,	-- Scowling Rosa <Texts and Specialty Goods>
 	[113686] = true,	-- Archmage Khadgar
 	[115785] = true,	-- Direbeak Hatchling
+	[117292] = true,	-- Navarrogg
 	[117475] = true,	-- Lord Darius Crowley
 	[126576] = true,	-- Razgaji (You can accept quests as he's walking back to his start position)
 	[129514] = true,	-- Warguard Rakera
+	[129655] = true,	-- Boss Tak
 	[130474] = true,	-- Reckless Vulpera (Nisha)
 	[133302] = true,	-- Wardruid Loti
 	[141602] = true,	-- Thomas Zelling
@@ -250,7 +292,9 @@ MobileDB.Creature = {
 	[146462] = true,	-- Rexxar
 	[146536] = true,	-- Lost Wisp
 	[145707] = true,	-- Advisor Belgrum
+	[146937] = true,	-- Dark Ranger Lyana
 	[150202] = true,	-- Hunter Akana
+	[151300] = true,	-- Neri Sharpfin
 	[153897] = true,	-- Blingtron 7000
 	[156179] = true,	-- Gila Crosswires <Tinkmaster's Assistant>
 	[158544] = true,	-- Lord Herne
@@ -261,12 +305,14 @@ MobileDB.Creature = {
 	[161436] = true,	-- Kael'thas Sunstrider
 	[161439] = true,	-- Kael'thas Sunstrider
 	[162476] = true,	-- Ta'eran
+	[164965] = true,	-- Prince Renathal (Ember Court)
 	[168432] = true,	-- Ve'rayn <Assets and Liabilities>
 	[172854] = true,	-- Dredger Butler
 	[181085] = true,	-- Stratholme Supply Crate
 	[185749] = true,	-- Gnoll Mon-Ark
 	[191494] = true,	-- Khanam Matra Sarest
 	[193985] = true,	-- Initiate Zorig
+	[197915] = true,	-- Lindormi
 	-- #if BEFORE 10.2.7
 	[205127] = true,	-- Newsy
 	-- #endif
@@ -324,6 +370,11 @@ MobileDB.GameObject = {
 	 [30856] = true,	-- Atal'ai Artifact (q:27694)
 	 [74448] = true,	-- Large Solid Chest
 	 [75298] = true,	-- Large Solid Chest
+	[113768] = true,	-- Brightly Colored Egg
+	[113769] = true,	-- Brightly Colored Egg
+	[113770] = true,	-- Brightly Colored Egg
+	[113771] = true,	-- Brightly Colored Egg
+	[143981] = true,	-- Brightly Colored Egg
 	[148499] = true,	-- Felix's Box (q:3361)
 	[153464] = true,	-- Large Solid Chest
 	[169243] = true,	-- Chest of The Seven (BRD)
@@ -344,6 +395,7 @@ MobileDB.GameObject = {
 	[181690] = true,	-- Fertile Dirt Mound (q:26446)
 	[181916] = true,	-- Satyrnaar Fel Wood (q:26454)
 	[182053] = true,	-- Glowcap
+	[186903] = true,	-- Pirate Booty (q:25054)
 	[192818] = true,	-- Infused Mushroom (q:13100, 13112)
 	[192828] = true,	-- Crystalsong Carrot (q:13114)
 	[194088] = true,	-- Highborne Relic (q:13505)
@@ -389,13 +441,32 @@ MobileDB.GameObject = {
 	[201734] = true,	-- Flammable Bed (q:14125)
 	[201735] = true,	-- Defective Generator (q:14125)
 	[201974] = true,	-- Raptor Egg (q:24741)
+	[202198] = true,	-- Steamwheedle Crate (q:25048)
+	[202351] = true,	-- Rockin' Powder (q:24946)
+	[202420] = true,	-- Ancient Hieroglyphs (q:25565)
+	[202470] = true,	-- Bilgewater Footlocker (q:25062)
+	[202552] = true,	-- Kaja'Cola Zero-One (q:25110)
+	[202553] = true,	-- Kaja'Cola Zero-One (q:25110)
+	[202554] = true,	-- Kaja'Cola Zero-One (q:25110)
 	[202606] = true,	-- Stonetear (q:25396)
+	[202609] = true,	-- Valve #1 (q:25204)
+	[202610] = true,	-- Valve #2 (q:25204)
+	[202611] = true,	-- Valve #3 (q:25204)
+	[202612] = true,	-- Valve #4 (q:25204)
 	[202793] = true,	-- Loose Soil (q:25422)
+	[202956] = true,	-- Rocket Car Parts (q:25515)
+	[202957] = true,	-- Rocket Car Parts (q:25515)
+	[202958] = true,	-- Rocket Car Parts (q:25515)
+	[202959] = true,	-- Rocket Car Parts (q:25515)
+	[202960] = true,	-- Rocket Car Parts (q:25515)
+	[202961] = true,	-- Rocket Car Parts (q:25515)
 	[203071] = true,	-- Night Elf Archaeology Find
+	[203090] = true,	-- Sunken Treasure Chest (q:25609)
 	[203148] = true,	-- Horde Cage (q:25662)
 	[203179] = true,	-- Sediment Deposit (q:25722)
 	[203182] = true,	-- Fenberries (q:25725)
 	[203214] = true,	-- Eldre'thar Relic (q:25767)
+	[203228] = true,	-- Needles Iron Pyrite (q:25774)
 	[203247] = true,	-- Fitzsimmon's Mead (q:25815)
 	[203253] = true,	-- Kalimdor Eagle Nest (q:25837)
 	[203264] = true,	-- Wobbling Raptor Egg (q:25854)
@@ -424,6 +495,7 @@ MobileDB.GameObject = {
 	[205089] = true,	-- Stabthistle Seed (q:27025)
 	[205092] = true,	-- Nascent Elementium (q:27077)
 	[205216] = true,	-- Neptulon's Cache (Throne of the Tides)
+	[205368] = true,	-- Grimtotem Weapon Rack (q:27310)
 	[205423] = true,	-- Banshee's Bells (q:27369)
 	[205537] = true,	-- Open Prayer Book (q:27488)
 	[205545] = true,	-- Stray Land Mine (q:27536)
@@ -468,9 +540,11 @@ MobileDB.GameObject = {
 	[207488] = true,	-- Sturdy Treasure Chest
 	[207489] = true,	-- Sturdy Treasure Chest
 	[207498] = true,	-- Dark Iron Treasure Chest
+	[207512] = true,	-- Silken Treasure Chest
 	[207513] = true,	-- Silken Treasure Chest
 	[207522] = true,	-- Maplewood Treasure Chest
 	[207523] = true,	-- Maplewood Treasure Chest
+	[207524] = true,	-- Maplewood Treasure Chest
 	[207534] = true,	-- Runestone Treasure Chest
 	[208545] = true,	-- Ash Pile (q:29139)
 	[209273] = true,	-- Tonk Scrap (q:29518)
@@ -678,6 +752,8 @@ MobileDB.GameObject = {
 	[307028] = true,	-- Azerite Grenades (q:53950)
 	[308100] = true,	-- Engine Gearing (q:53885)
 	[308103] = true,	-- Azerite Cannon Balls (q:53885)
+	[308381] = true,	-- Alliance Cage (q:53883)
+	[309886] = true,	-- Engine Gearing (q:53712)
 	[311174] = true,	-- Volatile Azerite Weapons (q:54177)
 	[311182] = true,	-- Crawler Mine Parts (q:54189)
 	[311183] = true,	-- Remote Mine Controls (q:54189)
@@ -694,6 +770,7 @@ MobileDB.GameObject = {
 	[322358] = true,	-- Waterlogged Alliance Crate (q:57331)
 	[322413] = true,	-- Glimmering Chest
 	[322787] = true,	-- Shrine of Torcali (q:55252)
+	[322805] = true,	-- Calling Conch
 	[325425] = true,	-- Wanderer's Wayshrine
 	[325426] = true,	-- Wanderer's Wayshrine
 	[325427] = true,	-- Wanderer's Wayshrine
@@ -713,11 +790,16 @@ MobileDB.GameObject = {
 	[328315] = true,	-- Mysterious Trashpile
 	[329639] = true,	-- Sharas'dal, Scepter of Tides (q:56429)
 	[330194] = true,	-- Prismatic Crystal
+	[334115] = true,	-- Explosive Crate (q:57148)
 	[334732] = true,	-- Glimmering Chest
 	[334733] = true,	-- Glimmering Chest
 	[334734] = true,	-- Glimmering Chest
 	[334735] = true,	-- Glimmering Chest
 	[334736] = true,	-- Glimmering Chest
+	[340023] = true,	-- Diagnostic Console: Uldir (q:58506)
+	[340025] = true,	-- Diagnostic Console: Uldaman (q:58506)
+	[340026] = true,	-- Diagnostic Console: Ulduar (q:58506)
+	[340027] = true,	-- Diagnostic Console: Uldum (q:58506)
 	[340625] = true,	-- Alver's Annals of Strategy (q:58622)
 	[340634] = true,	-- How Not To Lose (q:58622)
 	[340648] = true,	-- How Not To Lose (q:58622)
@@ -727,6 +809,7 @@ MobileDB.GameObject = {
 	[348639] = true,	-- Anima Stores (q:59581)
 	[349136] = true,	-- Forgotten Memorandum (q:59717)
 	[349274] = true,	-- Forgotten Memorandum (q:59717)
+	[349393] = true,	-- Battered Chest (q:59740)
 	[349885] = true,	-- Guide To Marching (q:58622)
 	[350978] = true,	-- Queen's Conservatory Cache
 	[351473] = true,	-- Droplets of Anima (q:60176)
@@ -750,9 +833,13 @@ MobileDB.GameObject = {
 	[356563] = true,	-- Sanguine Rose (q:60532)
 	[356596] = true,	-- Feather Cap (q:61406)
 	[356597] = true,	-- Lacy Bell Morel (q:61406)
+	[358297] = true,	-- Purified Nectar (q:62276)
 	[363824] = true,	-- Cage (q:62720)
+	[364345] = true,	-- A Faintly Glowing Seed
 	[368304] = true,	-- Damaged Binding
 	[368604] = true,	-- Mawsworn Cage
+	[368605] = true,	-- Cage (SoD)
+	[368606] = true,	-- Cage (SoD)
 	[369306] = true,	-- Bundle of Writings (q:64224)
 	[369308] = true,	-- Undelivered Mail (q:64224)
 	[369309] = true,	-- Unattended Books (q:64224)
@@ -940,6 +1027,7 @@ MobileDB.GameObject = {
 	[478437] = true,	-- Waiting Garbage Can (q:85514)
 	[478438] = true,	-- Waiting Garbage Can (q:85514)
 	[478443] = true,	-- Mislaid Curiosity (delve object)
+	[478744] = true,	-- Mislaid Curiosity (delve object)
 	[478679] = true,	-- Salvage Part
 	[479594] = true,	-- Depleted Hotrod Battery
 	[487825] = true,	-- Ruffled Pages (q:85589)
@@ -1086,8 +1174,16 @@ local function OnQUEST_DETAIL(...)
 	local questID = GetQuestID();
 	-- app.PrintDebug("Contributor.OnQUEST_DETAIL",questID,...)
 	if questID == 0 then return end
+
 	-- only check logic when the player is not actually on this quest
 	if C_QuestLog_IsOnQuest(questID) then return end
+
+	-- also skip the check if somehow this quest was just turned in but also fired a relevant event afterwards
+	if app.MostRecentQuestTurnIns and app.MostRecentQuestTurnIns[1] == questID then
+		app.PrintDebug(app.Modules.Color.Colorize("Contrib Check attempted on Turned In Quest!",app.Colors.LockedWarning),questID)
+		return
+	end
+
 	local objRef = app.SearchForObject("questID", questID, "field")
 	-- app.PrintDebug("Contributor.OnQUEST_DETAIL.ref",objRef and objRef.hash)
 	if not objRef then
@@ -1146,6 +1242,13 @@ AddEventFunc("QUEST_PROGRESS", OnQUEST_DETAIL)
 AddEventFunc("QUEST_COMPLETE", OnQUEST_DETAIL)
 
 -- PLAYER_SOFT_INTERACT_CHANGED
+-- Whenever we can't find a ObjectID in ATT data, create a cached version of it so we can keep resolved data
+-- instead of always generating new
+local UnknownObjectsCache = setmetatable({}, { __index = function(t, objectID)
+	local o = app.CreateObject(objectID)
+	t[objectID] = o
+	return o
+end})
 local LastSoftInteract = {}
 local RegisterUNIT_SPELLCAST_START, UnregisterUNIT_SPELLCAST_START
 -- Allows automatically tracking nearby ObjectID's and running check functions on them for data verification
@@ -1209,7 +1312,7 @@ local SpellIDHandlers = {
 		if objRef then return end
 
 		local tooltipName = GameTooltipTextLeft1:GetText()
-		objRef = app.CreateObject(id)
+		objRef = UnknownObjectsCache[id]
 		local objID = objRef.keyval
 		-- report openable object
 		AddReportData(objRef.__type,objID,{
@@ -1233,6 +1336,7 @@ local function OnUNIT_SPELLCAST_START(...)
 	spellHandler(source)
 end
 UnregisterUNIT_SPELLCAST_START = function()
+	if not RegisteredUNIT_SPELLCAST_START then return end
 	-- app.PrintDebug("Unregister.UNIT_SPELLCAST_START")
 	app:UnregisterEvent("UNIT_SPELLCAST_START")
 	RegisteredUNIT_SPELLCAST_START = nil

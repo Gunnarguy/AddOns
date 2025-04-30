@@ -1,4 +1,7 @@
-﻿1.15.84 - 16th April 2025
+﻿1.15.85 - 23rd April 2025
+- Added flight times.
+
+1.15.84 - 16th April 2025
 - For 'Enhance tooltip' ('Interface'), fixed an issue with 'Hide tooltips during combat'.
 - Added flight times.
 

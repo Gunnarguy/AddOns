@@ -3,5 +3,6 @@
 ## Notes: Tracks Skullflame Shield and Flamestrike
 ## Author: YourName
 ## Version: 1.0
+## SavedVariables: SFS_DB
 
 SkullflameStats.lua

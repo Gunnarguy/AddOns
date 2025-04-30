@@ -119,7 +119,7 @@
 				["0.70:0.16:0.67:0.30:0.62:0.31"] = 234, -- Light's Hope Chapel, Revantusk Village, Hammerfall
 				["0.70:0.16:0.67:0.30"] = 141, -- Light's Hope Chapel, Revantusk Village
 				["0.70:0.16:0.67:0.30:0.49:0.27"] = 301, -- Light's Hope Chapel, Revantusk Village, Tarren Mill
-				["0.70:0.16:0.44:0.19"] = 262, -- Light's Hope Chapel, Undercity
+				["0.70:0.16:0.44:0.19"] = 262, -- Light's Hope Chapel, Undercity (Montana montes reported 316)
 				["0.70:0.16:0.44:0.19:0.38:0.24"] = 294, -- Light's Hope Chapel, Undercity, The Sepulcher
 				["0.70:0.16:0.44:0.19:0.55:0.57:0.45:0.84"] = 985, -- Light's Hope Chapel, Undercity, Kargath, Grom'gol
 				["0.70:0.16:0.44:0.19:0.49:0.27:0.62:0.31"] = 443, -- Light's Hope Chapel, Undercity, Tarren Mill, Hammerfall
@@ -184,6 +184,7 @@
 				["0.49:0.27:0.44:0.19:0.55:0.57:0.43:0.93"] = 966, -- Tarren Mill, Undercity, Kargath, Booty Bay
 				["0.49:0.27:0.44:0.19:0.55:0.57:0.61:0.75"] = 830, -- Tarren Mill, Undercity, Kargath, Stonard
 				["0.49:0.27:0.44:0.19:0.55:0.57"] = 550, -- Tarren Mill, Undercity, Kargath
+				["0.49:0.27:0.44:0.19:0.55:0.57:0.45:0.84:0.43:0.93"] = 942, -- Tarren Mill, Undercity, Kargath, Grom'gol, Booty Bay
 
 				-- Horde: The Sepulcher (Silverpine Forest)
 				["0.38:0.24:0.49:0.27:0.62:0.31:0.55:0.57:0.45:0.84:0.43:0.93"] = 863, -- The Sepulcher, Tarren Mill, Hammerfall, Kargath, Grom'gol, Booty Bay
@@ -447,6 +448,7 @@
 				["0.55:0.73:0.44:0.69:0.32:0.58"] = 323, -- Freewind Post, Camp Mojache, Shadowprey Village
 				["0.55:0.73:0.56:0.53:0.57:0.64"] = 357, -- Freewind Post, Crossroads, Brackenwall Village
 				["0.55:0.73:0.45:0.56:0.32:0.58"] = 385, -- Freewind Post, Thunder Bluff, Shadowprey Village
+				["0.55:0.73:0.56:0.53:0.41:0.47:0.32:0.58"] = 486, -- Freewind Post, Crossroads, Sun Rock Retreat, Shadowprey Village
 
 				-- Horde: Gadgetzan (Tanaris)
 				["0.61:0.80:0.42:0.79"] = 233, -- Gadgetzan, Cenarion Hold
