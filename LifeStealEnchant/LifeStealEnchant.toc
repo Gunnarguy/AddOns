@@ -1,0 +1,8 @@
+## Interface: 11403
+## Title: LifeStealEnchant
+## Notes: Tracks Life Steal Enchant
+## Author: YourName
+## Version: 1.0
+## SavedVariables: LSE_DB
+
+LifeStealEnchant.lua
