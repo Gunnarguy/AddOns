@@ -1,0 +1,8 @@
+## Interface: 11503
+## Title: HolyCreditTracker
+## Notes: Track Paladin healing efficiency with Illumination mana refunds
+## Author: YourName
+## Version: 2.0
+## SavedVariables: HolyCreditTrackerDB
+
+HolyCreditTracker.lua

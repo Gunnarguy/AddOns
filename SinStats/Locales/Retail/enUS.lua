@@ -24,7 +24,7 @@ L["Level_HonorPointsTooltip"] = Ns.Colors.Green .. "Level|r\n" .. "Your current 
 L["Speed_StaticTooltip"] = Ns.Colors.Green .. "Real-time|r\n" .. "Displays the movement speed of your character's \nevery movement, in real-time (Standing, running, \nswimming, flying, RP walking, Skyriding etc.) \n\n" .. Ns.Colors.Green .. "Static|r\n" .. "Your character's movement speed is static and \nwill change only when traveling methods change \nor speed value increases"
 L["Normal_EnchantedTooltip"] = Ns.Colors.Green .. "Normal|r\n" .. "Displays the item's total quantity, including \nin your bags and bank \n\n" .. Ns.Colors.Green .. "Enchanted|r\n" .. "Displays the Enchanted item's quantity, \nincluding in your bags and bank"
 L["Season_ExpTooltip"] = Ns.Colors.Green .. "Season|r\n" .. "Displays your Mythic+ rating of \nthe current season \n\n" .. Ns.Colors.Green .. "Expansion|r\n" .. "Displays your best Mythic+ rating \nof the current expansion"
-L["Splint_SparkTooltip"] = Ns.Colors.Green .. "Spark|r\n" .. "Displays the total quantity of \nSpark of Fortunes \n\n" .. Ns.Colors.Green .. "Fractured|r\n" .. "Displays the total quantity of \nFractured Spark of Fortunes"
+L["Splint_SparkTooltip"] = Ns.Colors.Green .. "Spark|r\n" .. "Displays the total quantity of \nSpark of Fortunes \n\n" .. Ns.Colors.Green .. "Dust|r\n" .. "Displays the total quantity of \nFractured Sparks obtained"
 L["Current_EarnedTooltip"] = Ns.Colors.Green .. "Current|r\n" .. "Displays the current quantity \n\n" .. Ns.Colors.Green .. "Earned|r\n" .. "Displays the total earned \nthis season"
 L["Empty_VintageTooltip"] = Ns.Colors.Green .. "Empty|r\n" .. "Displays the quanity of \nEmpty Kaja'Cola Cans \n\n" .. Ns.Colors.Green .. "Vintage|r\n" .. "Displays the quantity of \nVintage Kaja'Cola Cans"
 
@@ -219,6 +219,12 @@ L["SpeedMenu"] = "Speed"
 L["SpeedTip"] = ""
 L["SpeedDescription"] = L["TipsAndInfo"] .. "Your character's movement speed in real-time, including your " .. Ns.Colors.Green .. "Skyriding speed|r.\n\nA red " .. Ns.Colors.Red .. "Speed|r value indicates that you are affected by slowing effects or moving at a slower speed than normal"
 
+L["Karesh"] = "Karesh"
+L["KareshAbrev"] = "Kar"
+L["KareshMenu"] = "The K'aresh"
+L["KareshTip"] = ""
+L["KareshDescription"] = L["TipsAndInfo"] .. "Displays the renown rank of " .. Ns.KareshLink
+
 L["Gallagio"] = "Galla"
 L["GallagioAbrev"] = "Glc"
 L["GallagioMenu"] = "Gallagio Loyalty"
@@ -333,6 +339,12 @@ L["GildedMenu"] = "Gilded Crest"
 L["GildedTip"] = ""
 L["GildedDescription"] = L["TipsAndInfo"] .. "Displays the currency " .. Ns.GildedLink
 
+L["Puzzling"] = "Chip"
+L["PuzzlingAbrev"] = "Pcc"
+L["PuzzlingMenu"] = "Cartel Chip"
+L["PuzzlingTip"] = ""
+L["PuzzlingDescription"] = L["TipsAndInfo"] .. "Displays the currency " .. Ns.PuzzlingLink .. "Puzzling Cartel Chip"
+
 L["Catalyst"] = "Catalyst"
 L["CatalystAbrev"] = "Cat"
 L["CatalystMenu"] = "Catalyst"
@@ -353,9 +365,9 @@ L["StashDescription"] = L["TipsAndInfo"] .. "Displays the quantity of looted " .
 
 L["Spark"] = "Spark"
 L["SparkAbrev"] = "Spk"
-L["SparkMenu"] = "Spark Fortunes"
+L["SparkMenu"] = "Crafting Spark"
 L["SparkTip"] = ""
-L["SparkDescription"] = L["TipsAndInfo"] .. "Displays the currency " .. Ns.SparkLink .. "Spark of Fortunes"
+L["SparkDescription"] = L["TipsAndInfo"] .. "Displays the currency " .. Ns.SparkLink .. "Spark of Starlight"
 
 L["Undercoin"] = "Coin"
 L["UndercoinAbrev"] = "Coin"
@@ -374,6 +386,24 @@ L["IronAbrev"] = "Iro"
 L["IronMenu"] = "Flame-Blessed"
 L["IronTip"] = ""
 L["IronDescription"] = L["TipsAndInfo"] .. "Displays the currency " .. Ns.IronLink
+
+L["Ethereal"] = "Ether"
+L["EtherealAbrev"] = "Eth"
+L["EtherealMenu"] = "Ethereal Strands"
+L["EtherealTip"] = ""
+L["EtherealDescription"] = L["TipsAndInfo"] .. "Displays the currency " .. Ns.EtherealLink
+
+L["Untethered"] = "Unteth"
+L["UntetheredAbrev"] = "Utc"
+L["UntetheredMenu"] = "Untethered"
+L["UntetheredTip"] = ""
+L["UntetheredDescription"] = L["TipsAndInfo"] .. "Displays the currency " .. Ns.UntethLink
+
+L["Mementos"] = "Meme"
+L["MementosAbrev"] = "Dcm"
+L["MementosMenu"] = "Mementos"
+L["MementosTip"] = ""
+L["MementosDescription"] = L["TipsAndInfo"] .. "Displays the currency " .. Ns.MementosLink
 
 L["KajaCola"] = "Cola"
 L["KajaColaAbrev"] = "Col"
@@ -644,7 +674,7 @@ L["Ingenuity"] = "Ingenuity"
 L["Season"] = "Season"
 L["Expansion"] = "Expansion"
 L["Spark"] = "Spark"
-L["Splinter"] = "Fractured"
+L["Splinter"] = "Dust"
 L["Gigantic"] = "Gigantic"
 L["Plump"] = "Plump"
 L["Current"] = "Current"

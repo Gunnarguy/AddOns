@@ -2,8 +2,17 @@
 local addonName, addonTable = ...
 local DragonbreathChiliTracker = CreateFrame("Frame", "DragonbreathChiliTrackerFrame", UIParent)
 
+-- Constants
+local FONT_PATH = "Fonts\\\\FRIZQT__.TTF" -- Default game font
+local FONT_STYLE_OUTLINE = "OUTLINE"
+local COLOR_GREEN_HEX = "|cff00ff00"
+local COLOR_HIGHLIGHT_HEX = "|cff00ff96"
+local COLOR_RESET_HEX = "|r"
+local DRAGONBREATH_CHILI_SPELL_ID = 15851
+local DEFAULT_COOLDOWN_SECONDS = 10
+
 -- Variables for tracking damage and combat timing
-local damageData = { 
+local damageData = {
     current = 0,    -- Current combat encounter damage
     session = 0,    -- Session damage (persists until manual reset)
     allTime = 0     -- All-time damage (persists between game sessions)
@@ -14,131 +23,20 @@ local combatInfo = {
     duration = 0          -- Duration of current/last combat
 }
 local framePosition = { point = "CENTER", relativePoint = "CENTER", x = 0, y = 0 } -- Default position
-local cooldownTime = 10 -- Cooldown time in seconds
 local cooldownEndTime = 0 -- Time when the cooldown ends
 
 -- Saved Variables Table with proper initialization
--- This ensures we persist data between sessions
 DragonbreathChiliTrackerDB = DragonbreathChiliTrackerDB or {
-    allTime = 0,         -- All-time damage persists between game sessions
-    locked = false,      -- Whether frame is locked or not
-    framePosition = nil  -- Frame position saved between sessions
+    allTime = 0,
+    locked = false,
+    framePosition = nil -- Will use default if nil
 }
 
 --------------------------------------------------------------------------------
--- Create UI Frame (Slightly bigger for improved readability)
+-- Helper Functions
 --------------------------------------------------------------------------------
-local frame = CreateFrame("Frame", "DragonbreathChiliTrackerDisplay", UIParent, "BackdropTemplate")
-frame:SetSize(240, 120)  -- Larger size for better readability
-frame:SetScale(0.8)      -- Global scale factor
-frame:SetPoint(framePosition.point, UIParent, framePosition.relativePoint, framePosition.x, framePosition.y)
 
--- Set up frame appearance
-frame:SetBackdrop({
-    bgFile   = "Interface\\DialogFrame\\UI-DialogBox-Background",
-    edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
-    tile     = true,
-    tileSize = 32,
-    edgeSize = 14,
-    insets   = { left = 4, right = 4, top = 4, bottom = 4 },
-})
-frame:SetBackdropColor(0, 0, 0, 0.7)
-frame:SetBackdropBorderColor(0.8, 0.8, 0.8)
-
--- Movable & Lockable frame setup
-frame:SetMovable(true)
-frame:EnableMouse(true)
-frame:RegisterForDrag("LeftButton")
-frame:SetScript("OnDragStart", function(self)
-    if not DragonbreathChiliTrackerDB.locked then
-        self:StartMoving()
-    end
-end)
-frame:SetScript("OnDragStop", function(self)
-    self:StopMovingOrSizing()
-    local point, _, relativePoint, x, y = self:GetPoint()
-    framePosition = { point = point, relativePoint = relativePoint, x = x, y = y }
-end)
-
---------------------------------------------------------------------------------
--- Title Text
---------------------------------------------------------------------------------
-local title = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightLarge")
-title:SetPoint("TOP", 0, -8)
-title:SetFont("Fonts\\FRIZQT__.TTF", 12, "OUTLINE")
-title:SetText("|cff00ff96Dragonbreath Chili|r")
-
---------------------------------------------------------------------------------
--- Damage Text (Bullet-Style)
---------------------------------------------------------------------------------
-local damageText = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-damageText:SetFont("Fonts\\FRIZQT__.TTF", 10, "OUTLINE")
-damageText:SetPoint("TOPLEFT", 12, -30)
-damageText:SetWidth(210)
-damageText:SetJustifyH("LEFT")
-damageText:SetWordWrap(true)
-
---------------------------------------------------------------------------------
--- Cooldown Text 
---------------------------------------------------------------------------------
-local cooldownText = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-cooldownText:SetFont("Fonts\\FRIZQT__.TTF", 10, "OUTLINE")
-cooldownText:SetPoint("TOPLEFT", damageText, "BOTTOMLEFT", 0, -4)  -- Just 4px gap
-cooldownText:SetWidth(210)
-cooldownText:SetJustifyH("LEFT")
-cooldownText:SetWordWrap(true)
-
---------------------------------------------------------------------------------
--- Combat DPS Text
---------------------------------------------------------------------------------
-local combatDPSText = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-combatDPSText:SetFont("Fonts\\FRIZQT__.TTF", 10, "OUTLINE")
-combatDPSText:SetPoint("TOPLEFT", cooldownText, "BOTTOMLEFT", 0, -4)
-combatDPSText:SetWidth(210)
-combatDPSText:SetJustifyH("LEFT")
-combatDPSText:SetWordWrap(true)
-
---------------------------------------------------------------------------------
--- Lock Button (Bottom-Right)
---------------------------------------------------------------------------------
-local lockButton = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
-lockButton:SetSize(60, 20)
-lockButton:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -10, 10)
-lockButton:SetText(DragonbreathChiliTrackerDB.locked and "Unlock" or "Lock")
-lockButton:SetScript("OnClick", function(self)
-    DragonbreathChiliTrackerDB.locked = not DragonbreathChiliTrackerDB.locked
-    self:SetText(DragonbreathChiliTrackerDB.locked and "Unlock" or "Lock")
-    if DragonbreathChiliTrackerDB.locked then
-        print("Dragonbreath Chili frame locked.")
-    else
-        print("Dragonbreath Chili frame unlocked.")
-    end
-end)
-
---------------------------------------------------------------------------------
--- Reset Button (Bottom-Left)
---------------------------------------------------------------------------------
-local resetButton = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
-resetButton:SetSize(60, 20)
-resetButton:SetPoint("BOTTOM", frame, "BOTTOM", 10, 10)
-resetButton:SetText("Reset")
-resetButton:SetScript("OnClick", function(self)
-    -- Create dropdown menu for reset options
-    local menu = {
-        { text = "Reset Options", isTitle = true, notCheckable = true },
-        { text = "Current Fight", notCheckable = true, func = function() ResetCurrentFight() end },
-        { text = "Session Stats", notCheckable = true, func = function() ResetSession() end },
-        { text = "All-Time Stats", notCheckable = true, func = function() ResetAllTime() end },
-        { text = "Cancel", notCheckable = true, func = function() end },
-    }
-    
-    -- Show dropdown menu at cursor position
-    EasyMenu(menu, CreateFrame("Frame", "ChiliResetMenu", UIParent, "UIDropDownMenuTemplate"), "cursor", 0, 0, "MENU")
-end)
-
---------------------------------------------------------------------------------
 -- Format number with K/M suffixes for better readability
---------------------------------------------------------------------------------
 local function FormatNumber(number)
     if number >= 1000000 then
         return string.format("%.1fM", number / 1000000)
@@ -150,78 +48,173 @@ local function FormatNumber(number)
 end
 
 --------------------------------------------------------------------------------
--- UpdateDamageDisplay: Shows bullet-style damage stats
+-- UI Creation
+--------------------------------------------------------------------------------
+local displayFrame -- Declare displayFrame to be accessible by UI functions
+
+-- Helper to apply standard font settings to text elements
+local function SetupStandardText(fontString)
+    fontString:SetFont(FONT_PATH, 10, FONT_STYLE_OUTLINE)
+    fontString:SetWidth(210)
+    fontString:SetJustifyH("LEFT")
+    fontString:SetWordWrap(true)
+end
+
+local function CreateMainFrame()
+    local frame = CreateFrame("Frame", "DragonbreathChiliTrackerDisplay", UIParent, "BackdropTemplate")
+    frame:SetSize(240, 120)
+    frame:SetScale(0.8)
+    frame:SetPoint(framePosition.point, UIParent, framePosition.relativePoint, framePosition.x, framePosition.y)
+
+    frame:SetBackdrop({
+        bgFile   = "Interface\\\\DialogFrame\\\\UI-DialogBox-Background",
+        edgeFile = "Interface\\\\Tooltips\\\\UI-Tooltip-Border",
+        tile     = true,
+        tileSize = 32,
+        edgeSize = 14,
+        insets   = { left = 4, right = 4, top = 4, bottom = 4 },
+    })
+    frame:SetBackdropColor(0, 0, 0, 0.7)
+    frame:SetBackdropBorderColor(0.8, 0.8, 0.8)
+
+    frame:SetMovable(true)
+    frame:EnableMouse(true)
+    frame:RegisterForDrag("LeftButton")
+    frame:SetScript("OnDragStart", function(self)
+        if not DragonbreathChiliTrackerDB.locked then
+            self:StartMoving()
+        end
+    end)
+    frame:SetScript("OnDragStop", function(self)
+        self:StopMovingOrSizing()
+        local point, _, relativePoint, x, y = self:GetPoint()
+        framePosition = { point = point, relativePoint = relativePoint, x = x, y = y }
+        -- Potentially call SaveFramePosition() here if immediate save on drag is desired
+    end)
+    return frame
+end
+
+local function CreateTextElements(parentFrame)
+    local title = parentFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlightLarge")
+    title:SetPoint("TOP", 0, -8)
+    title:SetFont(FONT_PATH, 12, FONT_STYLE_OUTLINE) -- Title uses a slightly larger font
+    title:SetText(COLOR_HIGHLIGHT_HEX .. "Dragonbreath Chili" .. COLOR_RESET_HEX)
+
+    local damageText = parentFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    damageText:SetPoint("TOPLEFT", 12, -30)
+    SetupStandardText(damageText)
+
+    local cooldownText = parentFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    cooldownText:SetPoint("TOPLEFT", damageText, "BOTTOMLEFT", 0, -4)
+    SetupStandardText(cooldownText)
+
+    local combatDPSText = parentFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    combatDPSText:SetPoint("TOPLEFT", cooldownText, "BOTTOMLEFT", 0, -4)
+    SetupStandardText(combatDPSText)
+
+    return title, damageText, cooldownText, combatDPSText
+end
+
+local function CreateButtons(parentFrame)
+    local lockButton = CreateFrame("Button", nil, parentFrame, "UIPanelButtonTemplate")
+    lockButton:SetSize(10, 10)
+    lockButton:SetPoint("BOTTOMLEFT", parentFrame, "BOTTOMLEFT", 15, 0)
+    lockButton:SetText(DragonbreathChiliTrackerDB.locked and "U" or "L")
+    lockButton:SetScript("OnClick", function(self)
+        DragonbreathChiliTrackerDB.locked = not DragonbreathChiliTrackerDB.locked
+        self:SetText(DragonbreathChiliTrackerDB.locked and "U" or "L")
+        print(addonName .. " frame " .. (DragonbreathChiliTrackerDB.locked and "locked." or "unlocked."))
+    end)
+
+    local resetButton = CreateFrame("Button", nil, parentFrame, "UIPanelButtonTemplate")
+    resetButton:SetSize(10, 10)
+    resetButton:SetPoint("BOTTOMLEFT", parentFrame, "BOTTOMLEFT", 35, 0) -- Adjusted for clarity if needed, original was fine
+    resetButton:SetText("R")
+    resetButton:SetScript("OnClick", function()
+        local menu = {
+            { text = "Reset Options", isTitle = true, notCheckable = true },
+            { text = "Current Fight", notCheckable = true, func = function() ResetCurrentFight() end },
+            { text = "Session Stats", notCheckable = true, func = function() ResetSession() end },
+            { text = "All-Time Stats", notCheckable = true, func = function() ResetAllTime() end },
+            { text = "Cancel", notCheckable = true, func = function() end },
+        }
+        EasyMenu(menu, CreateFrame("Frame", "ChiliResetMenu", UIParent, "UIDropDownMenuTemplate"), "cursor", 0, 0, "MENU")
+    end)
+    return lockButton, resetButton
+end
+
+-- Initialize UI
+displayFrame = CreateMainFrame()
+local titleText, damageTextElement, cooldownTextElement, combatDPSTextElement = CreateTextElements(displayFrame)
+local lockButton, resetButton = CreateButtons(displayFrame)
+
+
+--------------------------------------------------------------------------------
+-- UI Update Functions
 --------------------------------------------------------------------------------
 local function UpdateDamageDisplay()
-    damageText:SetText(string.format(
-        "|cff00ff00Dragonbreath Chili Damage|r\n" ..
+    damageTextElement:SetText(string.format(
+        "%sDragonbreath Chili Damage%s\n" ..
         "  • Current: %s\n" ..
         "  • Session: %s\n" ..
         "  • All-Time: %s",
+        COLOR_GREEN_HEX, COLOR_RESET_HEX,
         FormatNumber(damageData.current),
         FormatNumber(damageData.session),
         FormatNumber(damageData.allTime)
     ))
 end
 
---------------------------------------------------------------------------------
--- UpdateCooldownDisplay: Shows cooldown status
---------------------------------------------------------------------------------
 local function UpdateCooldownDisplay()
     local remainingTime = cooldownEndTime - GetTime()
     if remainingTime > 0 then
-        cooldownText:SetText(string.format(
-            "|cff00ff00Cooldown:|r\n" ..
+        cooldownTextElement:SetText(string.format(
+            "%sCooldown:%s\n" ..
             "  %d second(s)",
+            COLOR_GREEN_HEX, COLOR_RESET_HEX,
             math.ceil(remainingTime)
         ))
     else
-        cooldownText:SetText(
-            "|cff00ff00Cooldown:|r\n" ..
+        cooldownTextElement:SetText(
+            COLOR_GREEN_HEX .. "Cooldown:" .. COLOR_RESET_HEX .. "\\n" ..
             "  Ready"
         )
     end
 end
 
---------------------------------------------------------------------------------
--- UpdateCombatDPS: Shows DPS information for current/last fight
---------------------------------------------------------------------------------
 local function UpdateCombatDPS()
-    -- Calculate current combat duration
     local currentTime = GetTime()
-    local duration = combatInfo.inCombat and (currentTime - combatInfo.startTime) or combatInfo.duration
+    local currentDuration = combatInfo.inCombat and (currentTime - combatInfo.startTime) or combatInfo.duration
     
-    -- Only show DPS if we have both damage and duration
-    if damageData.current > 0 and duration > 0 then
-        local dps = damageData.current / duration
-        combatDPSText:SetText(string.format(
-            "|cff00ff00Combat Stats:|r\n" ..
+    if damageData.current > 0 and currentDuration > 0 then
+        local dps = damageData.current / currentDuration
+        combatDPSTextElement:SetText(string.format(
+            "%sCombat Stats:%s\\n" ..
             "  • DPS: %s (%.1f sec)",
+            COLOR_GREEN_HEX, COLOR_RESET_HEX,
             FormatNumber(dps),
-            duration
+            currentDuration
         ))
     else
-        combatDPSText:SetText(
-            "|cff00ff00Combat Stats:|r\n" ..
+        combatDPSTextElement:SetText(
+            COLOR_GREEN_HEX .. "Combat Stats:" .. COLOR_RESET_HEX .. "\\n" ..
             "  • No data yet"
         )
     end
 end
 
 --------------------------------------------------------------------------------
--- OnCombatStart: Tracks when player enters combat
+-- Combat Logic
 --------------------------------------------------------------------------------
 local function OnCombatStart()
     if not combatInfo.inCombat then
         combatInfo.inCombat = true
         combatInfo.startTime = GetTime()
-        -- Don't reset damage on combat start - let it accumulate until manually reset
+        -- Current damage accumulates until manually reset or new combat if desired
+        -- For now, it persists across combats within a session until ResetCurrentFight
     end
 end
 
---------------------------------------------------------------------------------
--- OnCombatEnd: Tracks when player leaves combat
---------------------------------------------------------------------------------
 local function OnCombatEnd()
     if combatInfo.inCombat then
         combatInfo.inCombat = false
@@ -233,30 +226,42 @@ end
 --------------------------------------------------------------------------------
 -- Reset Functions
 --------------------------------------------------------------------------------
-function ResetCurrentFight()
-    damageData.current = 0
-    combatInfo.startTime = combatInfo.inCombat and GetTime() or 0
-    combatInfo.duration = 0
+
+-- Helper function to announce resets and update relevant UI elements
+local function AnnounceReset(category)
     UpdateDamageDisplay()
     UpdateCombatDPS()
-    print("Dragonbreath Chili current fight damage reset!")
+    print(addonName .. " " .. category .. " reset!")
+end
+
+function ResetCurrentFight()
+    damageData.current = 0
+    combatInfo.startTime = combatInfo.inCombat and GetTime() or 0 -- Reset start time if in combat
+    combatInfo.duration = 0
+    AnnounceReset("current fight damage")
 end
 
 function ResetSession()
+    damageData.current = 0 -- Also reset current fight damage as session includes it
     damageData.session = 0
-    UpdateDamageDisplay()
-    print("Dragonbreath Chili session damage reset!")
+    combatInfo.startTime = combatInfo.inCombat and GetTime() or 0
+    combatInfo.duration = 0
+    AnnounceReset("session damage")
 end
 
 function ResetAllTime()
     damageData.allTime = 0
     DragonbreathChiliTrackerDB.allTime = 0 -- Update saved value immediately
-    UpdateDamageDisplay()
-    print("Dragonbreath Chili all-time damage reset!")
+    -- Optionally reset current and session too if desired, e.g.:
+    -- damageData.current = 0
+    -- damageData.session = 0
+    -- combatInfo.startTime = combatInfo.inCombat and GetTime() or 0
+    -- combatInfo.duration = 0
+    AnnounceReset("all-time damage") -- This will also call UpdateCombatDPS
 end
 
 --------------------------------------------------------------------------------
--- Save/Load Frame Position
+-- Persistence: Save/Load Frame Position
 --------------------------------------------------------------------------------
 local function SaveFramePosition()
     DragonbreathChiliTrackerDB.framePosition = framePosition
@@ -265,14 +270,106 @@ end
 local function LoadFramePosition()
     if DragonbreathChiliTrackerDB.framePosition then
         local pos = DragonbreathChiliTrackerDB.framePosition
-        frame:ClearAllPoints()
-        frame:SetPoint(pos.point, UIParent, pos.relativePoint, pos.x, pos.y)
+        displayFrame:ClearAllPoints()
+        displayFrame:SetPoint(pos.point, UIParent, pos.relativePoint, pos.x, pos.y)
+    elseif framePosition then -- Fallback to initial default if nothing saved
+        displayFrame:ClearAllPoints()
+        displayFrame:SetPoint(framePosition.point, UIParent, framePosition.relativePoint, framePosition.x, framePosition.y)
     end
 end
 
 --------------------------------------------------------------------------------
--- Event Handling
+-- Event Handling Logic
 --------------------------------------------------------------------------------
+local function HandleCombatLogEvent()
+    local _, subevent, _, sourceGUID, _, _, _, _, _, _, _, spellID, _, _, amount = CombatLogGetCurrentEventInfo()
+
+    if sourceGUID == UnitGUID("player") and 
+       subevent == "SPELL_DAMAGE" and 
+       spellID == DRAGONBREATH_CHILI_SPELL_ID and 
+       amount and amount > 0 then -- Ensure amount is positive
+        
+        damageData.current  = damageData.current + amount
+        damageData.session  = damageData.session + amount
+        damageData.allTime  = damageData.allTime + amount
+        cooldownEndTime     = GetTime() + DEFAULT_COOLDOWN_SECONDS
+        
+        if not combatInfo.inCombat then
+            OnCombatStart() -- Ensure combat is initiated
+        end
+        
+        UpdateDamageDisplay()
+        UpdateCombatDPS()
+        -- Cooldown display is handled by the OnUpdate timer
+    end
+end
+
+local function OnAddonLoaded(loadedAddonName)
+    if loadedAddonName == addonName then
+        -- Load saved data
+        damageData.allTime = DragonbreathChiliTrackerDB.allTime or 0
+        
+        -- Load frame position (ensure displayFrame exists)
+        if displayFrame then
+             LoadFramePosition()
+        end
+        UpdateDamageDisplay() -- Update display with loaded data
+        
+        -- Set initial text for lock button based on saved state
+        if lockButton then
+            lockButton:SetText(DragonbreathChiliTrackerDB.locked and "Unlock" or "Lock")
+        end
+    end
+end
+
+local function OnPlayerLogout()
+    DragonbreathChiliTrackerDB.allTime = damageData.allTime
+    SaveFramePosition() -- Save frame position on logout
+end
+
+local function OnPlayerEnteringWorld()
+    -- Setup OnUpdate handler for timers
+    DragonbreathChiliTracker:SetScript("OnUpdate", function(self, elapsed)
+        self.updateTimer = (self.updateTimer or 0) + elapsed
+        
+        if self.updateTimer >= 0.1 then -- Update 10 times per second
+            UpdateCooldownDisplay()
+            
+            if combatInfo.inCombat then
+                UpdateCombatDPS()
+            end
+            
+            self.updateTimer = 0
+        end
+    end)
+    -- Initial UI updates after entering world, in case ADDON_LOADED was too early for some UI elements
+    if displayFrame then
+        UpdateDamageDisplay()
+        UpdateCooldownDisplay()
+        UpdateCombatDPS()
+    end
+end
+
+--------------------------------------------------------------------------------
+-- Main Event Handler
+--------------------------------------------------------------------------------
+DragonbreathChiliTracker:SetScript("OnEvent", function(self, event, ...)
+    if event == "COMBAT_LOG_EVENT_UNFILTERED" then
+        HandleCombatLogEvent(...)
+    elseif event == "PLAYER_REGEN_ENABLED" then -- Player left combat
+        OnCombatEnd()
+    elseif event == "PLAYER_REGEN_DISABLED" then -- Player entered combat
+        OnCombatStart()
+    elseif event == "ADDON_LOADED" then
+        OnAddonLoaded(...)
+    elseif event == "PLAYER_LOGOUT" then
+        OnPlayerLogout()
+    elseif event == "PLAYER_ENTERING_WORLD" then
+        OnPlayerEnteringWorld()
+    end
+end)
+
+-- Register Events
 DragonbreathChiliTracker:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 DragonbreathChiliTracker:RegisterEvent("PLAYER_REGEN_ENABLED")
 DragonbreathChiliTracker:RegisterEvent("PLAYER_REGEN_DISABLED")
@@ -280,92 +377,50 @@ DragonbreathChiliTracker:RegisterEvent("ADDON_LOADED")
 DragonbreathChiliTracker:RegisterEvent("PLAYER_LOGOUT")
 DragonbreathChiliTracker:RegisterEvent("PLAYER_ENTERING_WORLD")
 
-DragonbreathChiliTracker:SetScript("OnEvent", function(self, event, ...)
-    if event == "COMBAT_LOG_EVENT_UNFILTERED" then
-        local _, subevent, _, sourceGUID, _, _, _, _, _, _, _, spellID, _, _, amount = CombatLogGetCurrentEventInfo()
-        -- Only track Dragonbreath Chili damage from the player
-        if sourceGUID == UnitGUID("player") and subevent == "SPELL_DAMAGE" and spellID == 15851 and amount then
-            damageData.current  = damageData.current + amount
-            damageData.session  = damageData.session + amount
-            damageData.allTime  = damageData.allTime + amount
-            cooldownEndTime     = GetTime() + cooldownTime
-            
-            -- Make sure we track combat status if damage happens outside normal combat
-            if not combatInfo.inCombat then
-                OnCombatStart()
-            end
-            
-            -- Update all displays when damage occurs
-            UpdateDamageDisplay()
-            UpdateCombatDPS()
-        end
-
-    elseif event == "PLAYER_REGEN_ENABLED" then
-        -- Player left combat
-        OnCombatEnd()
-
-    elseif event == "PLAYER_REGEN_DISABLED" then
-        -- Player entered combat
-        OnCombatStart()
-
-    elseif event == "ADDON_LOADED" and ... == addonName then
-        -- Load saved data
-        damageData.allTime = DragonbreathChiliTrackerDB.allTime or 0
-        
-        -- Load frame position
-        framePosition = DragonbreathChiliTrackerDB.framePosition or framePosition
-        LoadFramePosition()
-        UpdateDamageDisplay()
-
-    elseif event == "PLAYER_LOGOUT" then
-        -- Save data before logout
-        DragonbreathChiliTrackerDB.allTime = damageData.allTime
-        SaveFramePosition()
-
-    elseif event == "PLAYER_ENTERING_WORLD" then
-        -- Setup OnUpdate handler for timers
-        self:SetScript("OnUpdate", function(self, elapsed)
-            self.updateTimer = (self.updateTimer or 0) + elapsed
-            
-            -- Update UI elements every 0.1 seconds (10 times per second)
-            if self.updateTimer >= 0.1 then
-                UpdateCooldownDisplay()
-                
-                -- Only update DPS in combat to avoid unnecessary calculations
-                if combatInfo.inCombat then
-                    UpdateCombatDPS()
-                end
-                
-                self.updateTimer = 0
-            end
-        end)
-    end
-end)
-
 --------------------------------------------------------------------------------
 -- Slash Commands
 --------------------------------------------------------------------------------
 SLASH_DRAGONCHILI1 = "/chilitracker"
-SlashCmdList["DRAGONCHILI"] = function(msg)
-    if msg == "resetfight" then
-        ResetCurrentFight()
-    elseif msg == "resetsession" then
-        ResetSession()
-    elseif msg == "resetalltime" then
-        ResetAllTime()
-    elseif msg == "toggle" then
-        if frame:IsShown() then
-            frame:Hide()
-            print("Dragonbreath Chili Tracker hidden.")
+SLASH_DRAGONCHILI2 = "/dbc" -- Alias
+
+local slashCommands = {
+    resetfight = ResetCurrentFight,
+    resetsession = ResetSession,
+    resetalltime = ResetAllTime,
+    toggle = function()
+        if displayFrame:IsShown() then
+            displayFrame:Hide()
+            print(addonName .. " Tracker hidden.")
         else
-            frame:Show()
-            print("Dragonbreath Chili Tracker shown.")
+            displayFrame:Show()
+            print(addonName .. " Tracker shown.")
         end
+    end,
+    lock = function() -- Added direct slash command for lock/unlock
+        DragonbreathChiliTrackerDB.locked = not DragonbreathChiliTrackerDB.locked
+        if lockButton then
+            lockButton:SetText(DragonbreathChiliTrackerDB.locked and "Unlock" or "Lock")
+        end
+        print(addonName .. " frame " .. (DragonbreathChiliTrackerDB.locked and "locked." or "unlocked."))
+    end
+}
+
+SlashCmdList["DRAGONCHILI"] = function(msg)
+    local command = string.lower(string.match(msg, "^(%S*)")) -- Get first word as command
+    if slashCommands[command] then
+        slashCommands[command]()
     else
-        print("Dragonbreath Chili Tracker Commands:")
-        print("/chilitracker resetfight - Reset current fight damage.")
-        print("/chilitracker resetsession - Reset session damage.")
-        print("/chilitracker resetalltime - Reset all-time damage.")
-        print("/chilitracker toggle - Show/hide the tracker.")
+        print(COLOR_HIGHLIGHT_HEX .. addonName .. " Commands:" .. COLOR_RESET_HEX)
+        print(SLASH_DRAGONCHILI1 .. " resetfight - Reset current fight damage.")
+        print(SLASH_DRAGONCHILI1 .. " resetsession - Reset session damage.")
+        print(SLASH_DRAGONCHILI1 .. " resetalltime - Reset all-time damage.")
+        print(SLASH_DRAGONCHILI1 .. " toggle - Show/hide the tracker.")
+        print(SLASH_DRAGONCHILI1 .. " lock - Toggle frame lock.")
     end
 end
+
+-- Initial update of displays once everything is set up
+UpdateDamageDisplay()
+UpdateCooldownDisplay()
+UpdateCombatDPS()
+print(COLOR_HIGHLIGHT_HEX .. addonName .. " loaded." .. COLOR_RESET_HEX)

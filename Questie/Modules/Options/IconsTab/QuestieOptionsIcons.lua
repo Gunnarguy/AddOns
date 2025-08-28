@@ -18,6 +18,8 @@ local QuestiePlayer = QuestieLoader:ImportModule("QuestiePlayer");
 local QuestieTooltips = QuestieLoader:ImportModule("QuestieTooltips");
 ---@type QuestieMenu
 local QuestieMenu = QuestieLoader:ImportModule("QuestieMenu");
+---@type Expansions
+local Expansions = QuestieLoader:ImportModule("Expansions")
 
 QuestieOptions.tabs.icons = {...}
 local optionsDefaults = QuestieOptionsDefaults:Load()
@@ -1273,7 +1275,7 @@ function QuestieOptionsUtils.SetPfQuestIcons(info, value)
 end
 
 _GetIconThemes = function()
-    if Questie.IsWotlk or Questie.IsCata then
+    if Expansions.Current >= Expansions.Wotlk then
         return {
             ["questie"] = "|T" .. Questie.icons["slay"] .. ":14|t Questie",
             ["blizzard"] = "|TInterface/buttons/adventureguidemicrobuttonalert.blp:20:20:0:0:32:32:2:28:2:28|t Blizzard",
@@ -1290,7 +1292,7 @@ _GetIconThemes = function()
 end
 
 _GetIconThemesSort = function()
-    if Questie.IsWotlk or Questie.IsCata then
+    if Expansions.Current >= Expansions.Wotlk then
         return {
             "questie",
             "blizzard",
@@ -1347,11 +1349,12 @@ end
 function QuestieOptionsUtils.ExecuteTheme(info, value)
     Questie.db.profile.iconTheme = value
     if value == "questie" then
-        if GetCVar("questPOI") then -- if wotlk objectives available
-            SetCVar("questPOI", "0") -- disable them
+        if GetCVar("questPOI") then -- check for Blizzard style objectives
+            SetCVar("questPOI", "0")
         end
-        if WorldMapQuestShowObjectives then -- if wotlk blizzard objectives button exists
-            WorldMapQuestShowObjectives:SetChecked(false) -- uncheck it
+        if WorldMapQuestShowObjectives then
+            -- Blizzard objectives button exists
+            WorldMapQuestShowObjectives:SetChecked(false)
         end
         Questie.db.profile.enableObjectives = true
         Questie.db.profile.ICON_SLAY = Questie.icons["slay"]
@@ -1366,11 +1369,12 @@ function QuestieOptionsUtils.ExecuteTheme(info, value)
         Questie.db.profile.alwaysGlowMinimap = optionsDefaults.profile.alwaysGlowMinimap
         Questie.db.profile.clusterLevelHotzone = optionsDefaults.profile.clusterLevelHotzone
     elseif value == "pfquest" then
-        if GetCVar("questPOI") then -- if wotlk objectives available
-            SetCVar("questPOI", "0") -- disable them
+        if GetCVar("questPOI") then -- check for Blizzard style objectives
+            SetCVar("questPOI", "0")
         end
-        if WorldMapQuestShowObjectives then -- if wotlk blizzard objectives button exists
-            WorldMapQuestShowObjectives:SetChecked(false) -- uncheck it
+        if WorldMapQuestShowObjectives then
+            -- Blizzard objectives button exists
+            WorldMapQuestShowObjectives:SetChecked(false)
         end
         Questie.db.profile.enableObjectives = true
         Questie.db.profile.ICON_SLAY = Questie.icons["node"]
@@ -1385,11 +1389,12 @@ function QuestieOptionsUtils.ExecuteTheme(info, value)
         Questie.db.profile.alwaysGlowMinimap = false
         Questie.db.profile.clusterLevelHotzone = 1
     elseif value == "blizzard" then
-        if GetCVar("questPOI") then -- if wotlk objectives available
-            SetCVar("questPOI", "1") -- enable them
+        if GetCVar("questPOI") then -- check for Blizzard style objectives
+            SetCVar("questPOI", "1")
         end
-        if WorldMapQuestShowObjectives then -- if wotlk blizzard objectives button exists
-            WorldMapQuestShowObjectives:SetChecked(false) -- check it
+        if WorldMapQuestShowObjectives then
+            -- Blizzard objectives button exists
+            WorldMapQuestShowObjectives:SetChecked(false)
         end
         Questie.db.profile.enableObjectives = false
         Questie.db.profile.ICON_SLAY = Questie.icons["slay"]

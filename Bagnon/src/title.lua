@@ -35,7 +35,7 @@ end
 
 function Title:OnMouseDown()
 	local parent = self:GetParent()
-	if not parent.profile.managed and (not Addon.sets.locked or IsAltKeyDown()) then
+	if parent:CanDrag() then
 		parent:StartMoving()
 	end
 end
@@ -43,7 +43,7 @@ end
 function Title:OnMouseUp()
 	local parent = self:GetParent()
 	parent:StopMovingOrSizing()
-	parent:RecomputePosition()
+	parent:SavePosition()
 end
 
 function Title:OnDoubleClick()
@@ -66,7 +66,7 @@ function Title:Update()
 	self:GetFontString():SetAllPoints(self)
 end
 
-function Title:UpdateVisible(_, busy)
+function Title:UpdateVisible(busy)
 	self:SetShown(not busy)
 end
 

@@ -1,0 +1,8 @@
+## Interface: 11507
+## Title: Raid Healer Tracker
+## Notes: Tracks all healers in your raid, their targets, and heal predictions for Classic Anniversary
+## Author: Copilot AI
+## Version: 1.0.0
+## SavedVariables: RaidHealerTracker_DB
+
+RaidHealerTracker.lua

@@ -1,0 +1,11 @@
+## Interface: 11505
+## Title: Lib: HealComm-2.0-Classic
+## Notes: Library for showing incoming heals and hots
+## Author: Shadowed, xbeeps, Azilroka, GrumpyPlayers (also known as <SG>Soul)
+## X-Category: Library
+## Version: 2.0.1
+
+libs\LibStub\LibStub.lua
+libs\CallbackHandler-1.0\CallbackHandler-1.0.lua
+
+LibHealComm-2.0-Classic.xml

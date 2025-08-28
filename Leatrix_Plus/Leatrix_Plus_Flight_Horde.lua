@@ -230,7 +230,7 @@
 				["0.44:0.19:0.62:0.31"] = 301, -- Undercity, Hammerfall
 				["0.44:0.19:0.67:0.30"] = 284, -- Undercity, Revantusk Village
 				["0.44:0.19:0.70:0.16"] = 261, -- Undercity, Light's Hope Chapel (Robbie Busch reported 279)
-				["0.44:0.19:0.49:0.27"] = 141, -- Undercity, Tarren Mill (Jason M reported 205)
+				["0.44:0.19:0.49:0.27"] = 141, -- Undercity, Tarren Mill (Jason M reported 205, Brandon Steele reported 177)
 				["0.44:0.19:0.38:0.24"] = 106, -- Undercity, The Sepulcher
 				["0.44:0.19:0.55:0.57:0.43:0.93"] = 904, -- Undercity, Kargath, Booty Bay
 
@@ -309,6 +309,7 @@
 				["0.44:0.69:0.55:0.73:0.61:0.80:0.50:0.76"] = 307, -- Camp Mojache, Freewind Post, Gadgetzan, Marshal's Refuge
 				["0.44:0.69:0.56:0.53:0.46:0.30:0.64:0.23"] = 661, -- Camp Mojache, Crossroads, Bloodvenom Post, Everlook
 				["0.44:0.69:0.45:0.56:0.53:0.61"] = 346, -- Camp Mojache, Thunder Bluff, Camp Taurajo
+				["0.44:0.69:0.56:0.53:0.63:0.44:0.64:0.23"] = 725, -- Camp Mojache, Crossroads, Orgrimmar, Everlook
 
 				-- Horde: Camp Taurajo (The Barrens)
 				["0.53:0.61:0.55:0.73:0.61:0.80"] = 218, -- Camp Taurajo, Freewind Post, Gadgetzan
@@ -451,7 +452,7 @@
 				["0.55:0.73:0.56:0.53:0.41:0.47:0.32:0.58"] = 486, -- Freewind Post, Crossroads, Sun Rock Retreat, Shadowprey Village
 
 				-- Horde: Gadgetzan (Tanaris)
-				["0.61:0.80:0.42:0.79"] = 233, -- Gadgetzan, Cenarion Hold
+				["0.61:0.80:0.42:0.79"] = 233, -- Gadgetzan, Cenarion Hold (Peter Scheuerman reported 305)
 				["0.61:0.80:0.50:0.76"] = 108, -- Gadgetzan, Marshal's Refuge
 				["0.61:0.80:0.55:0.73"] = 87, -- Gadgetzan, Freewind Post
 				["0.61:0.80:0.44:0.69"] = 200, -- Gadgetzan, Camp Mojache
@@ -641,6 +642,7 @@
 				["0.32:0.58:0.44:0.69:0.61:0.80"] = 397, -- Shadowprey Village, Camp Mojache, Gadgetzan
 				["0.32:0.58:0.41:0.47:0.56:0.53:0.57:0.64"] = 511, -- Shadowprey Village, Sun Rock Retreat, Crossroads, Brackenwall Village
 				["0.32:0.58:0.41:0.47:0.56:0.53:0.55:0.42"] = 511, -- Shadowprey Village, Sun Rock Retreat, Crossroads, Splintertree Post
+				["0.32:0.58:0.44:0.69:0.56:0.53:0.63:0.44"] = 602, -- Shadowprey Village, Camp Mojache, Crossroads, Orgrimmar
 
 				-- Horde: Splintertree Post (Ashenvale)
 				["0.55:0.42:0.56:0.53:0.55:0.73:0.61:0.80"] = 436, -- Splintertree Post, Crossroads, Freewind Post, Gadgetzan

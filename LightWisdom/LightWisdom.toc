@@ -1,8 +1,8 @@
-## Interface: 11501
-## Title: LightWisdomStats
-## Notes: Tracks Judgement of Light/Wisdom statistics
+## Interface: 11503
+## Title: Light & Wisdom Stats
+## Notes: Track Judgement of Light healing and Judgement of Wisdom mana for your group
 ## Author: YourName
-## Version: 1.2.0
+## Version: 2.0
 ## SavedVariables: LWS_DB
 
 LightWisdom.lua

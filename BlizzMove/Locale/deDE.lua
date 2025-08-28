@@ -26,6 +26,8 @@ L["DeModal is loaded, this addon is known to cause issues, consider replacing it
 L["Detached windows can be moved and resized independently from the parent."] = "Losgelöste Fenster können unabhängig von ihrem übergeordnetem Fenster bewegt und skaliert werden."
 L["Do not remember"] = "Nicht speichern"
 L["Enable the Blizzmove_Debug plugin, to find more debugging information."] = "Aktiviere das Blizzmove_Debug-Plugin für weitere Informationen zum Debugging."
+--[[Translation missing --]]
+L["Failed to make frame movable:"] = "Failed to make frame movable:"
 L["Filter"] = "Filter"
 L["Found bad anchor connections, copy the popup window contents to analyze them."] = "Schlechte Ankerverbindungen gefunden, kopiere den Inhalt des Popup-Fensters zum Analysieren."
 L["frame positions are remembered until you switch to another option, click the reset button, or disable BlizzMove"] = "Fensterpositionen werden gespeichert, bis du eine andere Option wählst, auf Zurücksetzen klickst oder BlizzMove deaktivierst"

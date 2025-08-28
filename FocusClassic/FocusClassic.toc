@@ -1,0 +1,16 @@
+## Interface: 11505
+## Title: FocusClassic
+## Notes: Permet aux joueurs d'avoir le focus d'une cible.
+## Author: Ghoosty 
+## Version: 2.5.0
+
+## SavedVariables: FocusClassicDB
+
+locales/frFR.lua
+locales/enUS.lua
+core/Commands.lua
+core/Focus.lua
+core/FocusMark.lua
+core/Main.lua
+core/UI.lua
+core/Options.lua

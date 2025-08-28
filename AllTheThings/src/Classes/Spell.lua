@@ -8,26 +8,18 @@ local pairs, select, rawget
 	= pairs, select, rawget
 
 -- App locals
-local IsQuestFlaggedCompleted, SearchForFieldContainer, GetFixedItemSpecInfo, SearchForField
-	= app.IsQuestFlaggedCompleted, app.SearchForFieldContainer, app.GetFixedItemSpecInfo, app.SearchForField
+local IsQuestFlaggedCompleted, SearchForFieldContainer, SearchForField
+	= app.IsQuestFlaggedCompleted, app.SearchForFieldContainer, app.SearchForField
 
 -- WoW API Cache
 local GetSpellLink = app.WOWAPI.GetSpellLink;
 
-local IsSpellKnown, IsPlayerSpell, GetNumSpellTabs, GetSpellTabInfo, IsSpellKnownOrOverridesKnown
+-- TODO: some of these deprecated in 11.2, move to WOWAPI
+local IsSpellKnown, GetNumSpellTabs, GetSpellTabInfo, IsSpellKnownOrOverridesKnown
 ---@diagnostic disable-next-line: deprecated
-	= IsSpellKnown, IsPlayerSpell, GetNumSpellTabs, GetSpellTabInfo, IsSpellKnownOrOverridesKnown
+	= app.WOWAPI.IsSpellKnown, GetNumSpellTabs, GetSpellTabInfo, app.WOWAPI.IsSpellKnownOrOverridesKnown
 
--- Consolidates some spell checking
----@param spellID number
----@param rank? number
----@param ignoreHigherRanks? boolean
----@return boolean isKnown
-local IsSpellKnownHelper = function(spellID, rank, ignoreHigherRanks)
-	if IsPlayerSpell(spellID) or IsSpellKnown(spellID) or IsSpellKnown(spellID, true)
-		or IsSpellKnownOrOverridesKnown(spellID) or IsSpellKnownOrOverridesKnown(spellID, true) then
-		return true;
-	end
+local function IsSpellKnownByQuestComplete(spellID)
 	if spellID == 390631 and IsQuestFlaggedCompleted(66444) then	-- Ottuk Taming returning false for the above functions
 		return true;
 	end
@@ -36,6 +28,36 @@ local IsSpellKnownHelper = function(spellID, rank, ignoreHigherRanks)
 	end
 	if (spellID == 148972 or spellID == 148970) and IsQuestFlaggedCompleted(32325) then	-- Green Dread/Fel-Steed returning false for the above functions
 		return true;
+	end
+end
+-- Consolidates some spell checking
+---@param spellID number
+---@param rank? number
+---@param ignoreHigherRanks? boolean
+---@return boolean isKnown
+local IsSpellKnownHelper
+-- In 11.2 some spell checking was consolidated
+if app.GameBuildVersion >= 110200 then
+	IsSpellKnownHelper = function(spellID, rank, ignoreHigherRanks)
+		if IsSpellKnown(spellID)
+			or IsSpellKnown(spellID, 1)
+			or IsSpellKnownOrOverridesKnown(spellID, 0, true)
+			or IsSpellKnownOrOverridesKnown(spellID, 1, true)
+			or IsSpellKnownByQuestComplete(spellID) then
+			return true
+		end
+	end
+else
+	local IsPlayerSpell = app.WOWAPI.IsPlayerSpell
+	IsSpellKnownHelper = function(spellID, rank, ignoreHigherRanks)
+		if IsPlayerSpell(spellID)
+			or IsSpellKnown(spellID)
+			or IsSpellKnown(spellID, true)
+			or IsSpellKnownOrOverridesKnown(spellID)
+			or IsSpellKnownOrOverridesKnown(spellID, true)
+			or IsSpellKnownByQuestComplete(spellID) then
+			return true
+		end
 	end
 end
 app.IsSpellKnownHelper = IsSpellKnownHelper;
@@ -63,10 +85,10 @@ SpellNameToSpellID = setmetatable(L.SPELL_NAME_TO_SPELL_ID, {
 		for spellID,g in pairs(cache) do
 			GetSpellName(spellID);
 		end
-		for _,spellID in pairs(app.SkillIDToSpellID) do
+		for _,spellID in pairs(app.SkillDB.SkillToSpell) do
 			GetSpellName(spellID);
 		end
-		for specID,spellID in pairs(app.SpecializationSpellIDs) do
+		for specID,spellID in pairs(app.SkillDB.SpecializationSpells) do
 			GetSpellName(spellID);
 		end
 		local numSpellTabs, offset, lastSpellName, currentSpellRank = GetNumSpellTabs(), select(4, GetSpellTabInfo(1)), "", 1;
@@ -104,7 +126,7 @@ local SkillIcons = setmetatable({
 	[2886] = 1394946,	-- Supply Shipments
 }, { __index = function(t, key)
 	if not key then return; end
-	local skillSpellID = app.SkillIDToSpellID[key];
+	local skillSpellID = app.SkillDB.SkillToSpell[key];
 	if skillSpellID then
 		return GetSpellIcon(skillSpellID);
 	end
@@ -137,25 +159,6 @@ local function CacheInfo(t, field)
 		-- fallback to skill icon if possible
 		_t.icon = SkillIcons[t.skillID] or 136243;	-- Trade_engineering
 		_t.link = _t.name;
-	end
-	if field then return _t[field]; end
-end
-local function CacheItemInfo(t, field)
-	local _t = cache.GetCached(t);
-	local item = _t._refitem
-	if not item then
-		-- this allows using the Item's cache to cache the Item information for the Recipe properly
-		-- eventually can use some shared ItemDB information cache driectly ideally
-		item = app.CreateItem(t.itemID)
-		_t._refitem = item
-	end
-	if item.link then
-		local itemCache = item._cache.GetCached(item)
-		_t.name = itemCache.name
-		_t.link = itemCache.link
-		_t.icon = itemCache.icon
-	elseif item.name then
-		_t.name = item.name
 	end
 	if field then return _t[field]; end
 end
@@ -194,24 +197,8 @@ do
 		end,
 	},
 	"WithItem", {
-		_cachekey = function(t)
-			return t[KEY] + (t.itemID / 1000000)
-		end,
-		specs = function(t)
-			return GetFixedItemSpecInfo(t.itemID)
-		end,
-		tsm = function(t)
-			return ("i:%d"):format(t.itemID)
-		end,
-		name = function(t)
-			return cache.GetCachedField(t, "name", CacheItemInfo);
-		end,
-		link = function(t)
-			return cache.GetCachedField(t, "link", CacheItemInfo);
-		end,
-		icon = function(t)
-			return cache.GetCachedField(t, "icon", CacheItemInfo) or 136243;	-- Trade_engineering
-		end,
+		ImportFrom = "Item",
+		ImportFields = { "name", "link", "icon", "specs", "tsm", "costCollectibles", "AsyncRefreshFunc" },
 	},
 	function(t) return t.itemID end)
 
@@ -299,29 +286,11 @@ do
 		end,
 	},
 	"WithItem", {
+		ImportFrom = "Item",
+		ImportFields = { "name", "link", "icon", "specs", "tsm", "costCollectibles", "AsyncRefreshFunc" },
 		b = function(t)
 			-- If not tracking Recipes Account-Wide, then pretend that every Recipe is BoP
 			return app.Settings.AccountWide[SETTING] and 2 or 1;
-		end,
-		-- Extended Classes don't inherit Variant versions of their Base Class automatically
-		-- i.e. RecipeWithItem doesn't extend SpellWithItem, it extends Spell
-		_cachekey = function(t)
-			return t[KEY] + (t.itemID / 1000000)
-		end,
-		specs = function(t)
-			return GetFixedItemSpecInfo(t.itemID)
-		end,
-		tsm = function(t)
-			return ("i:%d"):format(t.itemID)
-		end,
-		name = function(t)
-			return cache.GetCachedField(t, "name", CacheItemInfo);
-		end,
-		link = function(t)
-			return cache.GetCachedField(t, "link", CacheItemInfo);
-		end,
-		icon = function(t)
-			return cache.GetCachedField(t, "icon", CacheItemInfo) or 136243;	-- Trade_engineering
 		end,
 	},
 	function(t) return t.itemID end);

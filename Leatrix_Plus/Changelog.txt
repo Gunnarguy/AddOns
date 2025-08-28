@@ -1,4 +1,10 @@
-﻿1.15.85 - 23rd April 2025
+﻿1.15.87 - 6th May 2025
+- Added flight times.
+
+1.15.86 - 30th April 2025
+- Added flight times.
+
+1.15.85 - 23rd April 2025
 - Added flight times.
 
 1.15.84 - 16th April 2025

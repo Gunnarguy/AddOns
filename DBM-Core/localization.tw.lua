@@ -546,12 +546,14 @@ L.AUTO_TIMER_OPTIONS.roleplay				= "計時條：劇情持續時間"
 L.AUTO_TIMER_OPTIONS.combat					= "為戰鬥開始顯示計時器"
 
 L.AUTO_ICONS_OPTION_TARGETS					= "為$spell:%s的目標設置標記"
-L.AUTO_ICONS_OPTION_TARGETS_TANK_A			= "為$spell:%s的目標設置標記，優先等級為坦克高於近戰高於遠程，並以字母順序優先"
-L.AUTO_ICONS_OPTION_TARGETS_TANK_R			= "為$spell:%s的目標設置標記，優先等級為坦克高於近戰高於遠程，並以團隊陣容優先"
+L.AUTO_ICONS_OPTION_TARGETS_TANK_A			= "為$spell:%s的目標設置標記，優先等級為坦克高於近戰高於遠程，並以字母順序後備"
+L.AUTO_ICONS_OPTION_TARGETS_TANK_R			= "為$spell:%s的目標設置標記，優先等級為坦克高於近戰高於遠程，並以團隊陣容後備"
 L.AUTO_ICONS_OPTION_TARGETS_MELEE_A			= "為$spell:%s的目標設置標記，以近戰和字母順序優先"
 L.AUTO_ICONS_OPTION_TARGETS_MELEE_R			= "為$spell:%s的目標設置標記，以近戰和團隊陣容優先"
 L.AUTO_ICONS_OPTION_TARGETS_RANGED_A		= "為$spell:%s的目標設置標記，以遠程和字母順序優先"
 L.AUTO_ICONS_OPTION_TARGETS_RANGED_R		= "為$spell:%s的目標設置標記，以遠程和團隊陣容優先"
+L.AUTO_ICONS_OPTION_TARGETS_MRH				= "為$spell:%s的目標設置標記，優先等級為近戰高於遠程高於治療，並以團隊陣容後備"
+L.AUTO_ICONS_OPTION_TARGETS_TOH				= "為$spell:%s的目標設置標記，優先等級為坦克高於輸出高於治療，並以團隊陣容後備"
 L.AUTO_ICONS_OPTION_TARGETS_ALPHA			= "為$spell:%s的目標設置標記，以字母順序優先"
 L.AUTO_ICONS_OPTION_TARGETS_ROSTER			= "為$spell:%s的目標設置標記，以團隊陣容優先"
 L.AUTO_ICONS_OPTION_NPCS					= "為$spell:%s設置標記"
@@ -644,14 +646,8 @@ L.SPEED_CLEAR_TIMER_TEXT		= "最佳紀錄"
 L.COMBAT_RES_TIMER_TEXT			= "下一個戰復充能"
 L.TIMER_RESPAWN					= "%s 重生"
 
-L.LAG_CHECKING					= "檢測團隊成員的網路延遲中..."
-L.LAG_HEADER					= ""..L.DEADLY_BOSS_MODS.." - 網路延遲結果"
-L.LAG_ENTRY						= "%s:世界延遲[%d毫秒]/本地延遲[%d毫秒]"
-L.LAG_FOOTER					= "無回應:%s"
-
-L.DUR_CHECKING					= "檢測團隊裝備耐久度..."
-L.DUR_HEADER					= ""..L.DEADLY_BOSS_MODS.." - 裝備耐久度結果"
-L.DUR_ENTRY						= "%s:耐久度[%d百分比]/裝備損壞[%s]"
+L.LAG_HEADER					= ""..L.DBM.." - 網路延遲結果"
+L.DUR_HEADER					= ""..L.DBM.." - 裝備耐久度結果"
 
 L.OVERRIDE_ACTIVATED			= "領隊已啟用此首領的配置覆蓋"
 
@@ -686,7 +682,18 @@ L.DBM_INSTALL_PACKAGE_WRATH			= "巫妖王組件"
 L.DBM_INSTALL_PACKAGE_CATA			= "浩劫與重生組件"
 L.DBM_INSTALL_PACKAGE_MOP			= "潘達利亞的迷霧組件"
 L.DBM_INSTALL_PACKAGE_DUNGEON		= "地下城、探究以及事件組件"
-L.DBM_INSTALL_PACKAGE_CHALLENGES	= "挑戰組件"
 
 -- Tests
 L.DBM_TAINTED_BY_TESTS			= "DBM在當前階段使用了包含時間扭曲的測試模式，建議使用DBM在真正的首領戰鬥中之前重新載入UI。一切都應該按預期工作但並不保證！"
+
+-- Boss tooltip
+L.TOOLTIP_DBM					= L.DBM .. " 資訊"
+L.TOOLTIP_ENRAGE_TIMER			= "激怒計時器"
+L.TOOLTIP_KILLS					= "擊殺 (%s)"
+L.TOOLTIP_WIPES					= "清除 (%s)"
+L.TOOLTIP_FASTEST				= "最快擊殺 (%s)"
+
+-- Difficulty info not found in normal globals, used by both GUI and tooltip
+L.FOLLOWER						= "追隨者"--i.e. the new dungeon type in 10.2.5. I haven't found a translated string yet
+L.STORY					    	= PLAYER_DIFFICULTY_STORY_RAID or "故事"--i.e. the new dungeon type in 11.0.0. I haven't found a translated string yet
+L.DUOS							= "雙煞"

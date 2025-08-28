@@ -1,0 +1,15 @@
+## Interface: 11507
+## Title: Archon Tooltip DB - Nightslayer (US)
+## Author: Archon
+## Dependencies: ArchonTooltip
+## DefaultState: enabled
+## LoadOnDemand: 1
+## X-Database-Key: US_5213
+## X-Database-Name: Nightslayer (US)
+## X-Game-Version-ID: warcraft-classic-fresh
+## X-Updated-At: 2025-08-19T12:56:31.000Z
+## IconTexture: Interface/AddOns/ArchonTooltip/Media/logo-32-circle.tga
+## Category: Archon
+
+../ArchonTooltip/DB/db_1035_US_5213_5213_subscribers.lua
+../ArchonTooltip/DB/db_1035_US_5213_5213_weekly.lua

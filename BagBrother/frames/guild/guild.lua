@@ -3,8 +3,7 @@
 		A specialized version of the window frame for the guild bank
 --]]
 
-local MODULE =  ...
-local ADDON, Addon = MODULE:match('[^_]+'), _G[MODULE:match('[^_]+')]
+local ADDON, Addon = (...):match('[^_]+'), _G[(...):match('[^_]+')]
 local Guild = Addon.Frame:NewClass('Guild')
 local Sushi = LibStub('Sushi-3.2')
 
@@ -14,7 +13,7 @@ Guild.CloseSound = SOUNDKIT.GUILD_VAULT_CLOSE
 Guild.OpenSound = SOUNDKIT.GUILD_VAULT_OPEN
 Guild.MoneyFrame = Addon.GuildMoney
 Guild.ItemGroup = Addon.GuildItemGroup
-Guild.BagGroup = Addon.GuildTabGroup
+Guild.BagButton = Addon.GuildTab
 Guild.Title = '%s'
 Guild.Bags = {}
 
@@ -38,13 +37,14 @@ function Guild:New(id)
 end
 
 function Guild:RegisterEvents()
+	self:Super(Guild):RegisterEvents()
 	self:RegisterFrameSignal('LOG_SELECTED', 'OnLogSelected')
 end
 
 
 --[[ Events ]]--
 
-function Guild:OnLogSelected(_, logID)
+function Guild:OnLogSelected(logID)
 	self.ItemGroup:SetShown(not logID)
 	self.Log:SetShown(logID)
 end
@@ -93,4 +93,3 @@ end
 
 function Guild:GetExtraButtons() return self.LogToggles end
 function Guild:AreBagsShown() return true end
-function Guild:HasOwnerSelector() end

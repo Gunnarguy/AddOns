@@ -337,6 +337,9 @@ function QuestieItemFixes:Load()
             [itemKeys.npcDrops] = {},
             [itemKeys.objectDrops] = {},
         },
+        [5086] = {
+            [itemKeys.npcDrops] = {3242,3426,3466},
+        },
         [5088] = {
             [itemKeys.relatedQuests] = {894},
             [itemKeys.npcDrops] = {},
@@ -762,6 +765,9 @@ function QuestieItemFixes:Load()
             [itemKeys.npcDrops] = {},
             [itemKeys.objectDrops] = {174793},
         },
+        [11148] = {
+            [itemKeys.class] = 12,
+        },
         [11149] = {
             [itemKeys.relatedQuests] = {3924},
             [itemKeys.npcDrops] = {},
@@ -937,6 +943,9 @@ function QuestieItemFixes:Load()
         },
         [13156] = {
             [itemKeys.class] = 12,
+        },
+        [13172] = {
+            [itemKeys.name] = "Grimm's Premium Tobacco",
         },
         [13422] = {
             [itemKeys.objectDrops] = {},
@@ -1119,6 +1128,9 @@ function QuestieItemFixes:Load()
         [18335] = {
             [itemKeys.class] = 12,
         },
+        [18401] = {
+            [itemKeys.name] = "Nostro's Compendium of Dragon Slaying",
+        },
         [18605] = {
             [itemKeys.npcDrops] = {12396}, -- #7583
         },
@@ -1233,6 +1245,9 @@ function QuestieItemFixes:Load()
         },
         [20709] = {
             [itemKeys.objectDrops] = {},
+        },
+        [20944] = {
+            [itemKeys.npcDrops] = {},
         },
         [21071] = {
             [itemKeys.objectDrops] = {},

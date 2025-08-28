@@ -455,9 +455,6 @@ L["soundOnlyInCityDesc"] = "Only play buff sounds when you are in the main city 
 L["soundsDisableInInstancesTitle"] = "Disable In Instances";
 L["soundsDisableInInstancesDesc"] = "Disable sounds while in raids and instances.";
 
-L["soundsFirstYellTitle"] = "Buff Coming";
-L["soundsFirstYellDesc"] = "Sound to play when head is handed in and you have a few seconds before buff will drop (First NPC Yell).";
-
 L["soundsOneMinuteTitle"] = "One Minute Warning";
 L["soundsOneMinuteDesc"] = "Sound to play for 1 minute left timer warning.";
 
@@ -1067,3 +1064,53 @@ L["No characters with buffs found."] = "No characters with buffs found.";
 L["Unknown Layer"] = "Unknown Layer";
 
 L["Active"] = "Active";
+L["noZonesMappedYet"] = "No zones have been mapped yet since server restart.";
+L["Rend log adjusted"] = "Adjusted by Rend Log";
+
+L["flashDisableRendTitle"] = "Disable Rend Flash";
+L["flashDisableRendDesc"] = "Override to disable all Rend related client flash events.";
+
+L["flashDisableOnyTitle"] = "Disable Ony Flash";
+L["flashDisableOnyDesc"] = "Override to disable all Ony/Nef related client flash events.";
+
+L["flashDisableZanTitle"] = "Disable Zan Flash";
+L["flashDisableZanDesc"] = "Override to disable all Zandalar related client flash events.";
+
+L["soundsFirstYellTitle"] = "Other Buffs Coming";
+L["soundsFirstYellDesc"] = "Sound to play when zand/other buffs are handed in and you have a few seconds before buff will drop (First NPC Yell).";
+
+L["soundsFirstYellRendTitle"] = "Rend Buff Coming";
+L["soundsFirstYellRendDesc"] = "Sound to play when rend head is handed in and you have a few seconds before buff will drop (First NPC Yell).";
+
+L["soundsFirstYellOnyTitle"] = "Ony/Nef Buff Coming";
+L["soundsFirstYellOnyDesc"] = "Sound to play when ony/nef head is handed in and you have a few seconds before buff will drop (First NPC Yell).";
+
+L["resetFramesTitle"] = "Reset Windows";
+L["resetFramesDesc"] = "Click here to reset all window positions back to middle of the screen.";
+
+L["buffHasNoCooldown"] = "This drop doesn't trigger a cooldown";
+L["noCooldown"] = "No cooldown";
+
+L["showDisableLayerButtonsTitle"] = "Show Disable Layer Button"
+L["showDisableLayerButtonsDesc"] = "Show disable layer button on the timers/layers frame.";
+
+L["Show Quest Handins Only"] = "Show Quest Handins Only";
+L["showQuestHandinsTooltip"] = "Only display log entries of rend quest being handed in.";
+
+L["Molten Core"] = "Molten Core";
+L["Onyxia's Lair"] = "Onyxia's Lair";
+L["Blackwing Lair"] = "Blackwing Lair";
+L["Naxxramas"] = "Naxxramas";
+L["Karazhan"] = "Karazhan";
+L["The Shattered Halls"] = "The Shattered Halls";
+L["Serpentshrine Cavern"] = "Serpentshrine Cavern";
+L["The Arcatraz"] = "The Arcatraz";
+L["Black Morass"] = "Black Morass";
+L["Battle of Mount Hyjal"] = "Battle of Mount Hyjal";
+L["Black Temple"] = "Black Temple";
+L["Hellfire Citadel"] = "Hellfire Citadel";
+L["Coilfang Reservoir"] = "Coilfang Reservoir";
+L["Shadow Labyrinth"] = "Shadow Labyrinth";
+L["Auchindoun"] = "Auchindoun";
+L["Tempest Keep"] = "Tempest Keep";
+L["Caverns of Time"] = "Caverns of Time";

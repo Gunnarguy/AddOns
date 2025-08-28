@@ -1,11 +1,10 @@
 local L = Gargul_L;
 
 ---@type GL
-local _, GL = ...;
+local GL;
+_, GL = ...;
 
----@class DefaultSettings : Data
-GL.Data = GL.Data or {};
-
+---@class DefaultSettings
 GL.Data.DefaultSettings = {
     autoOpenCommandHelp = true,
     changeLog = true,
@@ -86,6 +85,7 @@ GL.Data.DefaultSettings = {
         autoTradeDisenchanter = true,
         autoTradeInCombat = true,
         awardMessagesEnabled = true,
+        awardBonusLoot = true,
         awardOnReceive = false,
         awardOnReceiveMinimumQuality = 4,
         notifyOfFailedTradeStart = true,

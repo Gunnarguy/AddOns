@@ -1,8 +1,0 @@
-## Interface: 11403
-## Title: WoW Classic Era Fresh Anniversary Nightslayer Interrupt
-## Notes: Announces when you've been interrupted and counts down the duration
-## Author: Your Name
-## Version: 1.15
-## SavedVariables: WoWClassicEraFreshAnniversaryNightslayerInterruptDB
-
-WoWClassicEraFreshAnniversaryNightslayerInterrupt.lua

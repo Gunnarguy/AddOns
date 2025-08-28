@@ -1,8 +1,8 @@
-## Interface: 110105
+## Interface: 110200
 ## Title: |cff71FFC9SinStats|r
 ## Author: Sinba
 ## Notes : Character Stats
-## Version: 5.9164
+## Version: 5.9181
 ## IconTexture: Interface\AddOns\SinStats\Textures\MiniMap.blp
 ## X-License: All Rights Reserved
 ## Category: Combat

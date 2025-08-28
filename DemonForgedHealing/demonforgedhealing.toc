@@ -1,8 +1,0 @@
-## Interface: 11403
-## Title: Demon Forged Healing Tracker
-## Notes: Tracks Demon Forged Breastplate healing (Spell ID 16608)
-## Author: YourName
-## Version: 1.0
-## SavedVariables: DFH_DB
-
-demonforgedhealing.lua

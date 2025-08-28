@@ -232,15 +232,28 @@ function NWB:OnCommReceived(commPrefix, string, distribution, sender)
 			NWB:sendLayerBuffs();
 		end
 	end
-	if (tonumber(remoteVersion) < 2.75) then
-		if (cmd == "requestData" and distribution == "GUILD") then
-			if (not NWB:getGuildDataStatus()) then
-				NWB:sendSettings("GUILD");
-			else
-				NWB:sendData("GUILD");
+	if (NWB.isMOP) then
+		if (tonumber(remoteVersion) < 3.11) then
+			if (cmd == "requestData" and distribution == "GUILD") then
+				if (not NWB:getGuildDataStatus()) then
+					NWB:sendSettings("GUILD");
+				else
+					NWB:sendData("GUILD");
+				end
 			end
+			return;
 		end
-		return;
+	else
+		if (tonumber(remoteVersion) < 2.75) then
+			if (cmd == "requestData" and distribution == "GUILD") then
+				if (not NWB:getGuildDataStatus()) then
+					NWB:sendSettings("GUILD");
+				else
+					NWB:sendData("GUILD");
+				end
+			end
+			return;
+		end
 	end
 	if (cmd == "data" or cmd == "settings") then
 		NWB:receivedData(data, sender, distribution, elapsed);
@@ -327,7 +340,7 @@ function NWB:sendComm(distribution, string, target, prio, useOldSerializer)
 end
 
 --Doesn't need to be sent with logon cmds.
-local function getStatusL()
+local function getStatusL(distribution)
 	local l = "";
 	if (NWB.isLayered) then
 		if (NWB.db.global.guildL and distribution == "GUILD" and NWB.currentLayerShared and NWB.currentLayerShared > 0) then
@@ -366,7 +379,7 @@ function NWB:sendData(distribution, target, prio, noLayerMap, noLogs, type, forc
 	--NWB:debug(data)
 	if (next(data) ~= nil and NWB:isClassicCheck()) then
 		data = NWB.serializer:Serialize(data);
-		local l = getStatusL();
+		local l = getStatusL(distribution);
 		NWB.lastDataSent = GetServerTime();
 		NWB:sendComm(distribution, "data " .. version .. l .. " " .. self.k() .. " " .. data, target, prio);
 	end
@@ -404,7 +417,7 @@ function NWB:getGuildDataStatus()
 	if (not IsInGuild()) then
 		return;
 	end
-	GuildRoster();
+	C_GuildInfo.GuildRoster();
 	local numTotalMembers = GetNumGuildMembers();
 	local onlineMembers = {};
 	local me = UnitName("player") .. "-" .. GetNormalizedRealmName();
@@ -442,7 +455,7 @@ function NWB:sendSettings(distribution, target, prio)
 	local data = NWB:createSettings(distribution);
 	if (next(data) ~= nil) then
 		data = NWB.serializer:Serialize(data);
-		local l = getStatusL();
+		local l = getStatusL(distribution);
 		NWB.lastDataSent = GetServerTime();
 		NWB:sendComm(distribution, "settings " .. version .. l .. " " .. self.k() .. " " .. data, target, prio);
 	end
@@ -711,7 +724,7 @@ function NWB:requestData(distribution, target, prio)
 	data = NWB.serializer:Serialize(data);
 	NWB.lastDataSent = GetServerTime();
 	if (NWB:isClassicCheck()) then
-		local l = getStatusL();
+		local l = getStatusL(distribution);
 		NWB:sendComm(distribution, "requestData " .. version .. " " .. self.k() .. " " .. data, target, prio);
 	else
 		NWB:requestSettings(distribution, target, prio);
@@ -907,6 +920,7 @@ function NWB:createDataLayered(distribution, noLayerMap, noLogs, type, forceLaye
 			--So there's no need to use the addon bandwidth every time we send.
 			--Also don't send layermap data with group joins.
 			sendLayerMap = true;
+			NWB:fixLayermaps();
 		end
 		for layer, v in NWB:pairsByKeys(NWB.data.layers) do
 			--Reset foundTimer with each loop so we don't send layermap data for layers with no timers later in the loop.
@@ -1294,6 +1308,10 @@ function NWB:validateCloseTimestamps(layer, key, timestamp)
 		--If buffs are syncing on both layers then skip this check for rend (Blizzard hotfix enabled 23/7/2020).
 		return true;
 	end
+	if (key == "spawn") then
+		--Layers can spawn at the same time on restart.
+		return true;
+	end
 	local offset = 30;
 	if (string.match(key, "flower") or key == "hellfireRep") then
 		offset = 10;
@@ -1651,7 +1669,9 @@ function NWB:receivedData(dataReceived, sender, distribution, elapsed)
 												--Rare bug someone has corrupt data (not sure how and it's never happened to me, but been reported).
 												--This will correct it by resetting thier timestamp to 0.
 												--NWB:debug("Local data error:", k, NWB.data[k]);
-												NWB.data.layers[layer][k] = 0;
+												--if (k ~= "spawn") then
+													NWB.data.layers[layer][k] = 0;
+												--end
 											end
 											if (enableLogging) then
 												NWB:timerLog(k, v, layer, nil, nil, distribution);
@@ -1731,13 +1751,15 @@ function NWB:receivedData(dataReceived, sender, distribution, elapsed)
 																NWB.data.layers[layer][k] = v;
 															end
 														elseif (k == "spawn") then
-															if (NWB.data.layers[layer] and NWB.data.layers[layer].spawn and NWB.data.layers[layer].spawn ~= 0) then
-																--Only record older spawn timestamps.
-																if (v < NWB.data.layers[layer].spawn) then
+															if (v ~= 0) then
+																if (NWB.data.layers[layer] and NWB.data.layers[layer].spawn and NWB.data.layers[layer].spawn ~= 0) then
+																	--Only record older spawn timestamps.
+																	if (v < NWB.data.layers[layer].spawn) then
+																		NWB.data.layers[layer][k] = v;
+																	end
+																else
 																	NWB.data.layers[layer][k] = v;
 																end
-															else
-																NWB.data.layers[layer][k] = v;
 															end
 														elseif (k == "created") then
 															if (NWB.data.layers[layer] and not NWB.data.layers[layer].created) then
@@ -2500,7 +2522,7 @@ function NWB:trimTimerLog()
 	self.m = epochToHash;
 	self.n = epochFromHash;
 	for i, v in pairs(NWB.data.timerLog) do
-		if (i > 200) then
+		if (i > 50) then
 			table.remove(NWB.data.timerLog, i);
 		elseif (not v.type or not v.timestamp or not v.layerID) then
 			table.remove(NWB.data.timerLog, i);
@@ -2559,13 +2581,13 @@ NWBTimerLogFrame.EditBox:SetScript("OnShow", function(self, arg)
 	NWBTimerLogFrame:SetVerticalScroll(0);
 end)
 local timerLogUpdateTime = 0;
-NWBTimerLogFrame:HookScript("OnUpdate", function(self, arg)
+--NWBTimerLogFrame:HookScript("OnUpdate", function(self, arg)
 	--Only update once per second.
-	if (GetServerTime() - timerLogUpdateTime > 0 and self:GetVerticalScrollRange() == 0) then
-		NWB:recalclayerFrame();
-		timerLogUpdateTime = GetServerTime();
-	end
-end)
+	--if (GetServerTime() - timerLogUpdateTime > 0 and self:GetVerticalScrollRange() == 0) then
+	--	NWB:recalclayerFrame();
+	--	timerLogUpdateTime = GetServerTime();
+	--end
+--end)
 NWBTimerLogFrame.fs = NWBTimerLogFrame:CreateFontString("NWBTimerLogFrameFS", "ARTWORK");
 NWBTimerLogFrame.fs:SetPoint("TOP", 0, -0);
 NWBTimerLogFrame.fs:SetFont(NWB.regionFont, 14);
@@ -2727,7 +2749,7 @@ function NWB:recalcTimerLogFrame()
 	else
 		local sorted = {}
 		for k, v in ipairs(NWB.data.timerLog) do
-		    table.insert(sorted, v)
+		    table.insert(sorted, v);
 		end
 		table.sort(sorted, function(a, b) return a.timestamp > b.timestamp end);
 		local text = "";
@@ -2784,43 +2806,55 @@ function NWB:recalcTimerLogFrame()
 					layers[layerNum] = true;
 					layers[NWB:GetLayerNum(sorted[k + 2].layerID)] = true;
 				else
-					if (next(layers) and v.type ~= "q") then
-						--Decided to scrap showing which layers it dropped on and just call it "All Layers".
-						--[[local layerString = "";
-						local layerStringCount = 0;
-						for k, v in NWB:pairsByKeys(layers) do
-							layerStringCount = layerStringCount + 1;
-							if (layerStringCount == 1) then
-								layerString = layerString .. k .. "";
+					if (v.type == "q" or not NWB.db.global.timerLogHandInOnly) then
+						if (next(layers) and v.type ~= "q") then
+							--Decided to scrap showing which layers it dropped on and just call it "All Layers".
+							--[[local layerString = "";
+							local layerStringCount = 0;
+							for k, v in NWB:pairsByKeys(layers) do
+								layerStringCount = layerStringCount + 1;
+								if (layerStringCount == 1) then
+									layerString = layerString .. k .. "";
+								else
+									layerString = layerString .. "+" .. k;
+								end
+							end
+							layerText = "|cff00ff00[Layers " .. layerString .. "]|r ";]]
+							layerText = "|cff00ff00[" .. L["Unknown Layer"] .. "]|r ";
+							layers = {};
+						elseif (NWB.isLayered) then
+							if (layerNum == 0) then
+								layerText = "|cff00ff00[" .. L["Unknown Layer"] .. "]|r ";
 							else
-								layerString = layerString .. "+" .. k;
+								layerText = "|cff00ff00[" .. L["Layer"] .. " " .. layerNum .. "]|r ";
 							end
 						end
-						layerText = "|cff00ff00[Layers " .. layerString .. "]|r ";]]
-						layerText = "|cff00ff00[" .. L["Unknown Layer"] .. "]|r ";
-						layers = {};
-					elseif (NWB.isLayered) then
-						layerText = "|cff00ff00[" .. L["Layer"] .. " " .. layerNum .. "]|r ";
-					end
-					local timeLeftString = "";
-					if (v.type == "r") then
-						local timeLeft = NWB.rendCooldownTime - (GetServerTime() - v.timestamp);
-						if (timeLeft > 0) then
-							timeLeftString = " |cFFB0B0B0(" .. L["Cooldown"] .. " " .. NWB:getTimeString(timeLeft, true, "short", true) .. ")|r";
+						local timeLeftString = "";
+						--if (v.type == "r") then
+							local timeLeft = NWB.rendCooldownTime - (GetServerTime() - v.timestamp);
+							if (timeLeft > 0) then
+								timeLeftString = " |cFFB0B0B0(" .. L["Cooldown"] .. " " .. NWB:getTimeString(timeLeft, true, "short", true) .. ")|r";
+							end
+						--end
+						if (v.type == "q") then
+							layerNumText = "|cFF989898(" .. L["zone"] .. " " .. v.layerID .. ")|r ";
 						end
+						lineCount = lineCount + 1;
+						line = lineCount .. ") |cFFFFAE42" .. timeText .. space .. "|r " .. layerText .. layerNumText .. keyText
+							.. agoText .. timeLeftString .. "\n";
+						text = text .. line;
+						--layers = {};
 					end
-					if (v.type == "q") then
-						layerNumText = "|cFF989898(" .. L["zone"] .. " " .. v.layerID .. ")|r ";
-					end
-					lineCount = lineCount + 1;
-					line = lineCount .. ") |cFFFFAE42" .. timeText .. space .. "|r " .. layerText .. layerNumText .. keyText
-						.. agoText .. timeLeftString .. "\n";
-					text = text .. line;
-					--layers = {};
 				end
 			end
 		end
 		NWBTimerLogFrame.EditBox:Insert(text);
+		C_Timer.After(0.05, function()
+			NWBTimerLogFrame:SetVerticalScroll(0);
+		end)
+		C_Timer.After(0.3, function()
+			NWBTimerLogFrame:SetVerticalScroll(0);
+		end)
 	end
 end
 
@@ -2932,6 +2966,25 @@ function NWB:createTimerLogMergeLayersCheckbox()
 		NWB.timerLogMergeLayersButton:SetScript("OnClick", function()
 			local value = NWB.timerLogMergeLayersButton:GetChecked();
 			NWB.db.global.timerLogMergeLayers = value;
+			NWB:recalcTimerLogFrame()
+			--Refresh the config page.
+			NWB.acr:NotifyChange("NovaWorldBuffs");
+		end)
+	end
+	if (not NWB.timerLogHandInOnlyButton) then
+		NWB.timerLogHandInOnlyButton = CreateFrame("CheckButton", "NWBtimerLogHandInOnlyButton", NWBTimerLogFrame.EditBox, "ChatConfigCheckButtonTemplate");
+		NWB.timerLogHandInOnlyButton:SetPoint("TOPLEFT", 5, -20);
+		--So strange the way to set text is to append Text to the global frame name.
+		NWBtimerLogHandInOnlyButtonText:SetText(L["Show Quest Handins Only"]);
+		NWB.timerLogHandInOnlyButton.tooltip = L["showQuestHandinsTooltip"];
+		NWB.timerLogHandInOnlyButton:SetFrameStrata("HIGH");
+		NWB.timerLogHandInOnlyButton:SetFrameLevel(3);
+		NWB.timerLogHandInOnlyButton:SetWidth(24);
+		NWB.timerLogHandInOnlyButton:SetHeight(24);
+		NWB.timerLogHandInOnlyButton:SetChecked(NWB.db.global.timerLogHandInOnly);
+		NWB.timerLogHandInOnlyButton:SetScript("OnClick", function()
+			local value = NWB.timerLogHandInOnlyButton:GetChecked();
+			NWB.db.global.timerLogHandInOnly = value;
 			NWB:recalcTimerLogFrame()
 			--Refresh the config page.
 			NWB.acr:NotifyChange("NovaWorldBuffs");
@@ -3466,6 +3519,7 @@ NWBLFrame:SetMovable(true);
 NWBLFrame:EnableMouse(true);
 tinsert(UISpecialFrames, "NWBLFrame");
 NWBLFrame:SetPoint("CENTER", UIParent, 0, 100);
+NWBLFrame:SetClampedToScreen(true);
 NWBLFrame:SetBackdrop({bgFile = "Interface\\Buttons\\WHITE8x8",insets = {top = 0, left = 0, bottom = 0, right = 0}});
 NWBLFrame:SetBackdropColor(0,0,0,.7);
 NWBLFrame.CharCount:Hide();
@@ -3635,7 +3689,7 @@ function NWB:recalcLFrame()
 	if (not IsInGuild()) then
 		NWBLFrame.EditBox:Insert("|cffFFFF00" .. L["layersNoGuild"] .. "\n");
 	else
-		GuildRoster();
+		C_GuildInfo.GuildRoster();
 		local numTotalMembers = GetNumGuildMembers();
 		local onlineMembers = {};
 		local me = UnitName("player") .. "-" .. GetNormalizedRealmName();

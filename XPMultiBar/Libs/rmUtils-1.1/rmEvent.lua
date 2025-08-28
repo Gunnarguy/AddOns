@@ -1,5 +1,5 @@
 --[=====[
-		## RM Utils library ver. 1.1.2
+		## RM Utils library ver. 1.1.3
 		## rmEvent.lua - Event module
 		Code for rmUtils Event logic
 --]=====]

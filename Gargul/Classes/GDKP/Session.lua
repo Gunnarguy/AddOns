@@ -183,10 +183,10 @@ function Session:copperOwedToPlayer(player, sessionID)
     local playerCutInCopper = 0;
     -- Only include the player cut if the current GDKP session is locked and ready for payout
     if (Instance.lockedAt) then
-        playerCutInCopper = GL:tableGet(Instance, "Pot.Cuts." .. playerGUID, 0) * 10000;
+        playerCutInCopper = GL:goldToCopper(GL:tableGet(Instance, "Pot.Cuts." .. playerGUID, 0));
     end
 
-    local copperSpentByPlayer = self:goldSpentByPlayer(playerGUID, Instance.ID) * 10000;
+    local copperSpentByPlayer = GL:goldToCopper(self:goldSpentByPlayer(playerGUID, Instance.ID));
     local copperToReceive = copperSpentByPlayer - copperReceived;
     local copperToGive = playerCutInCopper - copperToReceive - copperGiven;
 
@@ -196,7 +196,6 @@ end
 --- We opened a trade window
 ---
 ---@param Details table
----@return void
 function Session:tradeInitiated(Details)
     if (not Details.partner) then
         return;
@@ -209,26 +208,32 @@ function Session:tradeInitiated(Details)
         return;
     end
 
+    local due = false;
+    local dueTexture = false;
     local message = "";
     local partnerGUID = GDKP:playerGUID(Details.partner);
     local playerCut = GDKPPot:getCut(partnerGUID);
 
     local copperGiven, copperReceived = self:goldTradedWithPlayer(partnerGUID);
-    local playerCutInCopper = playerCut * 10000;
-    local copperSpentByPlayer = self:goldSpentByPlayer(partnerGUID) * 10000;
+    local playerCutInCopper = GL:goldToCopper(playerCut);
+    local copperSpentByPlayer = GL:goldToCopper(self:goldSpentByPlayer(partnerGUID));
     local balance = tonumber(self:copperOwedToPlayer(partnerGUID, Instance.ID) or 0);
 
     local balanceMessage = " ";
     local whisperMessage = nil;
+    local showGoldInput = balance > 0 and Settings:get("GDKP.precision") == 0;
+
     if (balance > 0) then
-        local due = GL:copperToMoney(balance);
-        balanceMessage = ("|c00F7922E" .. L["To give: %s"] .. "|r"):format(due);
-        whisperMessage = (L.CHAT["I owe you %s. Enjoy!"]):format(due);
+        due = GL:copperToMoney(balance);
+        dueTexture = GL:copperToMoneyTexture(balance);
+        balanceMessage = "|c00F7922E" .. L["To give: %s"]:format(dueTexture) .. "|r";
+        whisperMessage = L.CHAT["I owe you %s. Enjoy!"]:format(due);
 
     elseif (balance < 0) then
         local owed = GL:copperToMoney(balance * -1);
-        balanceMessage = ("|c0092FF00" .. L["To receive: %s"] .. "|r"):format(owed);
-        whisperMessage = (L.CHAT["You owe me %s. Thank you!"]):format(owed);
+        local owedTexture = GL:copperToMoneyTexture(balance * -1);
+        balanceMessage = "|c0092FF00" .. L["To receive: %s"]:format(owedTexture) .. "|r";
+        whisperMessage = L.CHAT["You owe me %s. Thank you!"]:format(owed);
     end
 
     if (whisperMessage and Settings:get("GDKP.whisperGoldDetails")) then
@@ -236,10 +241,10 @@ function Session:tradeInitiated(Details)
     end
 
     message = (L["\n|c00967FD2GDKP Session\nSpent by player: %s\nGiven: %s\nReceived: %s\nPlayer cut: %s\n\n%s\n"]):format(
-        GL:copperToMoney(copperSpentByPlayer),
-        GL:copperToMoney(copperGiven),
-        GL:copperToMoney(copperReceived),
-        GL:copperToMoney(playerCutInCopper),
+        GL:copperToMoneyTexture(copperSpentByPlayer),
+        GL:copperToMoneyTexture(copperGiven),
+        GL:copperToMoneyTexture(copperReceived),
+        GL:copperToMoneyTexture(playerCutInCopper),
         balanceMessage
     );
 
@@ -270,6 +275,74 @@ function Session:tradeInitiated(Details)
         DescriptionLabel:SetText(message);
         DescriptionLabel:SetColor(1, .95686, .40784);
         Window:AddChild(DescriptionLabel);
+
+        -- Add a buton that allows the loot master to pick up and drop gold in the trade window
+        if (due) then
+            -- Good job Blizzard, now it's even easier for people to make mistakes whilst trading gold
+            -- local insufficientFunds = GetMoney() < balance;
+            -- local PickupGoldButton = GL.AceGUI:Create("Button");
+            
+            -- PickupGoldButton:SetText(insufficientFunds and L["Not enough gold"] or L["Pick up %s"]:format(dueTexture));
+            -- PickupGoldButton:SetFullWidth(true);
+            -- PickupGoldButton:SetCallback("OnClick", function()
+            --     if (insufficientFunds) then
+            --         GL:warning(L["Not enough gold"]);
+            --         return;
+            --     elseif (GetPlayerTradeMoney() > 0) then
+            --         GL:warning(L["You already added %s to the trade window"]:format(GL:copperToMoneyTexture(GetPlayerTradeMoney())));
+            --         return;
+            --     end
+
+            --     PickupPlayerMoney(balance);
+            -- end);
+            -- Window:AddChild(PickupGoldButton);
+
+            -- -- Add breathing effect to the button for increased visibility
+            -- do
+            --     local Text = PickupGoldButton.frame:GetFontString();
+            --     local AnimationGroup = Text:CreateAnimationGroup();
+
+            --     local FadeOut = AnimationGroup:CreateAnimation("Alpha");
+            --     FadeOut:SetFromAlpha(1);
+            --     FadeOut:SetToAlpha(0.2);
+            --     FadeOut:SetDuration(.4);
+            --     FadeOut:SetSmoothing("IN_OUT");
+
+            --     local FadeIn = AnimationGroup:CreateAnimation("Alpha");
+            --     FadeIn:SetFromAlpha(0.2);
+            --     FadeIn:SetToAlpha(1);
+            --     FadeIn:SetDuration(.4);
+            --     FadeIn:SetSmoothing("IN_OUT");
+            --     FadeIn:SetStartDelay(.4) -- Wait until FadeOut is done
+
+            --     AnimationGroup:SetLooping("REPEAT");
+            --     AnimationGroup:Play();
+            -- end
+
+            -- GL.Interface:addTooltip(PickupGoldButton, L["Click button, then click your item side of the trade window to add %s"]:format(dueTexture));
+
+            --[[ GOLD INPUT ]]
+            if (showGoldInput) then
+                local GoldInput = GL.AceGUI:Create("EditBox");
+                GoldInput:DisableButton(true);
+                GoldInput:SetHeight(20);
+                GoldInput:SetWidth(80);
+                GoldInput:SetMaxLetters(7);
+                GoldInput:SetText(balance / 10000);
+                GoldInput.editbox:SetJustifyH("CENTER");
+                GoldInput.editbox:SetTextInsets(0, 14, 0, 0);
+                Window:AddChild(GoldInput);
+
+                GoldInput.editbox:HighlightText();
+                GoldInput.editbox:SetFocus();
+
+                -- Gold Icon
+                local GoldInputGoldIcon = GoldInput.editbox:CreateTexture(nil, "OVERLAY");
+                GoldInputGoldIcon:SetTexture("Interface/MoneyFrame/UI-GoldIcon");
+                GoldInputGoldIcon:SetPoint("RIGHT", -3, 0);
+                GoldInputGoldIcon:SetSize(11, 11);
+            end
+        end
 
         local IncludeTradeInSession = GL.AceGUI:Create("CheckBox");
         IncludeTradeInSession:SetValue(false);
@@ -618,10 +691,10 @@ function Session:tooltipLines(itemLink)
     local PerItemSettings = GDKP:settingsForItemID(itemID);
     return GL:explode((L["\n\n|c00967FD2GDKP Data (sold %sx)\nLast sold for: %s\nAverage price: %s\nMinimum bid: %s\nIncrement: %s\n\n"]):format(
         Details.timesSold,
-        GL:goldToMoney(Details.lastSoldPrice),
-        GL:goldToMoney(Details.averageSaleValue),
-        GL:goldToMoney(PerItemSettings.minimum),
-        GL:goldToMoney(PerItemSettings.increment)
+        GL:goldToMoneyTexture(Details.lastSoldPrice),
+        GL:goldToMoneyTexture(Details.averageSaleValue),
+        GL:goldToMoneyTexture(PerItemSettings.minimum),
+        GL:goldToMoneyTexture(PerItemSettings.increment)
     ), "\n");
 end
 
@@ -913,7 +986,7 @@ function Session:announceDeletedAuction(sessionID, Auction)
 
         -- This was raw gold added to the pot
         if (Auction.itemID == Constants.GDKP.potIncreaseItemID) then
-            GL:sendChatMessage((L.CHAT["I removed %sg from the pot"]):format(GL:goldToMoney(price)), "GROUP");
+            GL:sendChatMessage((L.CHAT["I removed %s from the pot"]):format(GL:goldToMoney(price)), "GROUP");
             GL:sendChatMessage((L.CHAT["The pot now holds %s"]):format(GDKPPot:humanTotal()), "GROUP");
 
             return;
@@ -952,7 +1025,7 @@ function Session:announceRestoredAuction(sessionID, Auction)
 
         -- This was raw gold added to the pot
         if (Auction.itemID == Constants.GDKP.potIncreaseItemID) then
-            GL:sendChatMessage((L.CHAT["I added %sg back to the pot"]):format(price), "GROUP");
+            GL:sendChatMessage((L.CHAT["I added %s back to the pot"]):format(GL:goldToMoney(price)), "GROUP");
             GL:sendChatMessage((L.CHAT["The pot now holds %s"]):format(GDKPPot:humanTotal()), "GROUP");
             return;
 
@@ -964,10 +1037,10 @@ function Session:announceRestoredAuction(sessionID, Auction)
             return;
         end
 
-        GL:sendChatMessage(string.format(L.CHAT["Pot was updated after restoring an auction, it now holds %s"], tostring(total)), "GROUP");
+        GL:sendChatMessage(string.format(L.CHAT["Pot was updated after restoring an auction, it now holds %s"], GDKPPot:humanTotal()), "GROUP");
     else
         -- Should not be possible, shenanigans?
-        GL:sendChatMessage(string.format(L.CHAT["Pot was updated after restoring an auction, it now holds %s"], tostring(total)), "GROUP");
+        GL:sendChatMessage(string.format(L.CHAT["Pot was updated after restoring an auction, it now holds %s"], GDKPPot:humanTotal()), "GROUP");
     end
 end
 

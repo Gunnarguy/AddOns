@@ -3,8 +3,8 @@ if T.SkipLocalActionBook then return end
 if T.TenEnv then T.TenEnv() end
 
 local MODERN, CF_CLASSIC, CI_ERA = COMPAT >= 10e4 or nil, COMPAT < 10e4 or nil, COMPAT < 2e4 or nil
-local CF_WRATH, CF_CATA = COMPAT < 10e4 and COMPAT > 3e4 or nil, COMPAT < 10e4 and COMPAT > 4e4 or nil
-local MODERN_MOUNTS = MODERN or CF_WRATH
+local CF_WRATH, CF_CATA, CF_MISTS = COMPAT < 10e4 and COMPAT > 3e4 or nil, COMPAT < 10e4 and COMPAT > 4e4 or nil, COMPAT < 10e4 and COMPAT > 5e4 or nil
+local MODERN_MOUNTS, MODERN_BATTLEPETS = MODERN or CF_WRATH, MODERN or CF_MISTS
 local EV = T.Evie
 local AB = T.ActionBook:compatible(2,43)
 local RW = T.ActionBook:compatible("Rewire", 1,27)
@@ -212,7 +212,7 @@ securecall(function() -- spell: spell ID + mount spell ID
 		local mjID = sid and getSpellMountID(sid)
 		if mjID then return mountHint(mjID) end
 		if not sname then return end
-		local now, msid = GetTime(), spellMap[lowered[n]] or sid
+		local now, msid = GetTime(), sid or spellMap[lowered[n]]
 		local inRange, usable, nomana, hasRange = NormalizeInRange[IsSpellInRange(sid and RUNE_BASESPELL_CACHE[sid] or n, target or "target")], IsUsableSpell(n)
 		inRange, hasRange = inRange ~= 0, inRange ~= nil
 		local cdLeft, cdLength, enabled = toCooldown(now, GetSpellCooldown(n))
@@ -271,7 +271,7 @@ securecall(function() -- spell: spell ID + mount spell ID
 			if not actionMap[action] then
 				actionMap[action] = AB:CreateActionSlot(spellHint, action, "attribute", "type","spell", "spell",action, "checkselfcast",true, "checkfocuscast",true)
 			end
-			if type(action) == "string" and spellMap[action] ~= id then
+			if type(action) == "string" and spellMap[lowered[action]] ~= id then
 				spellMap[lowered[action]] = id
 			end
 		end
@@ -283,7 +283,7 @@ securecall(function() -- spell: spell ID + mount spell ID
 		local _, castType = RW:IsSpellCastable(id, nil, laxRank)
 		if castType == "rune-ability-spell" then
 			_, icon2 = GetSpellTexture(id)
-		elseif name and castType ~= "forced-id-cast" then
+		elseif name and castType ~= "forced-id-cast"  and castType ~= "rewire-escape" then
 			local qRank = (MODERN or q == "list-query" or not laxRank) and rank or nil
 			rank, name2, _, icon2, _, _, _, sid2 = GetSpellSubtext(name, rank), GetSpellInfo(name, qRank)
 			if MODERN and sid2 and IsPassiveSpell(sid2) or RUNE_SPELLS[id] then
@@ -697,11 +697,11 @@ securecall(function() -- macro: name
 	AB:RegisterActionType("macro", createNamedMacro, describeMacro, 2)
 end)
 securecall(function() -- battlepet: pet ID, species ID
-	if not (MODERN or CF_WRATH) then
+	if not (MODERN_BATTLEPETS or CF_WRATH) then
 		return
 	end
 	local petAction, special = {}, {}
-	local BPET_ATYPE_NAME, SummonCompanion = not MODERN and COMPANIONS or L"Battle Pet"
+	local BPET_ATYPE_NAME, SummonCompanion = not MODERN_BATTLEPETS and COMPANIONS or L"Battle Pet"
 	local function SetBattlePetByID(self, id)
 		local sid, cname, lvl, _, _, _, _, name, _, ptype, _, _, desc, _, cb = C_PetJournal.GetPetInfoByPetID(id)
 		if not sid then return false end
@@ -716,8 +716,10 @@ securecall(function() -- battlepet: pet ID, species ID
 			self:AddLine(desc, nc.r, nc.g, nc.b, 1)
 		end
 	end
-	if CF_WRATH then
+	if not MODERN_BATTLEPETS then
 		SetBattlePetByID = callMethod.SetCompanionPet
+	end
+	if not MODERN then
 		function SummonCompanion(guid)
 			if C_PetJournal.IsCurrentlySummoned(guid) then
 				C_PetJournal.DismissSummonedPet(guid)
@@ -734,7 +736,7 @@ securecall(function() -- battlepet: pet ID, species ID
 		            + (enabled == 0 and 2048 or 0)
 		return sid and cdLeft == 0 and C_PetJournal.PetIsSummonable(pid), state, tex, cn or n or "", 0, cdLeft, cdLength, SetBattlePetByID, pid
 	end
-	if MODERN then -- random favorite pet
+	if MODERN_BATTLEPETS then -- random favorite pet
 		local rname, _, ricon = GetSpellInfo(243819)
 		local function randFaveHint()
 			return HasFullControl(), C_PetJournal.GetSummonedPetGUID() and 1 or 0, ricon, rname, 0, 0, 0, callMethod.SetSpellByID, 243819
@@ -775,7 +777,7 @@ securecall(function() -- battlepet: pet ID, species ID
 		if not petAction[pk] then
 			if MODERN then
 				petAction[pk] = AB:CreateActionSlot(battlepetHint, rpid, "macrotext", EMOTE143_CMD1 .. "\n" .. SLASH_SUMMON_BATTLE_PET1 .. " " .. rpid)
-			else -- no /summonbattlepet implementation as of 4.4.0
+			else -- no /summonbattlepet implementation in 4.4.0, 5.5.0
 				petAction[pk] = AB:CreateActionSlot(battlepetHint, rpid, "func", SummonCompanion, rpid)
 			end
 		end
@@ -1155,7 +1157,7 @@ securecall(function() -- toy: item ID, flags[FORCE_SHOW]
 		[89222]=1, [63141]="[alliance]", [64997]="[horde]", [66888]=1, [89869]=1, [90175]=1,
 		[103685]=1, [115468]="[horde]", [115472]="[alliance]", [119160]="[horde]", [119182]="[alliance]",
 		[122283]=1, [142531]=1, [142532]=1, [163211]=1,
-		[85500]="[fish5]",
+		[85500]=MODERN and "[fish5]",
 		[182773]="[coven:necro][acoven80:necro]", [184353]="[coven:kyrian][acoven80:kyrian]", [180290]="[coven:fae][acoven80:fae]", [183716]="[coven:venthyr][acoven80:venthyr]", [190237] = 1,
 	}
 	local function playerHasToy(id)
@@ -1217,12 +1219,15 @@ securecall(function() -- toy: item ID, flags[FORCE_SHOW]
 		end
 	end
 	local function createToy(id, flags)
-		local forceShow = flags == 1
-		local mid, ignUse = map[id], IGNORE_TOY_USABILITY[id]
-		if not (mid or ignUse or type(id) == "number") or not (forceShow or playerHasToy(id)) then
+		if type(id) ~= "number" or id < 1 then
 			return
 		end
-		local isUsable = ignUse or C_ToyBox.IsToyUsable(id)
+		local forceShow, ignUse = flags == 1, IGNORE_TOY_USABILITY[id]
+		local qid = forceShow and (ignUse or 1) ~= 1 and -id or id
+		if not (forceShow or playerHasToy(id)) then
+			return
+		end
+		local isUsable, mid = ignUse or C_ToyBox.IsToyUsable(id), map[qid]
 		if isUsable == nil then
 			isUsable, uq[id] = lastUsability[id], 1
 			C_Item.GetItemInfo(id)
@@ -1232,15 +1237,17 @@ securecall(function() -- toy: item ID, flags[FORCE_SHOW]
 		if not (forceShow or isUsable) then
 			mid = nil
 		elseif mid == nil then
-			mid = AB:CreateActionSlot(toyHint, id, wrapCondition(ignUse, "attribute", "type","toy", "toy",id))
-			map[id] = mid
+			mid = AB:CreateActionSlot(toyHint, id, wrapCondition(forceShow and 1 or ignUse, "attribute", "type","toy", "toy",id))
+			map[qid] = mid
 		end
 		return mid
 	end
 	local function describeToy(id)
 		if type(id) ~= "number" then return end
-		local _, name, tex = C_ToyBox.GetToyInfo(id)
-		return L"Toy", name, tex or C_Item.GetItemIconByID(id), nil, callMethod.SetToyByItemID, id
+		local ignUse, _, name, tex = IGNORE_TOY_USABILITY[id], C_ToyBox.GetToyInfo(id)
+		local canUse = playerHasToy(id) and (type(ignUse) ~= "string" or KR:EvaluateCmdOptions(ignUse)) and (ignUse or C_ToyBox.IsToyUsable(id))
+		local actionFlags = not canUse and 1 or nil
+		return L"Toy", name, tex or C_Item.GetItemIconByID(id), nil, callMethod.SetToyByItemID, id, nil, actionFlags
 	end
 	AB:RegisterActionType("toy", createToy, describeToy, 2)
 	RW:SetCommandHint(SLASH_USE_TOY1, 60, function(_, _, clause, target)
@@ -1347,8 +1354,8 @@ securecall(function() -- /ping
 	end)
 end)
 securecall(function() -- uipanel: token
-	local CLICK, pyCLICK, widgetClickCommand, widgetAttrCommand, closeButton = SLASH_CLICK1 .. " " do
-		local pyName, attrCounter = newWidgetName("AB:PY!"), 500
+	local CLICK, pyCLICK, widgetClickCommand, closeButton = SLASH_CLICK1 .. " " do
+		local pyName = newWidgetName("AB:PY!")
 		local py = CreateFrame("Button", pyName, nil, "SecureActionButtonTemplate")
 		py:SetAttribute("type", "click")
 		py:SetAttribute("pressAndHoldAction", 1)
@@ -1364,25 +1371,14 @@ securecall(function() -- uipanel: token
 			end
 			return CLICK .. tn .. " 1\n"
 		end
-		function widgetAttrCommand(w, ...)
-			local r = ""
-			for i=1,select("#", ...), 2 do
-				local bs, k,v = "-at" .. attrCounter, select(i, ...)
-				py:SetAttribute("type" .. bs, "attribute")
-				py:SetAttribute("attribute-frame" .. bs, w)
-				py:SetAttribute("attribute-name" .. bs, k)
-				py:SetAttribute("attribute-value" .. bs, v)
-				r, attrCounter = r .. CLICK .. pyName .. " at" .. attrCounter .. " 1\n", attrCounter + 1
-			end
-			return r
-		end
 		function closeButton(p, reg)
 			local r = CreateFrame("Button", nil, p, "UIPanelCloseButton")
 			r:Hide()
 			return r, reg and widgetClickCommand(reg, r)
 		end
 	end
-	local ShowVaultTip if MODERN then
+	local ShowVaultTip
+	if MODERN then
 		local unlockedRewards, needRefresh
 		function EV:WEEKLY_REWARDS_UPDATE()
 			unlockedRewards = nil
@@ -1487,7 +1483,7 @@ securecall(function() -- uipanel: token
 		ex:SetAttribute("pressAndHoldAction", 1)
 		local function prerun(k)
 			local i, r = panels[k], 0
-			local tw, gw, cw, ow, ofun, scs = i.tw, i.gw, i.cw, i.ow, i.open, i.skipCloseSound
+			local tw, gw, cw, cw2, ow, ofun, scs = i.tw, i.gw, i.cw, i.cw2, i.ow, i.open, i.skipCloseSound
 			if tw and not tw:IsEnabled() then
 				r = i.tcr and r + 1 or r; tw:Enable()
 			end
@@ -1495,6 +1491,9 @@ securecall(function() -- uipanel: token
 				local gh, cd, od = not (gw and gw:IsShown()), not (cw and cw:IsEnabled()), not (ow and ow:IsEnabled())
 				if cw and gh ~= cd then
 					r = r + (gh and 6 or 2); cw:SetEnabled(not gh)
+				end
+				if cw2 then
+					r = r + (gh and 64 or 0); cw2:SetEnabled(not gh)
 				end
 				if ow and gh == od then
 					r = r + (gh and 8 or 24); ow:SetEnabled(gh)
@@ -1515,6 +1514,7 @@ securecall(function() -- uipanel: token
 			local i, m1, m3, m5 = panels[k], m % 2, m % 8, m % 32
 			if m5 >= 8 then i.ow:SetEnabled(m5 > 8) end
 			if m3 >= 2 then i.cw:SetEnabled(m3 > 2) end
+			if m >= 64 then i.cw2:SetEnabled(true) end
 			if m1 >= 1 then i.tw:Disable() end
 			local ssh = i.stopSoundHandle
 			i.stopSoundHandle = ssh and StopSound(ssh) and nil
@@ -1522,7 +1522,7 @@ securecall(function() -- uipanel: token
 		ex:SetScript("PreClick", function(_, b)
 			local i = panels[b]
 			if i and i.pre then
-				i.postMessage = i.pre(b)
+				i.postMessage = i.pre(b, i, prerun)
 			end
 		end)
 		ex:SetScript("PostClick", function(_, b)
@@ -1532,7 +1532,7 @@ securecall(function() -- uipanel: token
 			pm = i and i.postMessage
 			if pm ~= nil and i.post then
 				i.postMessage = nil
-				i.post(bp, pm)
+				i.post(bp, pm, postrun)
 			end
 		end)
 		local function prepareMacroText(k, v)
@@ -1543,6 +1543,9 @@ securecall(function() -- uipanel: token
 				tmt = widgetClickCommand(k, v.tw)
 			elseif v.cw or v.ow then
 				tmt = widgetClickCommand(k, v.ow) .. widgetClickCommand(k, v.cw)
+				if v.cw2 then
+					tmt = tmt .. widgetClickCommand(k, v.cw2)
+				end
 			end
 			if v.tw or v.cw or v.ow or v.open or v.cwrap then
 				v.pre, v.post = v.pre or prerun, v.post or postrun
@@ -1574,23 +1577,15 @@ securecall(function() -- uipanel: token
 		for k,v in pairs(panels) do
 			v.pk = k
 			setmetatable(v, pmeta)
+			if v.cpreamble and v.cw then
+				ex:SetAttribute("type-" .. k, "click")
+				ex:SetAttribute("clickbutton-" .. k, v.cw)
+				v.pre, v.post = v.pre or prerun, v.post or postrun
+			end
 		end
 	end
 	do -- further panels init
-		local fpd = CF_WRATH and securecall(function()
-			local tf, x2, x = CreateFrame("Frame"), EnumerateFrames(), nil
-			tf:SetAttribute("UIPanelLayout-defined", 1)
-			tf:SetAttribute("UIPanelLayout-area", "none")
-			HideUIPanel(tf)
-			repeat
-				x, x2 = EnumerateFrames(x), x2 and EnumerateFrames(x2)
-				x2 = x2 and (x2 == x and x2 or EnumerateFrames(x2))
-				if x and x.ShowUIPanel and x.GetAttribute and x:GetAttribute("panel-frame") == tf then
-					return x
-				end
-			until x == nil or x == x2
-		end)
-		panels.options.cw = panels.csp.cw
+		panels.options.cw, panels.options.cw2 = panels.csp.cw, panels.cgm.cw
 		panels.macro.postmt = widgetClickCommand("cmf", panels.macro.cw)
 		if MODERN then
 			panels.gamemenu.cw, panels.gamemenu.tmt = panels.cgm.cw, nil
@@ -1617,26 +1612,20 @@ securecall(function() -- uipanel: token
 			end
 			pcall(C_AddOns.LoadAddOn, "Blizzard_WeeklyRewards")
 			panels.vault.cw = closeButton(panels.vault.gw)
-		else -- not MODERN
-			if CF_WRATH then
-				panels.achievements.icon = "Interface/PvPFrame/Icons/prestige-icon-4"
-				local gfp = panels.groupfinder
-				gfp.tw, gfp.cw, gfp.skipCloseSound = nil, closeButton(gfp.gw), 839
-				if fpd then
-					gfp.premt = widgetClickCommand("groupfinder", gfp.cw) .. widgetAttrCommand(fpd, "panel-force",false, "panel-frame",gfp.gw, "panel-show",true) .. CLICK .. "GroupFinderFrameGroupButton1"
-				else
-					gfp.open, gfp.premt = openPanelFallback, CLICK .. "GroupFinderFrameGroupButton1"
-				end
-				function panels.currency.req()
-					return GetCurrencyListSize() > 0
-				end
-			else
-				panels.achievements = nil
-				panels.groupfinder = nil
-				panels.currency = nil
-				panels.calendar = nil
-				panels.reputation.icon = "Interface/Icons/INV_MISC_NOTE_02"
+		elseif CF_WRATH then
+			panels.achievements.icon = "Interface/PvPFrame/Icons/prestige-icon-4"
+			local gfp = panels.groupfinder
+			gfp.tw, gfp.cw, gfp.skipCloseSound = nil, closeButton(gfp.gw), 839
+			gfp.open, gfp.premt = openPanelFallback, CLICK .. "GroupFinderFrameGroupButton1"
+			function panels.currency.req()
+				return GetCurrencyListSize() > 0
 			end
+		else -- era
+			panels.achievements = nil
+			panels.groupfinder = nil
+			panels.currency = nil
+			panels.calendar = nil
+			panels.reputation.icon = "Interface/Icons/INV_MISC_NOTE_02"
 		end
 		function EV.ADDON_LOADED()
 			if MacroFrame then

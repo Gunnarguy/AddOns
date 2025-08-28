@@ -4,7 +4,7 @@
 --]]
 
 local ADDON, Addon = ...
-local Item = Addon.Tipped:NewClass('Item', Addon.IsRetail and 'ItemButton' or 'Button', 'ContainerFrameItemButtonTemplate', true)
+local Item = Addon.Tipped:NewClass('Item', 'ItemButton', 'ContainerFrameItemButtonTemplate', true)
 local Search = LibStub('ItemSearch-1.3')
 local C = LibStub('C_Everywhere')
 
@@ -141,7 +141,7 @@ function Item:UpdateBorder()
 		elseif Addon.sets.glowSets and Search:BelongsToSet(id) then
 	  		r,g,b = .2, 1, .8
 		elseif Addon.sets.glowQuality and quality and quality > 1 then
-			r,g,b = GetItemQualityColor(quality)
+			r,g,b = C.Item.GetItemQualityColor(quality)
 		end
 
 		if r then
@@ -192,9 +192,9 @@ function Item:UpdateFocus()
 end
 
 function Item:UpdateSearch()
-	local search = Addon.canSearch and Addon.search or ''
-	local matches = search == '' or self.hasItem and Search:Matches(self:GetQuery(), search)
-
+	local search = Addon.canSearch and Addon.search
+	local matches = self.frame:SearchItem(search, self:GetBag(), self:GetID(), self.info)
+	
 	self:SetAlpha(matches and 1 or 0.3)
 	self:SetDesaturated(not matches or self.info.isLocked)
 end
@@ -277,10 +277,6 @@ end
 
 function Item:GetQuestInfo()
 	return self.hasItem and Search:IsQuestItem(self.info.itemID)
-end
-
-function Item:GetQuery()
-	return self.info.hyperlink
 end
 
 function Item:IsUpgrade()

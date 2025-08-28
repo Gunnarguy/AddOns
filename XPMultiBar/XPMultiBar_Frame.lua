@@ -1,5 +1,5 @@
 --[=====[
-		## XP MultiBar ver. 11.1.1-final
+		## XP MultiBar ver. 11.1.2-final
 		## XPMultiBar_Frame.lua - module
 		Frame module (UI) for XPMultiBar addon
 --]=====]

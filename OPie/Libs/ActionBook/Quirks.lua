@@ -346,6 +346,31 @@ securecall(function() -- Draenic Hologem usability limitation
 		AB:SetPlayerHasToyOverride(210455, false)
 	end
 end)
+securecall(function() -- Modern Hunter Fetch ability disambiguation + usability
+	if not MODERN or playerClass ~= "HUNTER" then return end
+	local PET_FETCH_SID, AVIAN_FETCH_SID, FETCH_SNAME = 125050, 1232995, GetSpellInfo(125050)
+	local state, goal = false, false
+	local function syncFetchState()
+		if state == goal then return end
+		RW:SetCastAlias(FETCH_SNAME, goal and "spell:" .. AVIAN_FETCH_SID or nil, false)
+		state = goal
+		AB:NotifyObservers("spell")
+	end
+	local function checkFetchState()
+		goal = IsSpellKnown(AVIAN_FETCH_SID)
+		if goal ~= state and not InCombatLockdown() then
+			syncFetchState()
+		end
+	end
+	AB:SetSpellIconOverride(PET_FETCH_SID, function()
+		if not (UnitExists("pet") and UnitIsFriend("player", "pet") and not UnitIsDead("pet")) then
+			return nil, false
+		end
+	end)
+	EV.PLAYER_REGEN_ENABLED = syncFetchState
+	EV.PLAYER_LOGIN = checkFetchState
+	EV.TRAIT_CONFIG_UPDATED = checkFetchState
+end)
 
 local MAYBE_FLYABLE, FLIGHT_BLOCKER = true
 securecall(function() -- FLIGHT_BLOCKER init
@@ -467,6 +492,11 @@ securecall(function() -- Darkmoon Fairegrounds flight restriction
 	end
 	KR:RegisterStateDriver(FLIGHT_BLOCKER, "dmf", "[in:darkmoon faire] 1; 0")
 end)
+securecall(function() -- K'aresh Phase Diving flight restriction
+	if MODERN then
+		KR:RegisterStateDriver(FLIGHT_BLOCKER, "phasedive", "[in:karesh,noflyable] 1;0")
+	end
+end)
 securecall(function() -- TWW dungeon/delve flight restriction
 	if not MODERN then
 		return
@@ -538,10 +568,18 @@ securecall(function() -- Modern: G-99 Breakneck is a fake mount
 	end
 	local G99_SPELL_ID, G99_QUEST_ID, questOK = 460013, 84352
 	local inUndermine, wf = false, CreateFrame("Frame", nil, nil, "SecureFrameTemplate")
+	local function pushG99SpellCastID()
+		RW:SetCastAlias("spell:" .. G99_SPELL_ID, C_Spell.GetSpellName(G99_SPELL_ID))
+		return "remove"
+	end
 	local function hasUnlockedG99()
 		if not questOK and C_QuestLog.IsQuestFlaggedCompletedOnAccount(G99_QUEST_ID) then
 			questOK = true
-			RW:SetCastAlias("spell:" .. G99_SPELL_ID, C_Spell.GetSpellName(G99_SPELL_ID))
+			if InCombatLockdown() then
+				EV.PLAYER_REGEN_ENABLED = pushG99SpellCastID
+			else
+				pushG99SpellCastID()
+			end
 		end
 		return questOK
 	end
@@ -580,4 +618,23 @@ securecall(function() -- Modern: G-99 Breakneck is a fake mount
 		-- [11.1/2504] quest completion cache is flushed on PLW; may not repop by PEW.
 		return hasUnlockedG99() and "remove"
 	end
+end)
+securecall(function() -- Classic Mists: [spec:1] is stuck
+	if MODERN or COMPAT < 5e4 then
+		return
+	end
+	local function syncSpec()
+		local spec = C_SpecializationInfo.GetSpecialization()
+		local specID, name = C_SpecializationInfo.GetSpecializationInfo(spec or 0)
+		local valid = specID and specID ~= 0 and name and name ~= ""
+		local ex = (C_SpecializationInfo.GetActiveSpecGroup() or 1) == 1 and "/p" or "/s"
+		local v = (spec or 0) .. (valid and "/" .. specID .. "/" .. name .. ex or ex)
+		KR:SetStateConditionalValue("spec", v)
+	end
+	function EV:PLAYER_SPECIALIZATION_CHANGED(u)
+		if u == "player" then
+			syncSpec()
+		end
+	end
+	EV.PLAYER_LOGIN = syncSpec
 end)

@@ -1,11 +1,11 @@
 --[=====[
-		## RM Utils library ver. 1.1.2
+		## RM Utils library ver. 1.1.3
 		## rmUtils.lua - main lib. module
 		Code for rmUtils lib
 --]=====]
 
 local RMUTILS11 = "rmUtils-1.1"
-local RMUTILS11_MINOR = 2 -- Bump on changes
+local RMUTILS11_MINOR = 3 -- Bump on changes
 
 if not LibStub then
 	error(RMUTILS11 .. " requires LibStub.")

@@ -105,11 +105,11 @@ function Ns.FunctionList.Valorstones(HUD, data, options, ...)
 end
 ------------------------------------------------
 
--- Weathered Undermine Crest
+-- Weathered Ethereal Crest
 function Ns.FunctionList.Weathered(HUD, data, options, ...)
 
 	local EB = options.Current_Earned
-	local currency = C_CurrencyInfo.GetCurrencyInfo(3107)
+	local currency = C_CurrencyInfo.GetCurrencyInfo(3284)
 	local max = currency.maxQuantity or 0
 	local earn = currency.totalEarned or 0
 	local display = 0
@@ -132,11 +132,11 @@ function Ns.FunctionList.Weathered(HUD, data, options, ...)
 end
 ----------------------------------------------
 
--- Carved Undermine Crest
+-- Carved Ethereal Crest
 function Ns.FunctionList.Carved(HUD, data, options, ...)
 
 	local EB = options.Current_Earned
-	local currency = C_CurrencyInfo.GetCurrencyInfo(3108)
+	local currency = C_CurrencyInfo.GetCurrencyInfo(3286)
 	local max = currency.maxQuantity or 0
 	local earn = currency.totalEarned or 0
 	local display = 0
@@ -159,11 +159,11 @@ function Ns.FunctionList.Carved(HUD, data, options, ...)
 end
 ----------------------------------------------
 
--- Runed Undermine Crest
+-- Runed Ethereal Crest
 function Ns.FunctionList.Runed(HUD, data, options, ...)
 
 	local EB = options.Current_Earned
-	local currency = C_CurrencyInfo.GetCurrencyInfo(3109)
+	local currency = C_CurrencyInfo.GetCurrencyInfo(3288)
 	local max = currency.maxQuantity or 0
 	local earn = currency.totalEarned or 0
 	local display = 0
@@ -186,11 +186,11 @@ function Ns.FunctionList.Runed(HUD, data, options, ...)
 end
 ----------------------------------------------
 
--- Gilded Undermine Crest
+-- Gilded Ethereal Crest
 function Ns.FunctionList.Gilded(HUD, data, options, ...)
 
 	local EB = options.Current_Earned
-	local currency = C_CurrencyInfo.GetCurrencyInfo(3110)
+	local currency = C_CurrencyInfo.GetCurrencyInfo(3290)
 	local max = currency.maxQuantity or 0
 	local earn = currency.totalEarned or 0
 	local display = 0
@@ -213,10 +213,58 @@ function Ns.FunctionList.Gilded(HUD, data, options, ...)
 end
 ----------------------------------------------
 
--- Essence of Kaja'mite (Catalyst)
+-- Puzzling Cartel Chip
+-- function Ns.FunctionList.Puzzling(HUD, data, options, ...)
+
+-- 	local item = C_Item.GetItemCount(237502, true)
+
+-- 	HUD:UpdateText(data, item)
+-- end
+----------------------------------------------
+
+-- Untethered Coin
+function Ns.FunctionList.Ethereal(HUD, data, options, ...)
+
+	local currency = C_CurrencyInfo.GetCurrencyInfo(3278)
+	local display = 0
+
+	if currency.name and tonumber(currency.quantity) then display = currency.quantity
+	else display = 0 end
+
+	HUD:UpdateText(data, display)
+end
+----------------------------------------------
+
+-- Untethered Coin
+function Ns.FunctionList.Untethered(HUD, data, options, ...)
+
+	local currency = C_CurrencyInfo.GetCurrencyInfo(3303)
+	local display = 0
+
+	if currency.name and tonumber(currency.quantity) then display = currency.quantity
+	else display = 0 end
+
+	HUD:UpdateText(data, display)
+end
+----------------------------------------------
+
+-- Displaced Corrupted Mementos
+function Ns.FunctionList.Mementos(HUD, data, options, ...)
+
+	local currency = C_CurrencyInfo.GetCurrencyInfo(3149)
+	local display = 0
+
+	if currency.name and tonumber(currency.quantity) then display = currency.quantity
+	else display = 0 end
+
+	HUD:UpdateText(data, display)
+end
+----------------------------------------------
+
+-- Ethereal Voidsplinter (Catalyst)
 function Ns.FunctionList.Catalyst(HUD, data, options, ...)
 
-	local currency = C_CurrencyInfo.GetCurrencyInfo(3116)
+	local currency = C_CurrencyInfo.GetCurrencyInfo(3269)
 	local display = 0
 
 	if currency.name and tonumber(currency.quantity) then display = currency.quantity
@@ -490,13 +538,17 @@ function Ns.FunctionList.TraderTender(HUD, data, options, ...)
 end
 ------------------------------------------------
 
--- Spark of Fortunes
+-- Spark of Starlight
 function Ns.FunctionList.Spark(HUD, data, options, ...)
 
 	local EB = options.Splint_Spark
 	local returnText
-	local spark = C_Item.GetItemCount(230906, true)
-	local splinter = C_Item.GetItemCount(230905, true)
+	local spark = C_Item.GetItemCount(231756, true)
+	local dust = C_CurrencyInfo.GetCurrencyInfo(3141)
+	local splinter = 0
+
+	if dust.name and tonumber(dust.quantity) then splinter = dust.quantity
+	else splinter = 0 end
 
 	if Ns.Band(EB, Spark) then returnText = spark end
 	if Ns.Band(EB, Splinter) then returnText = splinter end

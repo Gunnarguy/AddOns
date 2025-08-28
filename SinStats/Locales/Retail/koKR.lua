@@ -218,6 +218,12 @@ L["SpeedMenu"] = "이동 속도"
 L["SpeedTip"] = ""
 L["SpeedDescription"] = L["TipsAndInfo"] .. "캐릭터의 실시간 이동 속도입니다.\n\n빨간 " .. Ns.Colors.Red .. "이동 속도|r 값은 이동 속도 감소 효과에 걸렸거나 기본 속도보다 느리게 움직이는 것을 나타냅니다"
 
+L["Karesh"] = "크아레쉬"
+L["KareshAbrev"] = "크아레쉬"
+L["KareshMenu"] = "크아레쉬 합작회"
+L["KareshTip"] = ""
+L["KareshDescription"] = L["TipsAndInfo"] .. "명성 순위를 표시합니다 " .. Ns.KareshLink
+
 L["Gallagio"] = "갤라지오"
 L["GallagioAbrev"] = "갤라지오"
 L["GallagioMenu"] = "갤라지오 충성"
@@ -338,6 +344,12 @@ L["GildedMenu"] = "금빛 전령 문장"
 L["GildedTip"] = ""
 L["GildedDescription"] = L["TipsAndInfo"] .. "통화를 표시합니다 " .. Ns.GildedLink
 
+L["Puzzling"] = "칩"
+L["PuzzlingAbrev"] = "칩"
+L["PuzzlingMenu"] = "무역회사 칩"
+L["PuzzlingTip"] = ""
+L["PuzzlingDescription"] = L["TipsAndInfo"] .. "통화를 표시합니다 " .. Ns.PuzzlingLink .. "수수께끼의 무역회사 칩"
+
 L["Catalyst"] = "촉매"
 L["CatalystAbrev"] = "촉매"
 L["CatalystMenu"] = "촉매"
@@ -379,6 +391,24 @@ L["IronAbrev"] = "무쇠"
 L["IronMenu"] = "불꽃축복 무쇠"
 L["IronTip"] = ""
 L["IronDescription"] = L["TipsAndInfo"] .. "통화를 표시합니다 " .. Ns.IronLink
+
+L["Ethereal"] = "에테리얼"
+L["EtherealAbrev"] = "에테리얼"
+L["EtherealMenu"] = "에테리얼 실오라기"
+L["EtherealTip"] = ""
+L["EtherealDescription"] = L["TipsAndInfo"] .. "통화를 표시합니다 " .. Ns.EtherealLink
+
+L["Untethered"] = "풀어헤쳐진"
+L["UntetheredAbrev"] = "풀어헤쳐진"
+L["UntetheredMenu"] = "풀어헤쳐진 주화"
+L["UntetheredTip"] = ""
+L["UntetheredDescription"] = L["TipsAndInfo"] .. "통화를 표시합니다 " .. Ns.UntethLink
+
+L["Mementos"] = "기념품"
+L["MementosAbrev"] = "기념품"
+L["MementosMenu"] = "기념품"
+L["MementosTip"] = ""
+L["MementosDescription"] = L["TipsAndInfo"] .. "통화를 표시합니다 " .. Ns.MementosLink
 
 L["KajaCola"] = "카자콜라"
 L["KajaColaAbrev"] = "카자콜라"

@@ -17,9 +17,19 @@ L.OTabWorld		= "Jefes del mundo"--Since there are so many world mods, enough to 
 L.OTabScenarios	= "Escenarios"--Future use, will be used for scenarios and delves, likely after there are more than 2 mods (so probably 12.x or later)
 L.OTabPlugins	= "Otros" --Scenarios, PVP, Delves (11.x), Solo/Challenge content (torghast, mage tower, etc)
 L.OTabOptions	= "Opciones"
+--L.OTabTools							= "Tools"--Such as break timer button, durability checks, latency checks, keystone checks (in future)
 L.OTabAbout		= "Acerca de"
 
-L.FOLLOWER	= "Seguidor"--i.e. the new dungeon type in 10.2.5. I haven't found a translated string yet
+--Main Tab, Tools checks
+--L.Tools_LatencyCheck				= "Latency Check"
+--L.Tools_DurabilityCheck				= "Durability Check"
+--L.Tools_KeystoneCheck				= "Keystone Check"
+
+--L.Tools_BreakTimer					= "Start Break Timer"
+--L.Tools_PizzaTimer					= "Start Generic Timer"
+
+--L.Tools_Duration					= "Duration"
+--L.Tools_Message						= "Timer Message"
 
 L.TabCategory_CURRENT_SEASON		= "Temporada actual"
 
@@ -89,8 +99,8 @@ L.ModelSoundLong			= TOAST_DURATION_LONG
 L.ResizeOptions			 	= "Tamaño de la ventana"
 L.ResizeInfo				= "Cambia el tamaño de la GUI arrastrando desde la esquina inferior derecha"
 L.Button_ResetWindowSize	= "Restablecer tamaño"
-L.Editbox_WindowWidth		= "Horizontal"
-L.Editbox_WindowHeight		= "Vertical"
+L.Editbox_WindowWidth		= "Anchura"
+L.Editbox_WindowHeight		= "Altura"
 
 L.UIGroupingOptions					= "Opciones de agrupación de IU (cambiarlas requiere recargar la IU)"
 L.GroupOptionsExcludeIcon			= "Excluir que las opciones 'Establecer icono activado' se agrupan por hechizo (en su lugar, se agruparán en su propia categoría 'Iconos')"
@@ -154,6 +164,11 @@ L.AutoAcceptFriendInvite	= "Aceptar automáticamente invitaciones de grupos de a
 L.AutoAcceptGuildInvite		= "Aceptar automáticamente invitaciones de grupos de miembros de la hermandad"
 L.Area_Advanced				= "Opciones avanzadas"
 L.FakeBW					= "Camuflar DBM como si fuera BigWigs en comprobaciones de versión (útil para hermandades que obligan a utilizar BigWigs)"
+--
+L.Area_Tooltip              = "Integración con tooltips"
+L.EnableTooltip             = "Añadir estadísticas de DBM a los tooltips de los jefes compatibles"
+L.EnableTooltipInCombat     = "Mostrar información del tooltip durante el combate"
+L.EnableTooltipHeader       = "Incluir encabezado de DBM en el tooltip"
 
 -- Panel: Profiles
 L.Panel_Profile				= "Perfiles"
@@ -283,7 +298,7 @@ L.VPReplaceNote				= "Nota: Los paquetes de voz nunca cambian ni eliminan los so
 L.ReplacesAnnounce			= "Reemplazar los sonidos de anuncio (Nota: muy pocos usan paquetes de voz, excepto para cambios de fase y bichos)"
 L.ReplacesSADefault 		= "Reemplazar los sonidos predeterminados de anuncio especial (los sonidos personalizados definidos por el usuario nunca serán reemplazados)"
 L.Area_VoicePackAdvOptions	= "Opciones avanzadas del paquete de voz"
-L.Area_VPLearnMore			= "Obten más información sobre los paquetes de voz y cómo utilizar estas opciones"
+L.Area_VPLearnMore			= "Obtén más información sobre los paquetes de voz y cómo utilizar estas opciones"
 L.VPLearnMore				= "|cFF73C2FBhttps://github.com/DeadlyBossMods/DBM-Retail/wiki/%5BGuide%5D-DBM-&-Voicepacks#2022-update|r"
 L.Area_BrowseOtherVP		= "Explora otros paquetes de voz en Curse"
 L.BrowseOtherVPs			= "|cFF73C2FBhttps://www.curseforge.com/wow/addons/search?search=dbm+voice|r"
@@ -293,10 +308,10 @@ L.BrowseOtherCTs			= "|cFF73C2FBhttps://www.curseforge.com/wow/addons/search?sea
 -- Panel: Event Sounds
 L.Panel_EventSounds			= "Sonidos de eventos"
 L.Area_SoundSelection		= "Selección de sonidos"
-L.EventVictorySound			= "Sonido de victoria de encuentro"
-L.EventWipeSound			= "Sonido de derrota de encuentro"
-L.EventEngagePT				= "Sonido de temporizador de inicio de encuentro"
-L.EventEngageSound			= "Sonido de inicio de encuentro"
+L.EventVictorySound			= "Sonido de victoria"
+L.EventWipeSound			= "Sonido de derrota"
+L.EventEngagePT				= "Sonido de temporizador de inicio"
+L.EventEngageSound			= "Sonido de inicio"
 L.EventDungeonMusic			= "Música de fondo de mazmorras y bandas"
 L.EventEngageMusic			= "Música de fondo de encuentro"
 L.Area_EventSoundsExtras	= "Opciones de sonidos de eventos"
@@ -384,8 +399,8 @@ L.AreaTitle_BarSetupVariance 	= "Opciones de barras de variación"
 L.EnableHugeBar 				= "Activar barras grandes (o 'Barra 2')"
 L.EnableVarianceBar 			= "Activar barras de variación"
 L.VarianceColor					= "Color de variación"
-L.VarianceTransparency			= "Transparencia de las barras: %0.1f"
-L.VarianceTimerTextBehavior 	= "Comportamiento del texto del temporizador de variación"
+L.VarianceTransparency			= "Transparencia: %0.1f"
+L.VarianceTimerTextBehavior 	= "Comportamiento del texto"
 L.ZeroatWindowEnds 				= "El texto llega a cero al final de la ventana de reutilización"
 L.ZeroatWindowStartPause 		= "El texto llega a cero al inicio de la ventana de reutilización y se pausa"
 L.ZeroatWindowStartRestart 		= "El texto llega a cero al inicio de la ventana de reutilización y luego se reinicia"
@@ -435,7 +450,7 @@ L.SpamBlockNoPrivateAuraSound		= "No registrar sonidos de auras privados"
 
 L.Area_SpamFilter_Timers			= "Opciones de temporizadores"
 L.SpamBlockNoShowBossTimers			= "No mostrar temporizadores para jefes de mazmorras/bandas"
-L.SpamBlockNoShowTrashTimers		= "No mostrar temporizadores para bichos (Nota: esto también desactiva los TdR con placa de nombre)"
+L.SpamBlockNoShowTrashTimers		= "No mostrar temporizadores para bichos (Nota: esto también desactiva las reutilizaciones con placa de nombre)"
 L.SpamBlockNoShowEventTimers		= "No mostrar temporizadores de eventos"
 L.SpamBlockNoShowUTimers			= "No mostrar temporizadores enviados por el usuario"
 L.SpamBlockNoCountdowns				= "No reproducir sonidos de cuenta atrás"
@@ -573,7 +588,7 @@ L.EnableWBSharing 			= "Compartir tus inicios y victorias de encuentros con jefe
 
 -- Tab: Frames & Integrations
 L.TabCategory_Frames		= "Marcos e integración"
-L.Area_NamelateInfo			= "Información de auras de placas de nombres de DBM"
+L.Area_NamelateInfo			= "Información de auras de placas de nombre de DBM"
 -- Panel: InfoFrame
 L.Panel_InfoFrame			= "Marco de información"
 
@@ -581,9 +596,9 @@ L.Panel_InfoFrame			= "Marco de información"
 L.Panel_Range				= "Marco de distancia"
 
 -- Panel: Nameplate
-L.Panel_Nameplates			= "Placas de nombres"
+L.Panel_Nameplates			= "Placas de nombre"
 L.Plater_Config				= "Abrir configuración de Plater"
-L.Area_NPStyle				= "Contorno (solo cuando DBM controla las placas de nombres)"
+L.Area_NPStyle				= "Contorno (solo cuando DBM controla las placas de nombre)"
 L.NPAuraText				= "Mostrar texto del temporizador en los iconos de la placa de nombre"
 L.NPAuraSize				= "Tamaño del aura: %d"
 L.NPIcon_BarOffSetX 		= "Desplazamiento del icono X: %d"

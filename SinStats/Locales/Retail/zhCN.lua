@@ -221,6 +221,12 @@ L["SpeedMenu"] = "速度"
 L["SpeedTip"] = ""
 L["SpeedDescription"] = L["TipsAndInfo"] .. "您角色的实时移动速度，包括您的 " .. Ns.Colors.Green .. "滑翔速度|r。\n\n红色 " .. Ns.Colors.Red .. "速度|r 值表示您受到减速效果影响或以比正常速度慢的速度移动"
 
+L["Karesh"] = "卡雷什托拉斯"
+L["KareshAbrev"] = "卡雷什托拉斯"
+L["KareshMenu"] = "卡雷什托拉斯"
+L["KareshTip"] = ""
+L["KareshDescription"] = L["TipsAndInfo"] .. "显示名望：" .. Ns.KareshLink
+
 L["Gallagio"] = "加乐宫"
 L["GallagioAbrev"] = "加乐宫"
 L["GallagioMenu"] = "加乐宫"
@@ -335,6 +341,12 @@ L["GildedMenu"] = "鎏金先驱纹章"
 L["GildedTip"] = ""
 L["GildedDescription"] = L["TipsAndInfo"] .. "显示：" .. Ns.GildedLink
 
+L["Puzzling"] = "令人费解"
+L["PuzzlingAbrev"] = "令人费解"
+L["PuzzlingMenu"] = "令人费解的财阀凭证"
+L["PuzzlingTip"] = ""
+L["PuzzlingDescription"] = L["TipsAndInfo"] .. "Displays the currency " .. Ns.PuzzlingLink .. "令人费解的财阀凭证"
+
 L["Catalyst"] = "化生台"
 L["CatalystAbrev"] = "化生台"
 L["CatalystMenu"] = "化生台"
@@ -376,6 +388,24 @@ L["IronAbrev"] = "焰祝之铁"
 L["IronMenu"] = "焰祝之铁"
 L["IronTip"] = ""
 L["IronDescription"] = L["TipsAndInfo"] .. "显示：" .. Ns.IronLink
+
+L["Ethereal"] = "虚灵丝线"
+L["EtherealAbrev"] = "虚灵丝线"
+L["EtherealMenu"] = "虚灵丝线"
+L["EtherealTip"] = ""
+L["EtherealDescription"] = L["TipsAndInfo"] .. "显示：" .. Ns.EtherealLink
+
+L["Untethered"] = "无拘钱币"
+L["UntetheredAbrev"] = "无拘钱币"
+L["UntetheredMenu"] = "无拘钱币"
+L["UntetheredTip"] = ""
+L["UntetheredDescription"] = L["TipsAndInfo"] .. "显示：" .. Ns.UntethLink
+
+L["Mementos"] = "纪念品"
+L["MementosAbrev"] = "纪念品"
+L["MementosMenu"] = "纪念品"
+L["MementosTip"] = ""
+L["MementosDescription"] = L["TipsAndInfo"] .. "显示：" .. Ns.MementosLink
 
 L["KajaCola"] = "卡亚可乐"
 L["KajaColaAbrev"] = "卡亚可乐"

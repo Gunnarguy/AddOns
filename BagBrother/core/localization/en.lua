@@ -11,21 +11,31 @@ L.OpenBank = 'Open Bank'
 L.OpenGuild = 'Open Guild Bank'
 L.OpenVault = 'Open Void Storage'
 
+--terminal
+L.Commands = 'Command list'
+L.CmdShowInventory = 'Toggles your inventory'
+L.CmdShowBank = 'Toggles your bank'
+L.CmdShowGuild = 'Toggles your guild bank'
+L.CmdShowVault = 'Toggles your void storage'
+L.CmdShowVersion = 'Prints the current version'
+L.CmdShowOptions = 'Opens the configuration menu'
+L.CmdReset = 'Wipe settings and cached data'
+L.ResetConfirm = 'Are you sure you want to reset %s?|nAll settings and cached data will be lost.'
+L.SkinError = 'Error applying skin.'
+L.UpgradeError = 'Issue upgrading settings. If you run into issues, try resetting your settings.'
+
 --titles
 L.TitleBags = '%s\'s Inventory'
 L.TitleBank = '%s\'s Bank'
 L.TitleVault = '%s\'s Void Storage'
 L.NormalBags = 'Normal Bags'
 L.TradeBags = 'Trade Bags'
+L.AmmoBags = 'Ammo Bags'
 
---actions
+--tooltips
 L.Bags = 'Bags'
 L.Drag = 'Drag'
-L.Guilds = 'Guilds'
-L.Locations = 'Locations'
-L.Characters = 'Characters'
 L.BrowseItems = 'Browse Items'
-L.EnterDescription = 'Enter Description:'
 L.HideBag = 'Click to hide this bag.'
 L.ShowBag = 'Click to show this bag.'
 L.GuildFunds = 'Guild Funds'
@@ -34,15 +44,19 @@ L.NumWithdraw = '%d Withdraw'
 L.NumDeposit = '%d Deposit'
 L.NumRemaining = '%d Remaining'
 L.WarbandMoney = 'Warband Money'
-
---dropdowns
 L.OfflineViewing = 'Offline Viewing'
+L.Others = 'Others'
+
+--menus
+L.Characters = 'Characters'
+L.Guilds = 'Guilds'
+L.Locations = 'Locations'
+L.EnterDescription = 'Enter Description:'
 L.ServerSorting = 'Server-Side Sorting'
-L.ServerSortingTip = 'Whether to let the game server sort items, where available.'
+L.ServerSortingTip = 'Enable to let the game server sort items, instead of the addon doing it.'
 L.CleanupOptions = 'Cleanup Options'
 L.IncludeReagents = 'Include Reagents'
 L.LockItems = 'Lock Item Slots'
-L.RequiresClientSorting = 'Requires client-side sorting!'
 
 --dialogs
 L.AskMafia = 'Ask Mafia'

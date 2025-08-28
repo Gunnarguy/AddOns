@@ -1082,3 +1082,53 @@ L["No characters with buffs found."] = "Aucun personnage avec des buffs trouvé.
 L["Unknown Layer"] = "Couche inconnue";
 
 L["Active"] = "Actif";
+L["noZonesMappedYet"] = "Aucune zone n’a encore été cartographiée depuis le redémarrage du serveur.";
+L["Rend log adjusted"] = "Journal de Rend ajusté";
+
+L["flashDisableRendTitle"] = "Désactiver l’illumination de Rend";
+L["flashDisableRendDesc"] = "Forcer la désactivation de tous les événements d’illumination client liés à Rend.";
+
+L["flashDisableOnyTitle"] = "Désactiver l’illumination d’Ony";
+L["flashDisableOnyDesc"] = "Forcer la désactivation de tous les événements d’illumination client liés à Ony/Nef.";
+
+L["flashDisableZanTitle"] = "Désactiver l’illumination de Zan";
+L["flashDisableZanDesc"] = "Forcer la désactivation de tous les événements d’illumination client liés à Zandalar.";
+
+L["soundsFirstYellTitle"] = "Autres buffs en approche";
+L["soundsFirstYellDesc"] = "Son joué lorsque les buffs zand / autres sont remises, avec quelques secondes avant l’apparition du buff (premier cri du PNJ).";
+
+L["soundsFirstYellRendTitle"] = "Buff de Rend en approche";
+L["soundsFirstYellRendDesc"] = "Son joué lorsque la tête de Rend est remise, avec quelques secondes avant l’apparition du buff (premier cri du PNJ).";
+
+L["soundsFirstYellOnyTitle"] = "Buff Ony/Nef en approche";
+L["soundsFirstYellOnyDesc"] = "Son joué lorsque la tête d’Ony/Nef est remise, avec quelques secondes avant l’apparition du buff (premier cri du PNJ).";
+
+L["showDisableLayerButtonsTitle"] = "Afficher le bouton de désactivation de couche"
+L["showDisableLayerButtonsDesc"] = "Affiche le bouton de désactivation de couche sur la fenêtre des minuteries / couches.";
+
+L["Show Quest Handins Only"] = "Afficher les remises de quêtes";
+L["showQuestHandinsTooltip"] = "Affiche uniquement les entrées du journal lors de la remise de la quête de Rend.";
+
+L["resetFramesTitle"] = "Réinitialiser les fenêtres";
+L["resetFramesDesc"] = "Cliquez ici pour réinitialiser toutes les fenêtres au centre de l’écran.";
+
+L["buffHasNoCooldown"] = "Ce buff ne déclenche pas de temps de recharge";
+L["noCooldown"] = "Pas de temps de recharge";
+
+L["Molten Core"] = "Cœur du Magma";
+L["Onyxia's Lair"] = "Repaire d'Onyxia";
+L["Blackwing Lair"] = "Repaire de l'Aile noire";
+L["Naxxramas"] = "Naxxramas";
+L["Karazhan"] = "Karazhan";
+L["The Shattered Halls"] = "Les Salles brisées";
+L["Serpentshrine Cavern"] = "Caverne du sanctuaire du Serpent";
+L["The Arcatraz"] = "L'Arcatraz";
+L["Black Morass"] = "Le Noir Marécage";
+L["Battle of Mount Hyjal"] = "La bataille du mont Hyjal";
+L["Black Temple"] = "Temple noir";
+L["Hellfire Citadel"] = "Citadelle des Flammes infernales";
+L["Coilfang Reservoir"] = "Réservoir de Glissecroc";
+L["Shadow Labyrinth"] = "Labyrinthe des ombres";
+L["Auchindoun"] = "Auchindoun";
+L["Tempest Keep"] = "Donjon de la Tempête";
+L["Caverns of Time"] = "Grottes du temps";

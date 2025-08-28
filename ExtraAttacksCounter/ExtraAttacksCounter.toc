@@ -1,0 +1,8 @@
+## Interface: 11501
+## Title: Extra Attacks Tracker
+## Notes: Tracks Flurry Axe, Hand of Justice, Iron Counterweight, Reckoning, and Parry-Haste extra swings
+## Author: Gunnar
+## Version: 1.0
+## SavedVariables: EAT_DB
+
+ExtraAttacksTracker.lua

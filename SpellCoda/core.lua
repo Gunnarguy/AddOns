@@ -1,13 +1,18 @@
 local _, sc                    = ...;
 
+local L                         = sc.L;
+
 local spells                    = sc.spells;
 local spell_flags               = sc.spell_flags;
+
+local load_localization         = sc.loc.load_localization;
 
 local load_sw_ui                = sc.ui.load_sw_ui;
 local create_sw_base_ui         = sc.ui.create_sw_base_ui;
 local sw_activate_tab           = sc.ui.sw_activate_tab;
 local update_profile_frame      = sc.ui.update_profile_frame;
 local update_loadout_frame      = sc.ui.update_loadout_frame;
+local locale_warning_popup      = sc.ui.locale_warning_popup;
 
 local config                    = sc.config;
 local load_config               = sc.config.load_config;
@@ -15,7 +20,6 @@ local save_config               = sc.config.save_config;
 local set_active_settings       = sc.config.set_active_settings;
 local set_active_loadout        = sc.config.set_active_loadout;
 local activate_settings         = sc.config.activate_settings;
-local activate_loadout_config   = sc.config.activate_loadout_config;
 
 local reassign_overlay_icon     = sc.overlay.reassign_overlay_icon;
 local update_overlay            = sc.overlay.update_overlay;
@@ -33,7 +37,7 @@ sc.core                         = core;
 core.addon_name                 = "SpellCoda";
 
 local version_major             = 0;
-local version_minor             = 4;
+local version_minor             = 5;
 local version_build             = sc.addon_build_id;
 
 core.version_id                 = version_build + version_minor*1000 + version_major*1000000;
@@ -46,6 +50,8 @@ core.sw_addon_loaded            = false;
 sc.sequence_counter             = 0;
 core.addon_running_time         = 0;
 core.active_spec                = 1;
+core.doing_raid                 = false;
+core.mute_overlay               = false;
 
 core.talents_update_needed      = true;
 core.equipment_update_needed    = true;
@@ -99,21 +105,24 @@ local function client_age_days()
     return diff_days;
 end
 
-local cc_spell_id        = 0;
-local cc_noexpire        = false;
-local cc_channel         = true;
-local cc_expire_timer    = 0;
-local cc_waiting_on_anim = false;
+local cc_spell_id           = 0;
+local cc_noexpire           = false;
+local cc_channel            = true;
+local cc_expire_timer       = 0;
+local cc_waiting_on_anim    = false;
+local cc_enqueued_spell_id  = 0;
 
 local function cc_enqueue(spell_id)
 
-    if sc.overlay.cc_f1.animating and not config.settings.overlay_cc_transition_nocd then
+    if sc.overlay.cc_f1.icon_frame.animating and not config.settings.overlay_cc_transition_nocd then
         cc_waiting_on_anim = true;
+        cc_enqueued_spell_id = spell_id;
     else
+        cc_spell_id = spell_id;
         sc.overlay.cc_new_spell(spell_id);
         cc_waiting_on_anim = false;
+        cc_enqueued_spell_id = 0;
     end
-    cc_spell_id = spell_id;
 end
 
 local function set_cc_spell(spell_id)
@@ -126,7 +135,6 @@ local function set_cc_spell(spell_id)
         if cc_spell_id ~= spell_id then
             cc_enqueue(spell_id);
         end
-        cc_spell_id = spell_id;
     end
 end
 
@@ -164,9 +172,22 @@ local function spell_tracking(dt)
     end
 
     if cc_waiting_on_anim then
-        cc_enqueue(cc_spell_id);
+        cc_enqueue(cc_enqueued_spell_id);
     end
 end
+
+local function doing_raid_update()
+    local in_instance, instance_type = IsInInstance();
+    sc.core.doing_raid = in_instance and (instance_type == "pvp" or (IsInRaid() and instance_type == "raid"));
+    local should_mute_overlay = config.settings.overlay_disable_in_raid and sc.core.doing_raid;
+    if not sc.core.mute_overlay and should_mute_overlay then
+        sc.overlay.clear_overlays();
+        sc.core.old_ranks_checks_needed = true;
+    end
+    sc.core.mute_overlay = should_mute_overlay;
+end
+core.doing_raid_update = doing_raid_update;
+
 
 local event_dispatch = {
     ["UNIT_SPELLCAST_SUCCEEDED"] = function(self, caster, _, spell_id)
@@ -224,14 +245,15 @@ local event_dispatch = {
     ["ADDON_LOADED"] = function(_, arg)
         if arg == "SpellCoda" then
             load_config();
+            load_localization();
+            sc.overlay.init_label_handler();
+            sc.overlay.init_ccfs();
             core.active_spec = GetActiveTalentGroup();
             set_active_settings();
             set_active_loadout(__sc_p_char.active_loadout);
             load_sw_ui();
-            sc.overlay.init_ccfs();
             activate_settings();
             update_profile_frame();
-            --activate_loadout_config();
             update_loadout_frame(); -- activates activate_loadout_config()
         end
     end,
@@ -271,46 +293,18 @@ local event_dispatch = {
             print("Spells in data:", num_spells);
         end
         -- don't warn about updates when build is relatively fresh
-        local version_warning_build_threshold_days = 5;
+        local version_warning_build_threshold_days = 14;
         if core.__sw__debug__ then
             version_warning_build_threshold_days = 0;
         end
         if config.settings.general_version_mismatch_notify and
             generated_data_is_outdated(sc.client_version_loaded, sc.client_version_src) and
             client_age_days() > version_warning_build_threshold_days then
-            print(core.addon_name..": detected client and addon data mismatch. Consider checking for an update.");
+            print(core.addon_name..": "..L["detected client and addon data mismatch for over 2 weeks. Consider checking for an update."]);
         end
 
-        -- temporary popup for first time using SpellCoda,
-        -- delete this at some point including special case in config on key "swc_to_sc_transition_popup_shown"
-        if not __sc_p_acc.swc_to_sc_transition_popup_shown then
-            local frame = CreateFrame("Frame", "__sc__transition_popup", UIParent, "DialogBoxFrame")
-            frame:SetSize(400, 200);
-            frame:SetPoint("CENTER", 0, 100);
-
-            local icon = frame:CreateTexture(nil, "ARTWORK");
-            icon:SetSize(32, 32);
-            icon:SetPoint("TOPLEFT", 12, -12);
-            icon:SetTexture("Interface\\Icons\\spell_fire_elementaldevastation");
-
-            local text = frame:CreateFontString(nil, "ARTWORK", "GameFontHighlight");
-            text:SetPoint("TOPLEFT", 25, -60);
-            text:SetPoint("RIGHT", -10, 0);
-            text:SetJustifyH("LEFT");
-            text:SetJustifyV("TOP");
-            text:SetText("|cFFFF0000StatWeightsClassic|r has been largely overhauled and renamed\nto |cFFFF0000SpellCoda|r. All classes are now implemented.\n\nInteract with |cFFFF0000SpellCoda|r by typing:\n\n   |cFF00FF00/spellcoda|r");
-
-            __sc__transition_popupButton:SetSize(180, 24);
-            __sc__transition_popupButton:SetPoint("BOTTOM", 0, 20);
-            __sc__transition_popupButton:SetText("Okay! Don't show again");
-            __sc__transition_popupButton:SetNormalFontObject("GameFontNormal");
-            __sc__transition_popupButton:SetDisabledFontObject("GameFontDisable");
-            __sc__transition_popupButton:SetHighlightFontObject("GameFontHighlight");
-            __sc__transition_popupButton:SetScript("OnClick", function()
-                __sc_p_acc.swc_to_sc_transition_popup_shown = true;
-                frame:Hide();
-            end)
-            frame:Show()
+        if not __sc_p_acc.localization_notified and sc.loc.locale_found then
+            locale_warning_popup();
         end
     end,
     ["ACTIONBAR_SLOT_CHANGED"] = function(_, slot)
@@ -416,6 +410,12 @@ local event_dispatch = {
         -- Currently only registered when in Hardcore mode
         -- Hide addon UI when in combat
         __sc_frame:Hide();
+    end,
+    ["PLAYER_ENTERING_WORLD"] = function()
+        doing_raid_update();
+    end,
+    ["GROUP_ROSTER_UPDATE"] = function()
+        doing_raid_update();
     end,
 };
 
@@ -564,7 +564,7 @@ local function command(arg)
         sw_activate_tab(__sc_frame.tabs[6]);
     elseif arg == "buffs" or arg == "auras" then
         sw_activate_tab(__sc_frame.tabs[7]);
-    elseif arg == "settings" or arg == "opt" or arg == "options" or arg == "conf" or arg == "configure" then
+    elseif arg == "settings" or arg == "opt" or arg == "options" or arg == "conf" or arg == "config" or arg == "configure" then
         sw_activate_tab(__sc_frame.tabs[8]);
     elseif string.find(arg, "force set") then
         local substrs = {};
@@ -576,8 +576,8 @@ local function command(arg)
         if set_id and num_pieces then
             core.equipment_update_needed = true;
             sc.equipment.force_item_sets[set_id] = num_pieces;
+            print(string.format("Forcing item set %d to have %d pieces", set_id, num_pieces));
         end
-        print(string.format("Forcing item set %d to have %d pieces", set_id, num_pieces));
     elseif string.find(arg, "force item") then
         local substrs = {};
         for s in arg:gmatch("%S+") do
@@ -587,8 +587,8 @@ local function command(arg)
         if item_id then
             core.equipment_update_needed = true;
             sc.equipment.force_items[item_id] = item_id;
+            print(string.format("Forcing item %d", item_id));
         end
-        print(string.format("Forcing item %d", item_id));
     elseif arg == "reset" then
         core.use_char_defaults = 1;
         core.use_acc_defaults = 1;

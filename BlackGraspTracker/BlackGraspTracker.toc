@@ -1,0 +1,8 @@
+## Interface: 11507
+## Title: Black Grasp Tracker
+## Notes: Tracks mana drained from Black Grasp of the Destroyer procs
+## Author: YourName
+## Version: 1.0
+## SavedVariables: BlackGraspTrackerDB
+
+BlackGraspTracker.lua

@@ -128,7 +128,7 @@ L["noTimer"] = "Sem temporizador"; --No timer
 L["noCurrentTimer"] = "Não há temporizador atual"; --No current timer
 L["noActiveTimers"] = "Sem temporizadores ativos"; --No active timers
 L["newBuffCanBeDropped"] = "Agora é possível obter um novo bônus de %s";
-L["buffResetsIn"] = "%s será redefinido em %s";
+L["buffResetsIn"] = "%s será reiniciado em %s";
 L["rendFirstYellMsg"] = "Laceral cairá em 6 segundos.";
 L["onyxiaFirstYellMsg"] = "Onyxia cairá em 14 segundos.";
 L["nefarianFirstYellMsg"] = "Nefarian cairá em 15 segundos.";
@@ -1092,3 +1092,53 @@ L["No characters with buffs found."] = "Nenhum personagem com bônus encontrado.
 L["Unknown Layer"] = "Camada desconhecida";
 
 L["Active"] = "Ativo";
+L["noZonesMappedYet"] = "Nenhuma zona foi mapeada desde a reinicialização do servidor.";
+L["Rend log adjusted"] = "Registro de Rend ajustado";
+
+L["flashDisableRendTitle"] = "Desativar iluminação de Rend";
+L["flashDisableRendDesc"] = "Substitui para desativar todos os eventos de iluminação do cliente relacionados a Rend.";
+
+L["flashDisableOnyTitle"] = "Desativar iluminação de Ony";
+L["flashDisableOnyDesc"] = "Substitui para desativar todos os eventos de iluminação do cliente relacionados a Ony/Nef.";
+
+L["flashDisableZanTitle"] = "Desativar iluminação de Zan";
+L["flashDisableZanDesc"] = "Substitui para desativar todos os eventos de iluminação do cliente relacionados a Zandalar.";
+
+L["soundsFirstYellTitle"] = "Outros bônus entrantes";
+L["soundsFirstYellDesc"] = "Som reproduzido quando os bônus de zand/outros são entregues e há alguns segundos antes do bônus ser ativado (primeiro grito do NPC).";
+
+L["soundsFirstYellRendTitle"] = "Bônus de Rend entrante";
+L["soundsFirstYellRendDesc"] = "Som reproduzido quando a cabeça de Rend é entregue e há alguns segundos antes do bônus ser ativado (primeiro grito do NPC).";
+
+L["soundsFirstYellOnyTitle"] = "Bônus de Ony/Nef entrante";
+L["soundsFirstYellOnyDesc"] = "Som reproduzido quando a cabeça da Ony/Nef é entregue e há alguns segundos antes do bônus ser ativado (primeiro grito do NPC).";
+
+L["showDisableLayerButtonsTitle"] = "Mostrar botão de desativar camada"
+L["showDisableLayerButtonsDesc"] = "Mostra o botão de desativar camada na janela de temporizadores/camadas.";
+
+L["Show Quest Handins Only"] = "Mostrar entregas de missões";
+L["showQuestHandinsTooltip"] = "Mostra apenas entradas do registro ao entregar a missão de Rend.";
+
+L["resetFramesTitle"] = "Redefinir janelas";
+L["resetFramesDesc"] = "Clique aqui para redefinir todas as janelas para o centro da tela.";
+
+L["buffHasNoCooldown"] = "Este bônus não ativa um tempo de recarga";
+L["noCooldown"] = "Sem tempo de recarga";
+
+L["Molten Core"] = "Núcleo Derretido";
+L["Onyxia's Lair"] = "Covil da Onyxia";
+L["Blackwing Lair"] = "Covil Asa Negra";
+L["Naxxramas"] = "Naxxramas";
+L["Karazhan"] = "Karazhan";
+L["The Shattered Halls"] = "Salões Despedaçados";
+L["Serpentshrine Cavern"] = "Caverna do Serpentário";
+L["The Arcatraz"] = "Arcatraz";
+L["Black Morass"] = "Lamaçal Negro";
+L["Battle of Mount Hyjal"] = "Batalha pelo Monte Hyjal";
+L["Black Temple"] = "Templo Negro";
+L["Hellfire Citadel"] = "Cidadela Fogo do Inferno";
+L["Coilfang Reservoir"] = "Reservatório Presacurva";
+L["Shadow Labyrinth"] = "Labirinto Soturno";
+L["Auchindoun"] = "Auchindoun";
+L["Tempest Keep"] = "Bastilha da Tormenta";
+L["Caverns of Time"] = "Cavernas do Tempo";

@@ -1,0 +1,8 @@
+## Interface: 11507
+## Title: EngagedThreat
+## Notes: Shows engaged enemies with health, swing speed, target, and threat runner-up (Classic Fresh).
+## Author: Gunnar & Copilot
+## Version: 1.0.0
+## SavedVariables: EngagedThreatDB
+
+EngagedThreat.lua

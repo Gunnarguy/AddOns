@@ -343,7 +343,9 @@ local function _GetWowheadLinkForLanguage()
     end
 
     local xpac
-    if Questie.IsCata then
+    if Questie.IsMoP then
+        xpac = "mop-classic/"
+    elseif Questie.IsCata then
         xpac = "cata/"
     elseif Questie.IsWotlk then
         xpac = "wotlk/"
@@ -424,7 +426,7 @@ function TrackerMenu:GetMenuForQuest(quest)
         end
     end
 
-    local coloredQuestName = QuestieLib:GetColoredQuestName(quest.Id, Questie.db.profile.enableTooltipsQuestLevel, true, true)
+    local coloredQuestName = QuestieLib:GetColoredQuestName(quest.Id, Questie.db.profile.enableTooltipsQuestLevel, true)
 
     tinsert(menu, { text = coloredQuestName, isTitle = true })
 

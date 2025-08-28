@@ -138,7 +138,7 @@ function Overview:build()
     ---@type AceGUILabel
     local RaidersLabel = AceGUI:Create("Label");
     RaidersLabel:SetText(L["Raiders"]);
-    RaidersLabel:SetWidth(300);
+    RaidersLabel:SetWidth(400);
     RaidersHeader:AddChild(RaidersLabel);
     Interface:set(self, "RaidersHeaderLabel", RaidersLabel);
 
@@ -692,7 +692,7 @@ function Overview:refresh()
 
         local CutLabel = AceGUI:Create("Label");
         CutLabel:SetText(" ");
-        CutLabel:SetWidth(120);
+        CutLabel:SetWidth(180);
         RaiderHolder:AddChild(CutLabel);
         self.CutHolders[player] = CutLabel;
 
@@ -737,12 +737,12 @@ function Overview:refresh()
         FillerLabel = AceGUI:Create("Label");
         FillerLabel:SetText(" ");
         FillerLabel:SetFullWidth(true);
-        RaiderHolder:AddChild(FillerLabel);
+        RaidersFrame:AddChild(FillerLabel);
 
         local Heading = GL.AceGUI:Create("Heading");
         Heading:SetFullWidth(true);
         Heading:SetText(("|c00FFFFFF%s|r"):format(L["Not in the raid"]));
-        RaiderHolder:AddChild(Heading);
+        RaidersFrame:AddChild(Heading);
 
         --- Not in raid
         for _, player in pairs(PlayersNotInRaid) do
@@ -792,7 +792,8 @@ function Overview:calculateCuts()
 
         if (CutHolder and CutHolder.SetText) then
             numberOfRaiders = numberOfRaiders + 1;
-            local cutPercentage = 100 / (totalToDistribute / cut);
+            local cutAsPartOfTotalToDistribute = ( cut > 0 and totalToDistribute > 0 ) and totalToDistribute / cut or 0;
+            local cutPercentage = cutAsPartOfTotalToDistribute > 0 and 100 / cutAsPartOfTotalToDistribute or 0;
 
             if (cutPercentage < 1) then
                 cutPercentage = 0;
@@ -802,7 +803,7 @@ function Overview:calculateCuts()
                 numberOfRaidersWithCut = numberOfRaidersWithCut + 1;
             end
 
-            CutHolder:SetText(("|c00967FD2%s|r|c00FFF569%s|r  (%s%%)"):format(GL:round(cut, 2), L["g"], GL:round(cutPercentage, 2)));
+            CutHolder:SetText(("|c00FFF569%s|r (%s%%)"):format(GL:goldToMoneyTexture(cut), GL:round(cutPercentage, 2)));
         end
     end
 
@@ -811,7 +812,7 @@ function Overview:calculateCuts()
     end
 
     Interface:get(self, "Label.RaidersHeaderLabel"):SetText(
-        ("    " .. L["%s Raiders | %s With cut | Total payout: %sg"]):format(numberOfRaiders, numberOfRaidersWithCut, GL:round(totalDistributed, 2))
+        ("    " .. L["%s Raiders | %s With cut | Total payout: %s"]):format(numberOfRaiders, numberOfRaidersWithCut, GL:goldToMoneyTexture(totalDistributed))
     );
 end
 

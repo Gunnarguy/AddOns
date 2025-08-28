@@ -1,8 +1,8 @@
-## Interface: 11501 ## Updated for current Classic Era (adjust if needed)
-## Title: |cffAAAAFFParry Haste Tracker|r (Gunnar)
-## Notes: Tracks estimated time saved and extra swings gained when the player's attacks are parried. Uses the 40% swing timer rule for parry haste.
+## Interface: 11403
+## Title: ParryHasteTracker
+## Notes: Tracks parry haste, avoidance, and related combat statistics.
 ## Author: Gemini AI (for Gunnar)
-## SavedVariablesPerCharacter: ParryHasteTracker_DB
 ## Version: 1.1-Corrected
+## SavedVariables: ParryHasteTracker_DB
 
 ParryHasteTracker.lua

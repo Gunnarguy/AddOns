@@ -1,0 +1,10 @@
+lightweight tag 9367fac301d7ba5fc76798ce763a447e3c179db6 v1.8.8
+Author:	dev7355608 <dev7355608@gmail.com>
+Date:	Sun Sep 29 17:25:40 2024 +0200
+
+commit 9367fac301d7ba5fc76798ce763a447e3c179db6
+Author: dev7355608 <dev7355608@gmail.com>
+Date:   Sun Sep 29 17:23:26 2024 +0200
+
+    Fix 1.15.4 compatibility
+

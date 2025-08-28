@@ -1,0 +1,8 @@
+Changes since tag spellsearch-1.3
+
+commit f5896f6d07028c5bb04b449f4a6bd19dac96ef3a
+Author: Broccoli <138363916+1broccoli@users.noreply.github.com>
+Date:   Wed Apr 9 00:54:10 2025 -0700
+
+    Update README.md
+

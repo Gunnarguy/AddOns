@@ -1,9 +1,8 @@
 ------------------------------------------------------------------------
-r379 | ileclerk | 2025-04-22 16:47:18 +0000 (Tue, 22 Apr 2025) | 1 line
+r383 | ileclerk | 2025-07-07 12:15:42 +0000 (Mon, 07 Jul 2025) | 1 line
 Changed paths:
-   M /trunk/MobInfo2-Vanilla.toc
-   M /trunk/MobInfo2.toc
+   A /trunk/MobInfo2-Mists.toc
 
-version updates
+
 ------------------------------------------------------------------------
 

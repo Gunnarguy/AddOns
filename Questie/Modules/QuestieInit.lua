@@ -4,6 +4,8 @@ local _QuestieInit = QuestieInit.private
 
 ---@type ThreadLib
 local ThreadLib = QuestieLoader:ImportModule("ThreadLib")
+---@type Expansions
+local Expansions = QuestieLoader:ImportModule("Expansions")
 
 ---@type QuestEventHandler
 local QuestEventHandler = QuestieLoader:ImportModule("QuestEventHandler")
@@ -81,6 +83,8 @@ local Phasing = QuestieLoader:ImportModule("Phasing")
 local WorldMapButton = QuestieLoader:ImportModule("WorldMapButton")
 ---@type AvailableQuests
 local AvailableQuests = QuestieLoader:ImportModule("AvailableQuests")
+---@type DailyQuests
+local DailyQuests = QuestieLoader:ImportModule("DailyQuests")
 ---@type SeasonOfDiscovery
 local SeasonOfDiscovery = QuestieLoader:ImportModule("SeasonOfDiscovery")
 ---@type WatchFrameHook
@@ -254,7 +258,7 @@ QuestieInit.Stages[3] = function() -- run as a coroutine
     coYield()
 
     -- Fill the QuestLogCache for first time
-    local cacheMiss, _, questIdsChecked = QuestLogCache.CheckForChanges(nil, false)
+    local cacheMiss, _, questIdsChecked = QuestLogCache.CheckForChanges(nil)
 
     if cacheMiss then
         Questie:Debug(Questie.DEBUG_CRITICAL, "QuestieInit: Game Cache did not fill in time, waiting for valid cache.")
@@ -286,7 +290,7 @@ QuestieInit.Stages[3] = function() -- run as a coroutine
         Questie.db.profile.aqWarningPrintDate = dateToday
         C_Timer.After(2, function()
             print("|cffff0000-----------------------------|r")
-            Questie:Print("|cffff0000The AQ War Effort quests are shown for you. If your server is done you can hide those quests in the General settings of Questie!|r");
+            Questie:Print("|cffff0000" .. l10n("The AQ War Effort quests are shown for you. If your server is done you can hide those quests in the Icons settings of Questie!") .. "|r");
             print("|cffff0000-----------------------------|r")
         end)
     end
@@ -301,12 +305,16 @@ QuestieInit.Stages[3] = function() -- run as a coroutine
     QuestieMenu:OnLogin()
 
     coYield()
+    DailyQuests.Initialize()
+
+    coYield()
     if Questie.db.profile.debugEnabled then
         QuestieLoader:PopulateGlobals()
     end
 
     Questie.started = true
 
+    -- ! Never implemented
     if (Questie.IsWotlk or Questie.IsTBC) and QuestiePlayer.IsMaxLevel() then
         local lastRequestWasYesterday = Questie.db.global.lastDailyRequestDate ~= date("%d-%m-%y"); -- Yesterday or some day before
         local isPastDailyReset = Questie.db.global.lastDailyRequestResetTime < GetQuestResetTime();
@@ -320,7 +328,7 @@ QuestieInit.Stages[3] = function() -- run as a coroutine
     -- We do this last because it will run for a while and we don't want to block the rest of the init
     AvailableQuests.CalculateAndDrawAll()
 
-    Questie:Debug(Questie.DEBUG_INFO, "[QuestieInit:Stage3] Questie init done.")
+    Questie:Debug(Questie.DEBUG_CRITICAL, "[QuestieInit:Stage3] Questie init done.")
 end
 
 -- End of QuestieInit.Stages ******************************************************
@@ -396,7 +404,7 @@ function QuestieInit:Init()
         -- This needs to be called ASAP otherwise tracked Achievements in the Blizzard WatchFrame shows upon login
         WatchFrameHook.Hide()
 
-        if (not Questie.IsWotlk) and (not Questie.IsCata) then
+        if Expansions.Current < Expansions.Wotlk then
             -- Need to hook this ASAP otherwise the scroll bars show up
             hooksecurefunc("ScrollFrame_OnScrollRangeChanged", function()
                 if TrackedQuestsScrollFrame then
@@ -422,10 +430,10 @@ function QuestieInit.WaitForValidGameCache()
 
     local timer
     timer = C_Timer.NewTicker(1, function()
-        local cacheMiss, _, newQuestIdsChecked = QuestLogCache.CheckForChanges(nil, false)
+        local cacheMiss, _, newQuestIdsChecked = QuestLogCache.CheckForChanges(nil)
         if (not cacheMiss) or retries >= 3 then
             if retries == 3 then
-                Questie:Error("QuestieInit: Game Cache did not become valid in 3 seconds, continuing with initialization.")
+                Questie:Debug(Questie.DEBUG_CRITICAL, "QuestieInit: Game Cache did not become valid in 3 seconds, continuing with initialization.")
             end
             doWait = false
             timer:Cancel()

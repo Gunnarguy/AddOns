@@ -80,10 +80,10 @@ if WOW_PROJECT_ID == WOW_PROJECT_MAINLINE then
 	Ns.RazorLink = "|T"..getSpell(51714)..":0|t"..C_Spell.GetSpellLink(51714).."   "
 	Ns.StashLink = "|T"..getSpell(1216211)..":0|t"..C_Spell.GetSpellLink(1216211).."   "
 	Ns.KejLink = "|T".. getCurrency(3056)..":0|t"..C_CurrencyInfo.GetCurrencyLink(3056)
-	Ns.WeathLink = "|T".. getCurrency(3107)..":0|t"..C_CurrencyInfo.GetCurrencyLink(3107)
-	Ns.CarvedLink = "|T".. getCurrency(3108)..":0|t"..C_CurrencyInfo.GetCurrencyLink(3108)
-	Ns.RunedLink = "|T".. getCurrency(3109)..":0|t"..C_CurrencyInfo.GetCurrencyLink(3109)
-	Ns.GildedLink = "|T".. getCurrency(3110)..":0|t"..C_CurrencyInfo.GetCurrencyLink(3110)
+	Ns.WeathLink = "|T".. getCurrency(3285)..":0|t"..C_CurrencyInfo.GetCurrencyLink(3285)
+	Ns.CarvedLink = "|T".. getCurrency(3287)..":0|t"..C_CurrencyInfo.GetCurrencyLink(3287)
+	Ns.RunedLink = "|T".. getCurrency(3289)..":0|t"..C_CurrencyInfo.GetCurrencyLink(3289)
+	Ns.GildedLink = "|T".. getCurrency(3290)..":0|t"..C_CurrencyInfo.GetCurrencyLink(3290)
 	Ns.ValorLink = "|T".. getCurrency(3008)..":0|t"..C_CurrencyInfo.GetCurrencyLink(3008)
 	Ns.CrystalLink = "|T".. getCurrency(2815)..":0|t"..C_CurrencyInfo.GetCurrencyLink(2815)
 	Ns.DonorLink = "|T".. getCurrency(2897)..":0|t"..C_CurrencyInfo.GetCurrencyLink(2897)
@@ -99,7 +99,7 @@ if WOW_PROJECT_ID == WOW_PROJECT_MAINLINE then
 	Ns.SevereLink = "|T".. getCurrency(2903)..":0|t"..C_CurrencyInfo.GetCurrencyLink(2903)
 	Ns.CofferLink = "|T".. getCurrency(3028)..":0|t"..C_CurrencyInfo.GetCurrencyLink(3028)
 	Ns.CoinLink = "|T".. getCurrency(2803)..":0|t"..C_CurrencyInfo.GetCurrencyLink(2803)
-	Ns.CatalystLink = "|T".. getCurrency(3116)..":0|t"..C_CurrencyInfo.GetCurrencyLink(3116)
+	Ns.CatalystLink = "|T".. getCurrency(3269)..":0|t"..C_CurrencyInfo.GetCurrencyLink(3269)
 	Ns.CelebLink = "|T".. getCurrency(3100)..":0|t"..C_CurrencyInfo.GetCurrencyLink(3100)
 	Ns.IronLink = "|T".. getCurrency(3090)..":0|t"..C_CurrencyInfo.GetCurrencyLink(3090)
 	Ns.PlundLink = "|T".. getCurrency(3139)..":0|t"..C_CurrencyInfo.GetCurrencyLink(3139)
@@ -109,28 +109,53 @@ if WOW_PROJECT_ID == WOW_PROJECT_MAINLINE then
 	Ns.DarkfuseLink = "|T".. getCurrency(3177)..":0|t"..C_CurrencyInfo.GetCurrencyLink(3177)
 	Ns.GallaLink = "|T".. getCurrency(3136)..":0|t"..C_CurrencyInfo.GetCurrencyLink(3136)
 	Ns.RadianceLink = "|T".. getCurrency(3283)..":0|t"..C_CurrencyInfo.GetCurrencyLink(3283)
-	Ns.SparkLink = "|T".. getItem(230906)..":0|t"
+	Ns.MementosLink = "|T".. getCurrency(3149)..":0|t"..C_CurrencyInfo.GetCurrencyLink(3149)
+	Ns.KareshLink = "|T".. getCurrency(3129)..":0|t"..C_CurrencyInfo.GetCurrencyLink(3129)
+	Ns.UntethLink = "|T".. getCurrency(3303)..":0|t"..C_CurrencyInfo.GetCurrencyLink(3303)
+	Ns.EtherealLink = "|T".. getCurrency(3278)..":0|t"..C_CurrencyInfo.GetCurrencyLink(3278)
+	Ns.PuzzlingLink = "|T".. getItem(237502)..":0|t"
+	Ns.SparkLink = "|T".. getItem(231757)..":0|t"
 	Ns.CinderLink = "|T".. getItem(225557)..":0|t"
 
 elseif WOW_PROJECT_ID == 14 then
-	Ns.DeathEmbLink = "|T"..select(3, GetSpellInfo(47198))..":0|t"..GetSpellLink(47198).."   "
-	Ns.FaeFireLink = "|T"..select(3, GetSpellInfo(91565))..":0|t"..GetSpellLink(91565).."   "
-	Ns.EarMoonLink = "|T"..select(3, GetSpellInfo(60433))..":0|t"..GetSpellLink(60433).."   "
-	Ns.HuntMarkLink = "|T"..select(3, GetSpellInfo(1130))..":0|t"..GetSpellLink(1130).."   "
-	Ns.ScarFeverLink = "|T"..select(3, GetSpellInfo(81130))..":0|t"..GetSpellLink(81130).."   "
-	Ns.ExpArmLink = "|T"..select(3, GetSpellInfo(8647))..":0|t"..GetSpellLink(8647).."   "
-	Ns.SunArmLink = "|T"..select(3, GetSpellInfo(58567))..":0|t"..GetSpellLink(58567).."   "
-	Ns.CursEleLink = "|T"..select(3, GetSpellInfo(1490))..":0|t"..GetSpellLink(1490).."   "
-	Ns.BeaSlayLink = "|T"..select(3, GetSpellInfo(20557))..":0|t"..GetSpellLink(20557).."   "
-	Ns.MolFuryLink = "|T"..select(3, GetSpellInfo(31679))..":0|t"
-	Ns.BrittleLink = "|T"..select(3, GetSpellInfo(81326))..":0|t"..GetSpellLink(81326).."   "
-	Ns.SavCombLink = "|T"..select(3, GetSpellInfo(58413))..":0|t"
-	Ns.MasPoisLink = "|T"..select(3, GetSpellInfo(93068))..":0|t"..GetSpellLink(93068).."   "
-	Ns.BloFrenLink = "|T"..select(3, GetSpellInfo(30070))..":0|t"..GetSpellLink(30070).."   "
-	Ns.NoEscapeLink = "|T"..select(3, GetSpellInfo(53298))..":0|t"
-	Ns.ShadFlameLink = "|T"..select(3, GetSpellInfo(76768))..":0|t"..GetSpellLink(17800).."   "
-	Ns.VindiLink = "|T"..select(3, GetSpellInfo(26017))..":0|t"..GetSpellLink(26017).."   "
-	Ns.LightBreathLink = "|T"..select(3, GetSpellInfo(24844))..":0|t"..GetSpellLink(24844).."   "
+	-- Ns.DeathEmbLink = ""--"|T"..select(3, GetSpellInfo(47198))..":0|t"..GetSpellLink(47198).."   "
+	-- Ns.FaeFireLink = ""--"|T"..select(3, GetSpellInfo(91565))..":0|t"..GetSpellLink(91565).."   "
+	-- Ns.EarMoonLink = ""--"|T"..select(3, GetSpellInfo(60433))..":0|t"..GetSpellLink(60433).."   "
+	-- Ns.HuntMarkLink = ""--"|T"..select(3, GetSpellInfo(1130))..":0|t"..GetSpellLink(1130).."   "
+	-- Ns.ScarFeverLink = ""--"|T"..select(3, GetSpellInfo(81130))..":0|t"..GetSpellLink(81130).."   "
+	-- Ns.ExpArmLink = ""--"|T"..select(3, GetSpellInfo(8647))..":0|t"..GetSpellLink(8647).."   "
+	-- Ns.SunArmLink = ""--"|T"..select(3, GetSpellInfo(58567))..":0|t"..GetSpellLink(58567).."   "
+	-- Ns.CursEleLink = ""--"|T"..select(3, GetSpellInfo(1490))..":0|t"..GetSpellLink(1490).."   "
+	-- Ns.BeaSlayLink = ""--"|T"..select(3, GetSpellInfo(20557))..":0|t"..GetSpellLink(20557).."   "
+	-- Ns.MolFuryLink = ""--"|T"..select(3, GetSpellInfo(31679))..":0|t"
+	-- Ns.BrittleLink = ""--"|T"..select(3, GetSpellInfo(81326))..":0|t"..GetSpellLink(81326).."   "
+	-- Ns.SavCombLink = ""--"|T"..select(3, GetSpellInfo(58413))..":0|t"
+	-- Ns.MasPoisLink = ""--"|T"..select(3, GetSpellInfo(93068))..":0|t"..GetSpellLink(93068).."   "
+	-- Ns.BloFrenLink = ""--"|T"..select(3, GetSpellInfo(30070))..":0|t"..GetSpellLink(30070).."   "
+	-- Ns.NoEscapeLink = ""--"|T"..select(3, GetSpellInfo(53298))..":0|t"
+	-- Ns.ShadFlameLink = ""--"|T"..select(3, GetSpellInfo(76768))..":0|t"..GetSpellLink(17800).."   "
+	-- Ns.VindiLink = ""--"|T"..select(3, GetSpellInfo(26017))..":0|t"..GetSpellLink(26017).."   "
+	-- Ns.LightBreathLink = ""--"|T"..select(3, GetSpellInfo(24844))..":0|t"..GetSpellLink(24844).."   "
+
+elseif WOW_PROJECT_ID == 19 then
+	Ns.DeathEmbLink = ""--"|T"..select(3, GetSpellInfo(47198))..":0|t"..GetSpellLink(47198).."   "
+	Ns.FaeFireLink = ""--"|T"..select(3, GetSpellInfo(91565))..":0|t"..GetSpellLink(91565).."   "
+	Ns.EarMoonLink = ""--"|T"..select(3, GetSpellInfo(60433))..":0|t"..GetSpellLink(60433).."   "
+	Ns.HuntMarkLink = ""--"|T"..select(3, GetSpellInfo(1130))..":0|t"..GetSpellLink(1130).."   "
+	Ns.ScarFeverLink = ""--"|T"..select(3, GetSpellInfo(81130))..":0|t"..GetSpellLink(81130).."   "
+	Ns.ExpArmLink = ""--"|T"..select(3, GetSpellInfo(8647))..":0|t"..GetSpellLink(8647).."   "
+	Ns.SunArmLink = ""--"|T"..select(3, GetSpellInfo(58567))..":0|t"..GetSpellLink(58567).."   "
+	Ns.CursEleLink = ""--"|T"..select(3, GetSpellInfo(1490))..":0|t"..GetSpellLink(1490).."   "
+	Ns.BeaSlayLink = ""--"|T"..select(3, GetSpellInfo(20557))..":0|t"..GetSpellLink(20557).."   "
+	Ns.MolFuryLink = ""--"|T"..select(3, GetSpellInfo(31679))..":0|t"
+	Ns.BrittleLink = ""--"|T"..select(3, GetSpellInfo(81326))..":0|t"..GetSpellLink(81326).."   "
+	Ns.SavCombLink = ""--"|T"..select(3, GetSpellInfo(58413))..":0|t"
+	Ns.MasPoisLink = ""--"|T"..select(3, GetSpellInfo(93068))..":0|t"..GetSpellLink(93068).."   "
+	Ns.BloFrenLink = ""--"|T"..select(3, GetSpellInfo(30070))..":0|t"..GetSpellLink(30070).."   "
+	Ns.NoEscapeLink = ""--"|T"..select(3, GetSpellInfo(53298))..":0|t"
+	Ns.ShadFlameLink = ""--"|T"..select(3, GetSpellInfo(76768))..":0|t"..GetSpellLink(17800).."   "
+	Ns.VindiLink = ""--"|T"..select(3, GetSpellInfo(26017))..":0|t"..GetSpellLink(26017).."   "
+	Ns.LightBreathLink = ""--"|T"..select(3, GetSpellInfo(24844))..":0|t"..GetSpellLink(24844).."   "
 end
 
 -- class colors

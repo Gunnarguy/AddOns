@@ -13,7 +13,8 @@ Addon.RuleEdit:Hide()
 
 function Frame:OpenMenu(anchor)
 	MenuUtil.CreateContextMenu(anchor, function(_, drop)
-		drop:SetTag(ADDON .. 'AddFilter')
+		drop:SetScrollMode(600)
+		drop:SetTag(ADDON .. 'RuleEdit')
 		drop:CreateTitle(L.InstalledFilters)
 
 		self:SetParent(anchor)
@@ -49,26 +50,26 @@ function Frame:OpenMenu(anchor)
 end
 
 function Frame:CreateCheckboxes(drop, rules)
-	local frame = self:GetParent().frame
-	local filters = frame.profile.filters
-	local sorted = GetPairsArray(rules)
+	local parent = self:GetParent()
+	local enabled, frame = parent.rules, parent.frame
 
+	local sorted = GetPairsArray(rules)
 	sort(sorted, function(a, b)
 		return a.value.title < b.value.title end)
 
 	for i, entry in pairs(sorted) do 
 		local rule, id = entry.value, entry.key
-		local icon = rule:GetIconMarkup(frame, 16)
 		local title = rule:GetValue('title', frame)
+		local icon = rule:GetIconMarkup(16, frame)
 
-		local isEnabled = function() return tContains(filters, id) end
+		local isEnabled = GenerateClosure(tContains, enabled, id)
 		local toggle = function()
-			(isEnabled() and tDeleteItem or tinsert)(filters, id)
+			(isEnabled() and tDeleteItem or tinsert)(enabled, id)
 			frame:SendFrameSignal('FILTERS_CHANGED')
 		end
 
 		local check = drop:CreateCheckbox(icon ..' '.. title, isEnabled, toggle)
-		check:SetCanSelect(function() return #filters > 1 or not isEnabled() end)
+		check:SetCanSelect(function() return #enabled > 1 or not isEnabled() end)
 		check:AddInitializer(function(check, _, menu)
 			local edit = MenuTemplates.AttachAutoHideGearButton(check)
 			edit:SetPoint('RIGHT')
@@ -93,10 +94,11 @@ function Frame:Create(rule)
 end
 
 function Frame:Display(rule)
+	self:ClearAllPoints()
 	self:Startup()
 	self:Show()
 
-	if self:GetParent().frame.id == 'inventory' then
+	if self:GetParent():IsFarRight() then
 		self:SetPoint('TOPRIGHT', self:GetParent(), 'TOPLEFT', -38,0)
 	else
 		self:SetPoint('TOPLEFT', self:GetParent(), 'TOPRIGHT', 38,0)
@@ -171,7 +173,6 @@ function Frame:Startup()
 	end)
 
 	self:SetSize(525, 594)
-	self:ClearAllPoints()
 	self.Startup = nop
 end
 
@@ -214,5 +215,5 @@ function Frame:OnShare()
 end
 
 function Frame:OnHelp()
-	LibStub('Sushi-3.2').Popup:External(self.rule.search and 'https://github.com/Jaliborc/ItemSearch-1.3/wiki/Search-Syntax' or 'https://github.com/Jaliborc/BagBrother/wiki/Macros')
+	LibStub('Sushi-3.2').Popup:External('https://youtu.be/sie39ZW8uZo')
 end

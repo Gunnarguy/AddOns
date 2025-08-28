@@ -6389,7 +6389,7 @@ local items = {
 	[25667] = {32410,},
 	[33948] = {43854,},
 };
-for k, v in pairs(items) do sc.items[k] = v; end
+for k, v in pairs(items) do if sc.items[k] then for _, vv in ipairs(v) do sc.items[k][#sc.items[k] + 1] = vv; end else sc.items[k] = v; end end
 local item_effects = {
 	[27848] = {
 			{"ability", "cost_mod_flat", -20, {348704,20165,31892,20375,21084,20154,}, 0, 0},
@@ -6401,6 +6401,12 @@ local item_effects = {
 	[33557] = {
 			{"aura_pts_flat", 0, 68, {20306,20308,21082,20162,27158,20305,20307,}, 0, 0},
 			{"aura_pts_flat", 0, 47, {20302,20300,20188,20301,27159,21183,20303,}, 0, 1},
+	},
+	[28851] = {
+			{"ability", "sp_flat", 83, {19750,}, 0, 0},
+	},
+	[28853] = {
+			{"ability", "sp_flat", 53, {19750,}, 0, 0},
 	},
 	[44300] = {
 			{"ability", "effect_mod", 0.049999997, {35395,}, 0, 0},

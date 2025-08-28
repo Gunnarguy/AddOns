@@ -1,0 +1,8 @@
+## Interface: 11403
+## Title: Healing Circle Tracker
+## Notes: Tracks Lawbringer 8-piece bonus healing (Spell ID 23544)
+## Author: YourName
+## Version: 1.0
+## SavedVariables: HC_DB
+
+HealingCircle.lua

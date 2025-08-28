@@ -1,7 +1,0 @@
-## Interface: 11403
-## Title: Reckoning Tracker
-## Notes: Tracks Reckoning stacks for Protection Paladins.
-## Author: WoW Addons
-## Version: 1.0
-
-ReckoningTracker.lua

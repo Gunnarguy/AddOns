@@ -1,4 +1,11 @@
-﻿1.15.83 - 9th April 2025
+﻿1.15.88 - 7th May 2025
+- Fixed an issue with map scaling which affected users using a non-standard UI scale.
+
+1.15.87 - 6th May 2025
+- Toggling 'Enlarge player arrow' and 'Show points of interest' now requires a UI reload.
+- The 'Sticky map frame' option has been removed.
+
+1.15.83 - 9th April 2025
 - Updated for game version 1.15.7.
 
 1.15.79 - 14th March 2025

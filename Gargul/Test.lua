@@ -477,12 +477,12 @@ end
 function Test.PackMule:whoReceivesItem(itemID, lootMethod)
     GL:success("Running Test.PackMule:whoReceivesItem() ...");
 
-    local oldGetLootMethod = GetLootMethod;
+    local oldGetLootMethod = GL.GetLootMethod;
     local oldIsMasterLooter = GL:toboolean(GL.User.isMasterLooter);
     local oldIsInGroup = GL:toboolean(GL.User.isInGroup);
     local oldIsInParty = GL:toboolean(GL.User.isInParty);
     local oldIsInRaid = GL:toboolean(GL.User.isInRaid);
-    GetLootMethod = function () return lootMethod; end;
+    GL.GetLootMethod = function () return lootMethod; end;
 
     if (lootMethod == "master") then
         GL.User.isMasterLooter = true;
@@ -501,7 +501,7 @@ function Test.PackMule:whoReceivesItem(itemID, lootMethod)
             return GL:error("No target for item ID: " .. itemID);
         end
 
-        GetLootMethod = oldGetLootMethod;
+        GL.GetLootMethod = oldGetLootMethod;
         GL.User.isMasterLooter = oldIsMasterLooter;
         GL.User.isInGroup = oldIsInGroup;
         GL.User.isInRaid = oldIsInRaid;
@@ -512,7 +512,7 @@ function Test.PackMule:whoReceivesItem(itemID, lootMethod)
 
     -- Just in case the callback fails
     GL.Ace:ScheduleTimer(function()
-        GetLootMethod = oldGetLootMethod;
+        GL.GetLootMethod = oldGetLootMethod;
         GL.User.isMasterLooter = oldIsMasterLooter;
         GL.User.isInGroup = oldIsInGroup;
         GL.User.isInRaid = oldIsInRaid;
@@ -662,6 +662,33 @@ function Test:stopGroupSimulation()
 
     GL.User.groupMembers = groupMembersFunction;
     groupMembersOverridden = false;
+end
+
+--[[ Test the libcustomglow implementation
+/script _G.Gargul.Test:itemGlow()
+]]
+function Test:itemGlow()
+    local LCG = LibStub("LibCustomGlowGargul-1.0");
+
+    local Button = CreateFrame("Button", "TestButton", UIParent, "UIPanelButtonTemplate");
+    Button:SetSize(100, 40);
+    Button:SetText("Test");
+    Button:SetPoint("CENTER", UIParent, "CENTER");
+
+    Button:SetScript("OnClick", function()
+        GL:xd("Click");
+
+        -- Remove any existing highlight
+        GL:stopHighlight(Button);
+
+        LCG.PixelGlow_Start(Button,
+            {1, 1, 1, 1, },
+            10,
+            .05,
+            5,
+            2
+        );
+    end);
 end
 
 --[[ Show all identity elements at once for easy screenshotting

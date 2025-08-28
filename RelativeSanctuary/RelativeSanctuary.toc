@@ -1,6 +1,0 @@
-## Interface: 11403
-## Title: Relative Sanctuary
-## Notes: Tracks Blessing of Sanctuary mitigation in real-time
-## Author: YourName
-## Version: 1.0.3
-## SavedVariables: RelativeSanctuaryDB

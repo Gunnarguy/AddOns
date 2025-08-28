@@ -90,13 +90,13 @@ end
 -- UI Creation: drop flame columns & shrink width
 local function CreateUI()
     -- Load position from saved variables
-    local position = LSE_DB.position or { "BOTTOMLEFT", UIParent, "BOTTOMLEFT", 10, 10 } -- Reverted variable name
-    local scale = LSE_DB.scale or 1.0 -- Reverted variable name
-    local locked = LSE_DB.locked or false -- Reverted variable name
+    local position = LSE_DB.position or { "BOTTOMLEFT", UIParent, "BOTTOMLEFT", 10, 10 }
+    local scale = LSE_DB.scale or 1.0
+    local locked = LSE_DB.locked or false
 
-    local f = CreateFrame("Frame", "SFS_StatsFrame", UIParent, "BackdropTemplate") -- Reverted stats frame name (back to original SFS)
+    local f = CreateFrame("Frame", "LSE_StatsFrame", UIParent, "BackdropTemplate") -- Changed SFS_StatsFrame to LSE_StatsFrame
     f:SetSize(160, 90) -- width adjusted after removing flame columns
-    f:SetScale(0.75)
+    f:SetScale(0.75) -- Using the existing scale, can be LSE_DB.scale if preferred
     f:SetPoint(unpack(position))
     f:SetBackdrop(nil)
     f:SetMovable(true)
@@ -107,12 +107,12 @@ local function CreateUI()
     end)
     f:SetScript("OnDragStop", function(self)
         self:StopMovingOrSizing()
-        LSE_DB.position = { self:GetPoint(1) } -- Reverted variable name
+        LSE_DB.position = { self:GetPoint(1) }
     end)
 
     local title = f:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     title:SetPoint("TOP", 0, -5)
-    title:SetText("|cFFFFA500Skullflame Stats|r")
+    title:SetText("|cFF33CCFFLife Steal Enchant|r") -- Changed title and color
 
     local labelX  = 10
     local col1X   = 60
@@ -244,38 +244,38 @@ frame:SetScript("OnEvent", function(self, event,...)
 end)
 
 -- Slash Commands
-SLASH_SFS1 = "/sfs" -- Reverted slash command variable
-SLASH_SFS2 = "/skullflamestats" -- Reverted slash command variable
-SlashCmdList["SFS"] = function(msg) -- Reverted slash command list key
+SLASH_LSE1 = "/lse" -- Changed from SLASH_SFS1
+SLASH_LSE2 = "/lifestealenchant" -- Changed from SLASH_SFS2
+SlashCmdList["LSE"] = function(msg) -- Changed from SlashCmdList["SFS"]
     msg = msg:lower()
     if msg == "toggle" then
         statsFrame:SetShown(not statsFrame:IsShown())
-        print("Skullflame Stats window is now", statsFrame:IsShown() and "|cFF00FF96shown|r" or "|cFFFF0000hidden|r")
+        print("Life Steal Enchant window is now", statsFrame:IsShown() and "|cFF00FF96shown|r" or "|cFFFF0000hidden|r") -- Changed text
     elseif msg == "reset combat" then
         ResetCombatData()
-        print("|cFFFFA500Current combat stats reset.|r")
+        print("|cFF33CCFFCurrent combat stats reset.|r") -- Changed color for consistency
     elseif msg == "reset session" then
         ResetSessionData()
-        print("|cFFFFA500Session stats reset.|r")
+        print("|cFF33CCFFSession stats reset.|r") -- Changed color for consistency
     elseif msg == "reset all" then
         ResetAllTimeData()
-        print("|cFFFFA500All-time stats reset.|r")
+        print("|cFF33CCFFAll-time stats reset.|r") -- Changed color for consistency
         -- Save immediately when all-time data is reset
         SaveData()
     elseif msg == "debug" then
         debugMode = not debugMode
-        LSE_DB.debug = debugMode -- Reverted variable name
+        LSE_DB.debug = debugMode
         print("Debug mode is now", debugMode and "|cFF00FF96enabled|r" or "|cFFFF0000disabled|r")
     elseif msg == "save" then
         SaveData()
-        print("|cFFFFA500Data manually saved.|r")
+        print("|cFF33CCFFData manually saved.|r") -- Changed color for consistency
     else
-        print("|cFFFFA500SkullflameStats Commands:|r")
-        print("|cFF00FF96/sfs toggle|r - Show/hide window")
-        print("|cFF00FF96/sfs reset combat|r - Reset current fight stats")
-        print("|cFF00FF96/sfs reset session|r - Reset session stats")
-        print("|cFF00FF96/sfs reset all|r - Reset all-time stats")
-        print("|cFF00FF96/sfs debug|r - Toggle debug messages")
-        print("|cFF00FF96/sfs save|r - Force save data now")
+        print("|cFF33CCFFLife Steal Enchant Commands:|r") -- Changed title and color
+        print("|cFF00FF96/lse toggle|r - Show/hide window") -- Changed command
+        print("|cFF00FF96/lse reset combat|r - Reset current fight stats") -- Changed command
+        print("|cFF00FF96/lse reset session|r - Reset session stats") -- Changed command
+        print("|cFF00FF96/lse reset all|r - Reset all-time stats") -- Changed command
+        print("|cFF00FF96/lse debug|r - Toggle debug messages") -- Changed command
+        print("|cFF00FF96/lse save|r - Force save data now") -- Changed command
     end
 end

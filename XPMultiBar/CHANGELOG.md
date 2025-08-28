@@ -4,6 +4,9 @@
 
 #### Complete Changelog
 
+##### 03.07.2025 - ver. 11.1.2-final
+###### Add support for MoP Classic. Update copyright year. Update interface versions
+-----
 ##### 07.04.2025 - ver. 11.1.1-final
 ###### Add Warband-wide icon for factions
 ###### Fix classic bar

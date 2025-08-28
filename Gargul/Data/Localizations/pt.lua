@@ -29,10 +29,10 @@ L["Auction"] = "Leilão";
 L["Auctioneer"] = "Leiloeiro";
 L["Auctions"] = "Leilões";
 L["Auto"] = "Auto";
-L["Auto award"] = "Prêmio automático";
+L["Auto award"] = "Recompensa automático";
 L["Auto trade"] = "Comércio de automóveis";
 L["Available values:"] = "Valores disponíveis:";
-L["Award"] = "Prêmio";
+L["Award"] = "Recompensa";
 L["Awarded To"] = "Concedido a";
 L["BR: %s"] = "BR: %s";
 L["Price: %s"] = "Preço: %s";
@@ -43,8 +43,8 @@ L["You won"] = "Você ganhou";
 L["Award %s to %s?"] = "Premiar %s para %s?";
 L["Are you sure you want to disenchant %s? %s boosted roll points will be refunded!"] = "Tem certeza de que deseja desencantar %s? %s pontos de rolagem aumentados serão reembolsados!";
 L["In Group"] = "Em grupo";
-L["Award history"] = "História do prêmio";
-L["Who should %s go to instead?"] = "A quem %s deveria recorrer?";
+L["Award history"] = "Histórco de prêmios";
+L["Who should %s go to instead?"] = "Para quem %s deveria ir?";
 L["Type player name here"] = "Digite o nome do jogador aqui";
 L["or select one below"] = "ou selecione um abaixo";
 L["Do you want to award %s to a random player?"] = "Quer premiar %s a um jogador aleatório?";
@@ -56,7 +56,7 @@ L["(Given: no)"] = "(Dado: não)";
 L["(OS)"] = "(SO)";
 L["%s boosted roll points will be refunded!"] = "%s pontos de rolagem aumentados serão reembolsados!";
 L["Are you sure you want to undo %s awarded to %s?%s"] = "Tem certeza de que deseja desfazer %s concedidos a %s?%s"; -- The last %s is the content of L["%s boosted roll points will be refunded!"]
-L["Bag inspection failed: no reports received"] = "Falha na inspeção da bagagem: nenhum relatório foi recebido";
+L["Bag inspection failed: no reports received"] = "Falha na inspeção da mochila: nenhum relatório foi recebido";
 L["Inspection finished"] = "Inspeção concluída";
 L["Starting inspection..."] = "Iniciando a inspeção...";
 L["Balance"] = "Equilíbrio";
@@ -69,7 +69,7 @@ L["1. Auto invite/sort groups from raid signup! Click below or use |c00A79EFF/gl
 L["2. Reward players for being regulars or going the extra mile! Click below or use |c00A79EFF/gl br"] = "2. Recompense os jogadores por serem regulares ou por fazerem um esforço extra! Clique abaixo ou use |c00A79EFF/gl br";
 L["Gargul has a few tricks up its sleeve that you might not be aware of. Have a looksy!"] = "Gargul tem alguns truques na manga que você talvez não conheça. Dê uma olhada!";
 L["3. Gargul includes a plus one tracking system! Click below or use |c00A79EFF/gl po"] = "3. Gargul inclui mais um sistema de rastreamento! Clique abaixo ou use |c00A79EFF/gl po";
-L["Boosted Rolls"] = "Rolinhos Impulsionados";
+L["Boosted Rolls"] = "Rolagem Impulsionada";
 L["BR"] = "BR";
 L["\nAdd how many points for everyone currently in the raid?\n\n|c00BE3333Use the 'Add missing raiders' button first if you want everyone to get points, even those without a boosted roll entry!"] = [[
 Adicione quantos pontos para todos que estão atualmente na raid?
@@ -77,7 +77,7 @@ Adicione quantos pontos para todos que estão atualmente na raid?
 |c00BE3333Use o botão 'Adicionar invasores ausentes' primeiro se quiser que todos ganhem pontos, mesmo aqueles sem uma entrada de rolagem aprimorada!]];
 L["No point value provided!"] = "Nenhum valor de pontos fornecido!";
 L["Add points to raid"] = "Adicione pontos ao ataque";
-L["Add missing raiders"] = "Adicionar invasores ausentes";
+L["Add missing raiders"] = "Adicionar membros de raide ausentes";
 L["Aliases"] = "Apelido";
 L["Apply aliases"] = "Aplicar aliases";
 L["Boosted Roll Cost:"] = "Custo de rolagem aumentado:";
@@ -190,12 +190,9 @@ L["Created by"] = "Criado por";
 L["\n|c00be3333Deleted by %s\nReason: %s"] = [[
 |c00be3333Excluído por %s
 Razão: %s]];
-L["\n|c00%s%sg added to pot by %s\nNote: %s"] = [[
+L["\n|c00%s%s added to pot by %s\nNote: %s"] = [[
 |c00%s%sg adicionado ao pote por %s
 Notas]];
-L["\n%s paid |c00%s%sg for\n%s"] = [[
-%s pagou |c00%s%sg por
-%s]];
 L["Won by"] = "Venceu por";
 L["Set paid amount (read left)"] = "Definir valor pago (leia à esquerda)";
 L["\n\nGargul automatically keeps track of gold traded. As long as players pay\nfor what they bought then you shouldn't ever need this field\n\n'Paid amount' refers to the amount of gold the buyer already traded you.\nThis does not change the actual price of the item!\n\nWarning: only set a value here if the player promises to pay\noutside of the raid or trades the gold from an alt / mail etc!\n\n\n"] = [[
@@ -274,7 +271,7 @@ Adjuster explanation:
 With adjust [g] you can add/deduct gold to a player (use -50 to deduct 50 gold from a player's cut)
 With adjust [%] you can add/deduct a percentage to a player (use -50 to give players a half cut)
 ]];
-L["%s Raiders | %s With cut | Total payout: %sg"] = "%s Invasores | %s Com corte | Pagamento total: %sg";
+L["%s Raiders | %s With cut | Total payout: %s"] = "%s Invasores | %s Com corte | Pagamento total: %sg";
 L["Nothing to import, double check your CSV"] = "Nada para importar, verifique seu CSV";
 L["Missing gold for player %s"] = "Faltando ouro para o jogador %s";
 L["Missing header, note: it's case-sensitive!"] = "Cabeçalho ausente, observação: diferencia maiúsculas de minúsculas!";
@@ -425,10 +422,10 @@ Comprado por mim: %s
 Lance total (não inclui vendas): %s
 Lance meu (não inclui vendido): %s
 ]];
-L["|c00%sSOLD to\n%s for |c00%s%sg"] = [[
+L["|c00%sSOLD to%s\nfor |c00%s%s"] = [[
 |c00%sVENDIDO para
 %s para |c00%s%sg]];
-L["Bid |c00%s%sg\nBy |c0092FF00YOU!"] = [[
+L["Bid |c00%s%s\nBy |c0092FF00YOU!"] = [[
 Lance |c00%s%sg
 Por |c0092FF00VOCÊ!]];
 L["Could not stop auto bidding on %s, try again or /reload!"] = "Não foi possível interromper o lance automático em %s. Tente novamente ou /recarregue!";
@@ -491,7 +488,7 @@ Isso excluirá todos os lances de itens que ainda não foram vendidos e fechará
 L["Hover over any of the buttons below for more information"] = "Passe o mouse sobre qualquer um dos botões abaixo para obter mais informações";
 L["Show/Hide items you can't use"] = "Mostrar/ocultar itens que você não pode usar";
 L["Invalid data provided for GDKP auction start!"] = "Dados inválidos fornecidos para início do leilão GDKP!";
-L["%s bought %s for %sg"] = "%s comprou %s por %sg";
+L["%s bought %s for %s"] = "%s comprou %s por %sg";
 L["The loot master (%s) is outdated, this can cause bids to fail!"] = "O loot master (%s) está desatualizado, isso pode fazer com que os lances falhem!";
 L["You were outbid!"] = "Você foi superado!";
 L["Mutators"] = "Mutadores";
@@ -689,7 +686,7 @@ L["zhTW"] = "zhTW"; -- Chinese (Traditional, Taiwan)
 L["You have one or more addons installed that can potentially cause Gargul to misfunction: %s"] = "Você tem um ou mais complementos instalados que podem causar mau funcionamento do Gargul: %s";
 L["Clear SoftRes"] = "Limpar SoftRes";
 L["Clear TMB"] = "Limpar TMB";
-L["/roll for MS or /roll 99 for OS"] = "/roll para MS ou /roll 99 para sistema operacional";
+L["/roll for MS or /roll 99 for OS"] = "/roll para MS ou /roll 99 para OS";
 L["Import SoftRes"] = "Importar SoftRes";
 L["Import TMB"] = "Importar TMB";
 L["You were given the role of Master Looter"] = "Você recebeu o papel de Mestre Looter";

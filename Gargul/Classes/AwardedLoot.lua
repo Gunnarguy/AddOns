@@ -64,6 +64,20 @@ function AwardedLoot:_init()
 
     -- Automatically mark an item as awarded when someone receives it
     Events:register("AwardedLootItemReceived", "GL.ITEM_RECEIVED", function (_, Details)
+        if (Details.isBonusLoot) then
+            if (not Settings:get("AwardingLoot.awardBonusLoot")) then
+                return;
+            end
+
+            self:addWinner{
+                announce = false,
+                automaticallyAwarded = true,
+                itemLink = Details.itemLink,
+                winner = Details.playerName,
+                RollBracket = {"Bonus Roll", };
+            };
+        end
+
         -- We don't want to automatically award loot
         if (not Settings:get("AwardingLoot.awardOnReceive")) then
             return;
@@ -131,7 +145,7 @@ function AwardedLoot:tooltipLines(itemLink)
             end
 
             if (GL:higherThanZero(Loot.GDKPCost)) then
-                tinsert(Details, (L["Price: %s"]):format(GL:goldToMoney(Loot.GDKPCost)));
+                tinsert(Details, (L["Price: %s"]):format(GL:goldToMoneyTexture(Loot.GDKPCost)));
             end
 
             local receivedString = L["Given: yes"];
@@ -157,7 +171,7 @@ function AwardedLoot:tooltipLines(itemLink)
                             break;
                         end
 
-                        tinsert(Details, (L["2nd bid: %s by %s"]):format(GL:goldToMoney(SecondHighestBid.bid), GL:disambiguateName(
+                        tinsert(Details, (L["2nd bid: %s by %s"]):format(GL:goldToMoneyTexture(SecondHighestBid.bid), GL:disambiguateName(
                             SecondHighestBid.bidder,
                             { colorize = true, }
                         )));
@@ -438,7 +452,7 @@ function AwardedLoot:addWinner(winner, itemLink, announce, date, isOS, BRCost, g
 
     if (broadcast == nil) then
         if (automaticallyAwarded) then
-            if (GetLootMethod() == "master") then
+            if (GL.GetLootMethod() == "master") then
                 broadcast = GL.User.isMasterLooter;
             else
                 broadcast = GL.User.isLead;
@@ -832,7 +846,9 @@ function AwardedLoot:initiateTrade(AwardDetails)
         tradingPartner = GL.PackMule.disenchanter;
     end
 
-    if (not TradeFrame:IsShown()) then
+    if (not TradeFrame:IsShown()
+        and not GL:iEquals(tradingPartner, GL.User.fqn)
+    ) then
         -- Open a trade window with the winner
         GL.TradeWindow:open(tradingPartner, function (success)
             if (not success) then

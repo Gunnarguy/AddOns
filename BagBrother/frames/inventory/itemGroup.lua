@@ -25,7 +25,7 @@ function Items:RegisterEvents()
 	end
 end
 
-function Items:BAGS_UPDATED(_, queue)
+function Items:BAGS_UPDATED(queue)
 	local static = self:IsStatic()
 	for i, bag in ipairs(self.bags) do
 		local updated = queue[bag.id]
@@ -39,15 +39,15 @@ function Items:BAGS_UPDATED(_, queue)
 	end
 end
 
-function Items:ITEM_LOCK_CHANGED(_, bag, slot)
-	local bag = self.buttons[bag]
+function Items:ITEM_LOCK_CHANGED(bag, slot)
+	local bag = self.byBag[bag]
 	local slot = bag and bag[slot]
 	if slot then
 		slot:UpdateLocked()
 	end
 end
 
-function Items:UNIT_QUEST_LOG_CHANGED(_, unit)
+function Items:UNIT_QUEST_LOG_CHANGED(unit)
 	if unit == 'player' then
 		self:ForAll('UpdateBorder')
 	end

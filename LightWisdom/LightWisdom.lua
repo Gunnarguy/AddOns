@@ -1,773 +1,856 @@
-------------------------------
--- 1. Addon Initialization  --
-------------------------------
 local ADDON_NAME, ns = ...
-local frame = CreateFrame("Frame", "LightWisdomStatsFrame", UIParent)
-local statsFrame, minimapButton = nil, nil
-local textWidgets = {}
-local strsplit = strsplit
-LWS_DB = LWS_DB or {
-    allTime   = { healing = 0, mana = 0 },
-    session   = { healing = 0, mana = 0, startTime = GetTime() },
-    combat    = { healing = 0, mana = 0, startTime = 0, inCombat = false },
-    rates     = { healing = 0, mana = 0 },
+
+--[[
+Light & Wisdom Stats (Judgements Only) - Gamified Edition
+Tracks Judgement of Light healing and Judgement of Wisdom mana for group members.
+Now with achievements, visual feedback, and contribution scoring!
+]]
+
+--=============================
+-- SavedVariables / Defaults
+--=============================
+local function applyDefaults(defaults, data)
+    data = data or {}
+    for k, v in pairs(defaults) do
+        if type(v) == "table" then
+            data[k] = applyDefaults(v, data[k])
+        elseif data[k] == nil then
+            data[k] = v
+        end
+    end
+    return data
+end
+
+local defaults = {
+    allTime  = { healing = 0, mana = 0 },
+    session  = { healing = 0, mana = 0, startTime = GetTime() },
+    combat   = { healing = 0, mana = 0, startTime = 0, inCombat = false },
     statusDebuffs = { light = false, wisdom = false },
-    position  = { "CENTER", nil, "CENTER", 0, 0 },
-    scale     = 1.0,
-    locked    = false,
-    showRates = true,
-    minimapPos= 45
+    position = { "CENTER", nil, "CENTER", 0, 0 },
+    scale    = 1.0,
+    locked   = false,
+    alpha    = 0.8,  -- New: transparency setting
+    fadeAlpha = 0.5, -- New: faded alpha when not hovering  
+    fadeEnabled = false, -- New: enable fade on mouse leave
+    minimapPos = 45,
+    -- New gamification features
+    achievements = {},
+    personalBests = {
+        bestHPS = 0,
+        bestMPS = 0,
+        bestCombatHealing = 0,
+        bestCombatMana = 0,
+        longestUptime = 0,
+    },
+    raidContribution = {}, -- Track per-player benefits
+    streaks = {
+        currentUptime = 0,
+        uptimeStart = 0,
+    },
+    settings = {
+        soundEnabled = true,
+        showAchievements = true,
+        debugMode = false, -- New: Debug mode for combat log inspection
+    }
 }
 
-local lastUpdate = 0
-local updateThreshold = 0.2 -- 5 times per second
+LWS_DB = applyDefaults(defaults, LWS_DB)
+ns = ns or {}
+ns.db = LWS_DB
 
-------------------------------
--- 2. Utility Functions     --
-------------------------------
-local function FormatNumber(number)
+--=============================
+-- Gamification Constants
+--=============================
+-- Performance grades based on HPS/MPS
+local PERFORMANCE_GRADES = {
+    {threshold = 150, grade = "S", color = "FFD700", desc = "Divine Support!"},   -- Gold
+    {threshold = 100, grade = "A", color = "00FF00", desc = "Excellent!"},        -- Green
+    {threshold = 50,  grade = "B", color = "00BFFF", desc = "Good"},             -- Light Blue
+    {threshold = 25,  grade = "C", color = "FFFF00", desc = "Average"},          -- Yellow
+    {threshold = 0,   grade = "D", color = "FF6B6B", desc = "Keep trying"},      -- Red
+}
+
+-- Achievement milestones
+local ACHIEVEMENTS = {
+    {healing = 10000,  name = "Light Bearer",       icon = "✦", desc = "10k healing from JoL"},
+    {healing = 50000,  name = "Radiant Guardian",   icon = "★", desc = "50k healing from JoL"},
+    {healing = 100000, name = "Champion of Light",  icon = "☀", desc = "100k healing from JoL"},
+    {mana = 5000,      name = "Wisdom Seeker",      icon = "♦", desc = "5k mana from JoW"},
+    {mana = 25000,     name = "Sage",               icon = "✧", desc = "25k mana from JoW"},
+    {mana = 50000,     name = "Oracle of Wisdom",   icon = "⚡", desc = "50k mana from JoW"},
+}
+
+--=============================
+-- Utility helpers
+--=============================
+function ns.FormatNumber(number)
+    if not number then return "0" end
     if number >= 1000000 then
         return string.format("%.1fM", number / 1000000)
     elseif number >= 1000 then
         return string.format("%.1fK", number / 1000)
-    else
-        return number
     end
+    return tostring(math.floor(number))
 end
 
-local function CreateTooltip(frame, title, text)
-    frame:SetScript("OnEnter", function(self)
-        GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT")
-        GameTooltip:AddLine(title, 1, 1, 1)
-        GameTooltip:AddLine(text, nil, nil, nil, true)
-        GameTooltip:Show()
-    end)
-    frame:SetScript("OnLeave", function()
-        GameTooltip:Hide()
-    end)
+local function ColorBool(state)
+    return state and "|cff00ff00Yes|r" or "|cffff0000No|r"
 end
 
-------------------------------
--- 3. Party Member Check   --
-------------------------------
-local function IsPartyMember(guid)
-    if not guid then return false end
-    if guid == UnitGUID("player") then return true end
-    if IsInGroup() then
-        local numGroupMembers = GetNumGroupMembers()
-        for i = 1, numGroupMembers do
-            local unitID = (IsInRaid() and "raid" .. i) or ("party" .. i)
-            if UnitExists(unitID) and guid == UnitGUID(unitID) then
-                return true
+local function colorText(hex, text) 
+    return "|cff"..hex..tostring(text).."|r" 
+end
+
+-- Calculate resource equivalents
+local function getHealthPotEquivalent(healing)
+    local MAJOR_HEALING_POT = 1700 -- Average Major Healing Potion
+    return math.floor((healing or 0) / MAJOR_HEALING_POT)
+end
+
+local function getManaPotEquivalent(mana)
+    local MAJOR_MANA_POT = 1800 -- Average Major Mana Potion
+    return math.floor((mana or 0) / MAJOR_MANA_POT)
+end
+
+-- Get performance grade
+local function getPerformanceGrade(value)
+    for _, grade in ipairs(PERFORMANCE_GRADES) do
+        if value >= grade.threshold then
+            return grade
+        end
+    end
+    return PERFORMANCE_GRADES[#PERFORMANCE_GRADES]
+end
+
+-- Calculate contribution score (0-100)
+local function getContributionScore()
+    local score = 0
+    local combat = ns.db.combat
+    
+    -- Base score from HPS/MPS
+    if combat.inCombat then
+        local duration = math.max(1, GetTime() - combat.startTime)
+        local hps = (combat.healing or 0) / duration
+        local mps = (combat.mana or 0) / duration
+        score = math.min(100, (hps + mps * 2) / 3) -- Weight mana higher as it's rarer
+    end
+    
+    -- Bonus for having both judgements up
+    if ns.db.statusDebuffs.light and ns.db.statusDebuffs.wisdom then
+        score = math.min(100, score * 1.2)
+    end
+    
+    return score
+end
+
+-- Check achievements
+local function checkAchievements()
+    local session = ns.db.session
+    local achievements = ns.db.achievements
+    
+    for _, achievement in ipairs(ACHIEVEMENTS) do
+        local key = achievement.name:gsub(" ", "_")
+        local checkValue = achievement.healing or achievement.mana
+        local currentValue = achievement.healing and session.healing or session.mana
+        
+        if currentValue >= checkValue and not achievements[key] then
+            achievements[key] = GetTime()
+            
+            if ns.db.settings.showAchievements then
+                UIErrorsFrame:AddMessage(achievement.icon .. " Achievement: " .. achievement.name .. "!", 1, 0.84, 0, 1.0)
+                if ns.db.settings.soundEnabled then
+                    PlaySound(888) -- Level up sound
+                end
             end
         end
     end
-    return false
-end
-
-------------------------------
--- 4. Display Update Logic  --
-------------------------------
-local function UpdateDisplay()
-    for _, widget in ipairs(textWidgets) do
-        local scope = LWS_DB[widget.key]
-        widget.healing:SetText(FormatNumber(scope.healing or 0))
-        widget.mana:SetText(FormatNumber(scope.mana or 0))
-    end
     
-    if statsFrame then
-        statsFrame.jolIndicator:SetTextColor(LWS_DB.statusDebuffs.light and 0 or 1, LWS_DB.statusDebuffs.light and 1 or 0, 0)
-        statsFrame.jowIndicator:SetTextColor(LWS_DB.statusDebuffs.wisdom and 0 or 1, LWS_DB.statusDebuffs.wisdom and 1 or 0, 0)
-    end
-end
-
-local function ThrottledUpdate()
-    local currentTime = GetTime()
-    if currentTime - lastUpdate >= updateThreshold then
-        UpdateDisplay()
-        lastUpdate = currentTime
-    end
-end
-
-local function UpdateStats(statType, amount)
-    LWS_DB.combat[statType] = LWS_DB.combat[statType] + amount
-    LWS_DB.session[statType] = LWS_DB.session[statType] + amount
-    LWS_DB.allTime[statType] = LWS_DB.allTime[statType] + amount
-    ThrottledUpdate()
-end
-
-------------------------------
--- 5. Combat Rate Tracking  --
-------------------------------
-local function UpdateCombatRates()
-    if not LWS_DB.combat.inCombat then return end
-
-    local currentTime = GetTime()
-    local combatDuration = currentTime - LWS_DB.combat.startTime
-
-    if combatDuration > 0 then
-        if LWS_DB.combat.healing > 0 or LWS_DB.combat.mana > 0 then
-            LWS_DB.rates.healing = math.floor((LWS_DB.combat.healing / combatDuration) * 60)
-            LWS_DB.rates.mana    = math.floor((LWS_DB.combat.mana / combatDuration) * 60)
-            ThrottledUpdate()
+    -- Update personal bests
+    local pb = ns.db.personalBests
+    if ns.db.combat.inCombat then
+        local duration = GetTime() - ns.db.combat.startTime
+        if duration > 0 then
+            local hps = ns.db.combat.healing / duration
+            local mps = ns.db.combat.mana / duration
+            
+            if hps > pb.bestHPS then
+                pb.bestHPS = hps
+                if hps > 50 then -- Only announce significant records
+                    print("|cFF00FF96L&W:|r New HPS record: " .. string.format("%.1f", hps))
+                end
+            end
+            
+            if mps > pb.bestMPS then
+                pb.bestMPS = mps
+                if mps > 25 then
+                    print("|cFF00FF96L&W:|r New MPS record: " .. string.format("%.1f", mps))
+                end
+            end
         end
-    else
-        LWS_DB.rates.healing = 0
-        LWS_DB.rates.mana    = 0
     end
 end
 
-local rateUpdateTimer = CreateFrame("Frame")
-rateUpdateTimer:SetScript("OnUpdate", function(self, elapsed)
-    self.elapsed = (self.elapsed or 0) + elapsed
-    if self.elapsed >= 1 then
-        self.elapsed = 0
-        UpdateCombatRates()
+--=============================
+-- Forward declarations for functions used in UI
+--=============================
+local UpdateDisplay, ResetCombat, UpdateRates
+
+--=============================
+-- Core frame & state
+--=============================
+local root = CreateFrame("Frame", "LWS_RootFrame", UIParent, "BackdropTemplate")
+ns.root = root
+root:SetScale(ns.db.scale)
+root:SetAlpha(ns.db.alpha or 0.8)  -- Apply saved alpha
+root:SetMovable(true)
+root:EnableMouse(not ns.db.locked)  -- Disable mouse when locked
+root:SetClampedToScreen(true)
+root:SetBackdrop({
+    bgFile   = "Interface/Tooltips/UI-Tooltip-Background",
+    edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
+    tile=false, edgeSize=12,
+    insets={left=4,right=4,top=4,bottom=4}
+})
+root:SetBackdropColor(0,0,0,0.80)
+
+do
+    local pos = ns.db.position
+    if pos and #pos >= 5 then
+        root:SetPoint(pos[1], UIParent, pos[3], pos[4], pos[5])
+    else
+        root:SetPoint("CENTER")
+        ns.db.position = { "CENTER", nil, "CENTER", 0, 0 }
+    end
+end
+
+root:RegisterForDrag("LeftButton")
+root:SetScript("OnDragStart", function(self)
+    if not ns.db.locked then 
+        self:StartMoving()
+        self:SetAlpha(1.0) -- Full opacity while dragging
     end
 end)
-rateUpdateTimer:Hide() -- Start hidden, only enabled in combat
+root:SetScript("OnDragStop", function(self)
+    self:StopMovingOrSizing()
+    ns.db.position = { self:GetPoint(1) }
+    self:SetAlpha(ns.db.alpha) -- Restore alpha
+end)
 
-local function OnCombatStart()
-    LWS_DB.combat = { 
-        healing = 0, 
-        mana = 0, 
-        startTime = GetTime(), 
-        inCombat = true 
-    }
-    LWS_DB.rates = { healing = 0, mana = 0 }
-    UpdateDisplay()
-    rateUpdateTimer:Show()
-end
-
-local function OnCombatEnd()
-    LWS_DB.combat.inCombat = false
-    local finalRates = { healing = LWS_DB.rates.healing, mana = LWS_DB.rates.mana }
-    LWS_DB.combat = { healing = 0, mana = 0, startTime = 0, inCombat = false }
-    LWS_DB.rates = finalRates
-    UpdateDisplay()
-    rateUpdateTimer:Hide()
-    C_Timer.After(5, function()
-        if not LWS_DB.combat.inCombat then
-            LWS_DB.rates = { healing = 0, mana = 0 }
-            UpdateDisplay()
+-- Enhanced right-click menu with dropdown
+root:SetScript("OnMouseUp", function(self, btn)
+    if btn == "RightButton" and not ns.db.locked then
+        -- Create dropdown menu if it doesn't exist
+        if not LWS_DropDown then
+            CreateFrame("Frame", "LWS_DropDown", UIParent, "UIDropDownMenuTemplate")
         end
-    end)
+        
+        UIDropDownMenu_Initialize(LWS_DropDown, function(menu, level)
+            local info = UIDropDownMenu_CreateInfo()
+            info.notCheckable = true
+            
+            if level == 1 then
+                info.text = "Light & Wisdom"; info.isTitle = true
+                UIDropDownMenu_AddButton(info, level)
+                info.isTitle = false
+                
+                info.text = ns.db.locked and "Unlock Window" or "Lock Window"
+                info.func = function()
+                    ns.db.locked = not ns.db.locked
+                    root:EnableMouse(not ns.db.locked)
+                    print("|cFF00FF96L&W:|r Frame " .. (ns.db.locked and "locked (click-through)" or "unlocked"))
+                    if UpdateDisplay then UpdateDisplay() end  -- Check if function exists
+                end
+                UIDropDownMenu_AddButton(info, level)
+                
+                info.text = "Transparency"
+                info.hasArrow = true
+                info.menuList = "transparency"
+                UIDropDownMenu_AddButton(info, level)
+                
+                info.text = ns.db.fadeEnabled and "Disable Fade" or "Enable Fade"
+                info.hasArrow = false
+                info.menuList = nil
+                info.func = function()
+                    ns.db.fadeEnabled = not ns.db.fadeEnabled
+                    if UpdateDisplay then UpdateDisplay() end  -- Check if function exists
+                end
+                UIDropDownMenu_AddButton(info, level)
+                
+                info.text = "Reset Combat"
+                info.func = function()
+                    if ResetCombat then ResetCombat() end  -- Check if function exists
+                    if UpdateDisplay then UpdateDisplay() end
+                    print("|cFF00FF96L&W:|r Combat stats reset.")
+                end
+                UIDropDownMenu_AddButton(info, level)
+                
+            elseif level == 2 and UIDROPDOWNMENU_MENU_VALUE == "transparency" then
+                info.text = "Transparency"; info.isTitle = true
+                UIDropDownMenu_AddButton(info, level)
+                info.isTitle = false
+                
+                local alphaValues = {1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3}
+                for _, alpha in ipairs(alphaValues) do
+                    info.text = string.format("%d%%", alpha * 100)
+                    info.func = function()
+                        ns.db.alpha = alpha
+                        root:SetAlpha(alpha)
+                        print(string.format("|cFF00FF96L&W:|r Transparency set to %d%%", alpha * 100))
+                    end
+                    if math.abs((ns.db.alpha or 0.8) - alpha) < 0.01 then  -- Float comparison fix
+                        info.text = info.text .. " |cFF00FF00✓|r"
+                    end
+                    UIDropDownMenu_AddButton(info, level)
+                end
+            end
+        end)
+        
+        ToggleDropDownMenu(1, nil, LWS_DropDown, self, 0, 0)
+    end
+end)
+
+local title = root:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+title:SetPoint("TOP", 0, -6)
+title:SetText("|cFF00FF96Light & Wisdom|r")
+root.title = title
+
+-- Add contribution score bar
+local scoreBar = CreateFrame("StatusBar", nil, root)
+scoreBar:SetSize(280, 10)
+scoreBar:SetPoint("TOP", title, "BOTTOM", 0, -4)
+scoreBar:SetStatusBarTexture("Interface\\TargetingFrame\\UI-StatusBar")
+scoreBar:SetMinMaxValues(0, 100)
+scoreBar:SetValue(0)
+scoreBar:SetStatusBarColor(0, 0.7, 1, 0.8)
+
+local scoreBg = scoreBar:CreateTexture(nil, "BACKGROUND")
+scoreBg:SetAllPoints()
+scoreBg:SetTexture("Interface\\TargetingFrame\\UI-StatusBar")
+scoreBg:SetVertexColor(0.2, 0.2, 0.2, 0.5)
+
+root.scoreBar = scoreBar
+
+-- Enhanced tooltip
+root:SetScript("OnEnter", function(self)
+    -- Update alpha when hovering
+    if ns.db.fadeEnabled then
+        self:SetAlpha(ns.db.alpha)
+    end
+    
+    GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT")
+    
+    if ns.db.locked then
+        GameTooltip:AddLine("Light & Wisdom Stats [LOCKED]", 1, 0.5, 0.5)
+        GameTooltip:AddLine("Type /lw unlock to enable interaction", 0.7, 0.7, 0.7)
+    else
+        GameTooltip:AddLine("Light & Wisdom Stats",1,1,1)
+        GameTooltip:AddLine("Judgement Support Tracker", 0.7, 0.7, 0.7)
+        GameTooltip:AddLine(" ")
+        
+        -- Show contribution score
+        local score = getContributionScore()
+        GameTooltip:AddLine("Contribution Score: " .. string.format("%.0f/100", score), 0, 0.7, 1)
+        
+        -- Show achievement progress
+        local achieved = 0
+        for _, ach in ipairs(ACHIEVEMENTS) do
+            if ns.db.achievements[ach.name:gsub(" ", "_")] then
+                achieved = achieved + 1
+            end
+        end
+        GameTooltip:AddLine(string.format("Achievements: %d/%d", achieved, #ACHIEVEMENTS), 1, 0.84, 0)
+        
+        -- Show personal bests
+        local pb = ns.db.personalBests
+        if pb.bestHPS > 0 or pb.bestMPS > 0 then
+            GameTooltip:AddLine(" ")
+            GameTooltip:AddLine("Personal Bests:", 1, 1, 0)
+            if pb.bestHPS > 0 then
+                GameTooltip:AddLine(string.format("  Best HPS: %.1f", pb.bestHPS), 0.7, 1, 0.7)
+            end
+            if pb.bestMPS > 0 then
+                GameTooltip:AddLine(string.format("  Best MPS: %.1f", pb.bestMPS), 0.7, 0.7, 1)
+            end
+        end
+        
+        GameTooltip:AddLine(" ")
+        GameTooltip:AddLine("Left-drag to move. Right-click for options.", .9,.9,.9)
+        GameTooltip:AddLine("/lw stats | lock | unlock | alpha <0.3-1.0> | fade", .7,.7,1)
+    end
+    
+    GameTooltip:Show()
+end)
+
+root:SetScript("OnLeave", function(self)
+    GameTooltip:Hide()
+    -- Apply fade when leaving
+    if ns.db.fadeEnabled and ns.db.locked then
+        self:SetAlpha(ns.db.fadeAlpha)
+    end
+end)
+
+-- Column headers
+local colX = { 110, 190, 270 }
+local headers = { "Now", "Session", "All-Time" }
+for i, h in ipairs(headers) do
+    local fs = root:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    fs:SetPoint("TOPLEFT", colX[i], -30) -- Adjusted for score bar
+    fs:SetText(h)
 end
 
-------------------------------
--- 6. UI and Minimap Button --
-------------------------------
+-- Enhanced row definitions
+local rows = {
+    { key="healing", label="JoL Healing" },
+    { key="mana",    label="JoW Mana" },
+    { key="hps",     label="HPS" },
+    { key="mps",     label="MPS" },
+    { key="grade",   label="Performance" },    -- New: performance grade
+    { key="pots",    label="Resources Saved" }, -- New: pot equivalents
+    { key="jol",     label="JoL Active" },
+    { key="jow",     label="JoW Active" },
+    { key="uptime",  label="Uptime" },         -- New: judgement uptime
+}
+
+local cells = {}
+local y = -46 -- Adjusted for score bar
+for _, r in ipairs(rows) do
+    local label = root:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    label:SetPoint("TOPLEFT", 10, y)
+    label:SetText(r.label)
+    local nowFS = root:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    nowFS:SetPoint("TOPLEFT", colX[1], y)
+    nowFS:SetText("0")
+    local sessFS = root:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    sessFS:SetPoint("TOPLEFT", colX[2], y)
+    sessFS:SetText("0")
+    local allFS = root:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    allFS:SetPoint("TOPLEFT", colX[3], y)
+    allFS:SetText("0")
+    cells[r.key] = { now=nowFS, session=sessFS, all=allFS }
+    y = y - 16
+end
+-- Resize frame for new rows
+root:SetSize(330, -y + 20)
+root.cells = cells
+
+--=============================
+-- Minimap button (optional)
+--=============================
+local minimapButton
 local function UpdateMinimapButtonPosition()
-    if not minimapButton then return end
-    local angle = LWS_DB.minimapPos
+    if not minimapButton or not Minimap then return end
+    local angle = (ns.db.minimapPos or 45) * math.pi / 180
     local x = math.cos(angle) * 80
     local y = math.sin(angle) * 80
     minimapButton:SetPoint("CENTER", Minimap, "CENTER", x, y)
 end
 
 local function CreateMinimapButton()
-    local button = CreateFrame("Button", "LWSMinimapButton", Minimap)
-    button:SetSize(31, 31)
-    button:SetFrameLevel(8)
-    button:SetHighlightTexture("Interface\\Minimap\\UI-Minimap-ZoomButton-Highlight")
-    
-    -- Set proper button properties to make it visible and clickable
-    button:EnableMouse(true)
-    button:SetMovable(false)
-    button:RegisterForDrag("LeftButton")
-    button:RegisterForClicks("LeftButtonUp", "RightButtonUp")
-    
-    -- Create the button icon
-    local icon = button:CreateTexture(nil, "BACKGROUND")
-    icon:SetTexture("Interface\\Icons\\Spell_Holy_SealOfWisdom")
-    icon:SetSize(20, 20)
-    icon:SetPoint("CENTER", 0, 0)
-    
-    -- Create the border texture
-    local border = button:CreateTexture(nil, "OVERLAY")
-    border:SetTexture("Interface\\Minimap\\MiniMap-TrackingBorder")
-    border:SetSize(53, 53)
-    border:SetPoint("TOPLEFT", -11, 11)
-    
-    -- Set up drag functionality
-    button:SetScript("OnDragStart", function(self)
-        -- We're not moving the button itself, just tracking cursor for angle calculation
-        self.isMoving = true
+    if not Minimap then return end
+    minimapButton = CreateFrame("Button", "LWS_MinimapButton", Minimap)
+    minimapButton:SetSize(31, 31)
+    minimapButton:SetFrameLevel(8)
+    minimapButton:SetHighlightTexture("Interface/Minimap/UI-Minimap-ZoomButton-Highlight")
+    minimapButton:RegisterForDrag("LeftButton")
+    minimapButton:SetScript("OnDragStart", function(self)
+        self:SetScript("OnUpdate", function(btn)
+            local mx, my = Minimap:GetCenter()
+            local px, py = GetCursorPosition()
+            local scale = Minimap:GetEffectiveScale()
+            px, py = px / scale, py / scale
+            local angle = math.deg(math.atan2(py - my, px - mx))
+            ns.db.minimapPos = angle
+            UpdateMinimapButtonPosition()
+        end)
     end)
-    
-    button:SetScript("OnDragStop", function(self)
-        self.isMoving = false
-        -- Calculate position based on cursor and minimap center
-        local xpos, ypos = GetCursorPosition()
-        local scale = Minimap:GetEffectiveScale()
-        xpos, ypos = xpos / scale, ypos / scale
-        local minimapX, minimapY = Minimap:GetCenter()
-        local angle = math.atan2(ypos - minimapY, xpos - minimapX)
-        LWS_DB.minimapPos = angle
-        UpdateMinimapButtonPosition()
+    minimapButton:SetScript("OnDragStop", function(self) self:SetScript("OnUpdate", nil) end)
+    minimapButton:SetScript("OnClick", function()
+        if root:IsShown() then root:Hide() else root:Show() end
     end)
-    
-    -- Set up click handlers
-    button:SetScript("OnClick", function(self, btn)
-        if btn == "LeftButton" then
-            statsFrame:SetShown(not statsFrame:IsShown())
-        elseif btn == "RightButton" then
-            ToggleDropDownMenu(1, nil, LWSDropDownMenu, self, 0, 0)
-        end
-    end)
-    
-    -- Create tooltip
-    CreateTooltip(button, "Light & Wisdom Stats", 
-        "Left-Click: Toggle stats window\nRight-Click: Open options menu\nDrag: Move button")
-    
-    return button
+    local icon = minimapButton:CreateTexture(nil, "BACKGROUND")
+    icon:SetTexture("Interface/Icons/Spell_Holy_SealOfWisdom")
+    icon:SetSize(19, 19)
+    icon:SetPoint("CENTER")
+    UpdateMinimapButtonPosition()
 end
 
-local function CreateUI()
-    -- Create the main stats frame with a backdrop
-    local f = CreateFrame("Frame", "LWS_StatsFrame", UIParent, "BackdropTemplate")
-    f:SetSize(200, 140) -- Keep size or adjust as needed
-    f:SetScale(LWS_DB.scale)
-    
-    -- Enable frame movement - critical for drag functionality
-    f:SetMovable(true)
-    f:SetClampedToScreen(true)
-    -- Keep mouse enabled so hover events work even when locked
-    f:EnableMouse(true) 
-    
-    -- Fix position setting by ensuring proper anchor format
-    local pos = LWS_DB.position
-    if pos and #pos >= 5 then
-        -- Standard format: point, relativeTo, relativePoint, x, y
-        f:SetPoint(pos[1], UIParent, pos[3], pos[4], pos[5])
+--=============================
+-- Enhanced display updates
+--=============================
+local lastRateTime, lastHealing, lastMana = 0,0,0
+local currentHPS, currentMPS = 0, 0
+
+-- Define UpdateDisplay function
+UpdateDisplay = function()
+    -- Ensure alpha is applied based on fade settings
+    if ns.db.locked and ns.db.fadeEnabled and not root:IsMouseOver() then
+        root:SetAlpha(ns.db.fadeAlpha)
     else
-        -- Fallback to default position if saved position is invalid
-        f:SetPoint("CENTER", UIParent, "CENTER", 0, 0)
-        -- Update the stored position with correct format
-        LWS_DB.position = {"CENTER", UIParent, "CENTER", 0, 0}
+        root:SetAlpha(ns.db.alpha or 0.8)
     end
     
-    -- Set visual appearance of the frame - Use a simpler backdrop
-    f:SetBackdrop({
-        bgFile = "Interface\\Tooltips\\UI-Tooltip-Background", -- Flat background texture
-        edgeFile = nil, -- No border edge
-        tile = false,
-        tileSize = 16,
-        edgeSize = 0, -- No edge size
-        insets = { left = 2, right = 2, top = 2, bottom = 2 } -- Minimal insets
-    })
-    -- Adjust backdrop color and transparency (e.g., slightly darker)
-    f:SetBackdropColor(0.1, 0.1, 0.1, 0.85) 
+    local nowHealing, nowMana = ns.db.combat.healing, ns.db.combat.mana
+    local sessHealing, sessMana = ns.db.session.healing, ns.db.session.mana
+    local allHealing, allMana = ns.db.allTime.healing, ns.db.allTime.mana
+
+    root.cells.healing.now:SetText(ns.FormatNumber(nowHealing))
+    root.cells.healing.session:SetText(ns.FormatNumber(sessHealing))
+    root.cells.healing.all:SetText(ns.FormatNumber(allHealing))
+
+    root.cells.mana.now:SetText(ns.FormatNumber(nowMana))
+    root.cells.mana.session:SetText(ns.FormatNumber(sessMana))
+    root.cells.mana.all:SetText(ns.FormatNumber(allMana))
+
+    root.cells.jol.now:SetText(ColorBool(ns.db.statusDebuffs.light))
+    root.cells.jow.now:SetText(ColorBool(ns.db.statusDebuffs.wisdom))
+    root.cells.jol.session:SetText("-")
+    root.cells.jol.all:SetText("-")
+    root.cells.jow.session:SetText("-")
+    root.cells.jow.all:SetText("-")
     
-    -- ===== DRAGGABLE HEADER SECTION =====
-    -- Create a header bar for dragging
-    local header = CreateFrame("Frame", nil, f)
-    header:SetHeight(20) -- Slightly shorter header
-    header:SetPoint("TOPLEFT", f, "TOPLEFT", 2, -2) -- Align with new insets
-    header:SetPoint("TOPRIGHT", f, "TOPRIGHT", -2, -2)
-    -- Header needs mouse enabled to catch drag events when frame is unlocked
-    header:EnableMouse(true) 
+    -- Update performance grades
+    local combinedRate = currentHPS + currentMPS * 1.5 -- Weight mana higher
+    local grade = getPerformanceGrade(combinedRate)
+    root.cells.grade.now:SetText(colorText(grade.color, grade.grade .. " (" .. string.format("%.0f", combinedRate) .. ")"))
+    root.cells.grade.session:SetText("-")
+    root.cells.grade.all:SetText("-")
     
-    -- Use a subtle texture or color for the header background
-    local headerBg = header:CreateTexture(nil, "BACKGROUND")
-    headerBg:SetAllPoints()
-    -- Use a semi-transparent dark color instead of a bright texture
-    headerBg:SetColorTexture(0.2, 0.2, 0.2, 0.5) 
-    -- Header background is only shown when unlocked
-    headerBg:SetShown(not LWS_DB.locked) 
-    f.headerTexture = headerBg -- Store reference for toggling
+    -- Update resource saved (pot equivalents)
+    local healPots = getHealthPotEquivalent(nowHealing)
+    local manaPots = getManaPotEquivalent(nowMana)
+    root.cells.pots.now:SetText(colorText("00BFFF", healPots .. "H/" .. manaPots .. "M"))
     
-    -- Grip texture is removed/hidden (existing code)
-    local grip = header:CreateTexture(nil, "OVERLAY")
-    grip:Hide() 
-    grip:SetShown(false) 
-    f.gripTexture = grip
+    local sessHealPots = getHealthPotEquivalent(sessHealing)
+    local sessManaPots = getManaPotEquivalent(sessMana)
+    root.cells.pots.session:SetText(colorText("00BFFF", sessHealPots .. "H/" .. sessManaPots .. "M"))
     
-    -- ===== DRAGGING BEHAVIOR =====
-    -- Only allow dragging if the frame is NOT locked
-    header:SetScript("OnMouseDown", function(self, button)
-        -- Check lock status *before* starting movement
-        if button == "LeftButton" and not LWS_DB.locked then 
-            f:StartMoving()
-            f.isMoving = true
+    local allHealPots = getHealthPotEquivalent(allHealing)
+    local allManaPots = getManaPotEquivalent(allMana)
+    root.cells.pots.all:SetText(colorText("00BFFF", allHealPots .. "H/" .. allManaPots .. "M"))
+    
+    -- Update uptime tracking
+    if ns.db.statusDebuffs.light or ns.db.statusDebuffs.wisdom then
+        if ns.db.streaks.uptimeStart == 0 then
+            ns.db.streaks.uptimeStart = GetTime()
         end
-    end)
-    
-    -- OnMouseUp remains the same (stops moving and saves position)
-    header:SetScript("OnMouseUp", function(self, button)
-        if button == "LeftButton" and f.isMoving then
-            f:StopMovingOrSizing()
-            f.isMoving = false
-            local point, _, relativePoint, x, y = f:GetPoint()
-            LWS_DB.position = {point, UIParent, relativePoint, x, y}
-        end
-    end)
-    
-    -- OnHide remains the same
-    header:SetScript("OnHide", function(self)
-        if f.isMoving then
-            f:StopMovingOrSizing()
-            f.isMoving = false
-        end
-    end)
-    
-    -- Change cursor only when unlocked
-    header:SetScript("OnEnter", function(self)
-        if not LWS_DB.locked then
-            SetCursor("CAST_CURSOR")
-        end
-    end)
-    
-    -- OnLeave remains the same
-    header:SetScript("OnLeave", function(self)
-        if not f.isMoving then
-            ResetCursor()
-        end
-    end)
-    
-    -- Title - Adjust position slightly due to header/inset changes (existing code)
-    local title = f:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    title:SetPoint("TOP", 0, -6) 
-    title:SetText("|cFF00FF96Light & Wisdom Stats|r")
-
-    -- ===== BOTTOM-LEFT ANCHOR (Visual Only) =====
-    local anchor = f:CreateTexture(nil, "OVERLAY")
-    anchor:SetSize(12, 12) -- Small visual indicator
-    anchor:SetPoint("BOTTOMLEFT", f, "BOTTOMLEFT", 4, 4) -- Position in the corner, respecting insets
-    -- Use a simple texture, e.g., a square or corner piece
-    anchor:SetTexture("Interface\\ChatFrame\\ChatFrameGrip") -- Re-use a grip-like texture
-    anchor:SetVertexColor(0.8, 0.8, 0.8, 0.6) -- Make it semi-transparent grey
-    -- Anchor is only shown when unlocked
-    anchor:SetShown(not LWS_DB.locked) 
-    f.anchorTexture = anchor -- Store reference
-
-    -- ===== HOVER LOCK BUTTON =====
-    local hoverLockBtn = CreateFrame("Button", nil, f)
-    hoverLockBtn:SetSize(18, 18) -- Small button
-    hoverLockBtn:SetPoint("TOPRIGHT", f, "TOPRIGHT", -5, -3) -- Position in the corner
-    
-    -- Set textures for locked and unlocked states
-    local tex = hoverLockBtn:CreateTexture(nil, "ARTWORK")
-    tex:SetAllPoints()
-    hoverLockBtn.texture = tex
-    
-    local function UpdateLockButtonTexture()
-        if LWS_DB.locked then
-            -- Use a 'locked' icon texture
-            hoverLockBtn.texture:SetTexture("Interface\\Buttons\\UI-Panel-Lock-Button-Down") 
-        else
-            -- Use an 'unlocked' icon texture
-            hoverLockBtn.texture:SetTexture("Interface\\Buttons\\UI-Panel-Lock-Button-Up") 
-        end
-    end
-    UpdateLockButtonTexture() -- Set initial texture
-
-    hoverLockBtn:SetScript("OnClick", function()
-        LWS_DB.locked = not LWS_DB.locked
-        UpdateLockButtonTexture() -- Update icon
-        f.headerTexture:SetShown(not LWS_DB.locked) -- Show/hide drag header bg
-        f.anchorTexture:SetShown(not LWS_DB.locked) -- Show/hide bottom-left anchor
-        print("Light & Wisdom Stats Frame " .. (LWS_DB.locked and "|cFFFF0000Locked|r" or "|cFF00FF00Unlocked|r"))
-        -- No need to change f:EnableMouse here, dragging is handled by header's OnMouseDown
-    end)
-
-    -- Initially hide the button (set alpha to 0)
-    hoverLockBtn:SetAlpha(0) 
-    f.hoverLockBtn = hoverLockBtn -- Store reference if needed elsewhere
-
-    -- Fade In/Out Logic for Hover Button
-    f:SetScript("OnEnter", function(self)
-        -- Fade in the lock button when mouse enters the main frame
-        UIFrameFadeIn(self.hoverLockBtn, 0.2, self.hoverLockBtn:GetAlpha(), 1) 
-    end)
-
-    f:SetScript("OnLeave", function(self)
-        -- Fade out the lock button when mouse leaves the main frame,
-        -- but only if the mouse isn't moving onto the button itself.
-        local currentMouseFocus = GetMouseFocus()
-        if currentMouseFocus ~= self.hoverLockBtn then
-            UIFrameFadeOut(self.hoverLockBtn, 0.3, self.hoverLockBtn:GetAlpha(), 0) 
-        end
-    end)
-
-    hoverLockBtn:SetScript("OnEnter", function(self)
-        -- Keep the button visible (cancel fade out) when mouse is over it
-        UIFrameFadeIn(self, 0.1, self:GetAlpha(), 1) 
-    end)
-
-    hoverLockBtn:SetScript("OnLeave", function(self)
-        -- Fade out the button when the mouse leaves it
-        UIFrameFadeOut(self, 0.3, self:GetAlpha(), 0) 
-    end)
-
-    CreateTooltip(hoverLockBtn, "Lock/Unlock Frame", "Click to toggle frame movement.")
-
-    -- REMOVED 'L' and 'R' buttons and their logic (including EasyMenu call)
-    
-    -- Status message (existing code, text updated slightly)
-    C_Timer.After(1, function()
-        if not LWS_DB.showedDragTip then
-            print("|cFF00FF96Light & Wisdom Stats:|r Frame is |cFF00FF00unlocked|r. Drag the header area (when visible) or use the lock icon.") 
-            LWS_DB.showedDragTip = true
-        end
-    end)
-    
-    -- Debuff Indicators - Adjust vertical position
-    local indicatorYOffset = -28 -- Position below title/header area
-    local jolIndicator = f:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    jolIndicator:SetPoint("TOPLEFT", 10, indicatorYOffset) 
-    jolIndicator:SetText("JoL:")
-    f.jolIndicator = jolIndicator
-    
-    local jowIndicator = f:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    jowIndicator:SetPoint("LEFT", jolIndicator, "RIGHT", 10, 0)
-    jowIndicator:SetText("JoW:")
-    f.jowIndicator = jowIndicator
-    
-    -- Tooltip frames for indicators (existing code)
-    local jolFrame = CreateFrame("Frame", nil, f)
-    jolFrame:SetAllPoints(jolIndicator)
-    CreateTooltip(jolFrame, "Judgement of Light", "Green = Active, Red = Inactive\nHeals the attacker when active.")
-    
-    local jowFrame = CreateFrame("Frame", nil, f)
-    jowFrame:SetAllPoints(jowIndicator)
-    CreateTooltip(jowFrame, "Judgement of Wisdom", "Green = Active, Red = Inactive\nRestores mana when active.")
-    
-    -- Headers - Adjust vertical position
-    local headerYOffset = indicatorYOffset - 18 -- Position below indicators
-    local col1X, col2X = 80, 150
-    for _, headerData in ipairs({ { text = "Healing", x = col1X }, { text = "Mana", x = col2X } }) do
-        local h = f:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-        -- Anchor relative to TOPLEFT for consistency with other elements
-        h:SetPoint("TOPLEFT", f, "TOPLEFT", headerData.x - 20, headerYOffset) 
-        h:SetText(headerData.text)
-    end
-    
-    -- Stat Rows - Adjust starting vertical position
-    local entries = {
-        { label = "Combat:",   key = "combat" },
-        { label = "Session:",  key = "session" },
-        { label = "All-Time:", key = "allTime" }
-    }
-    local rowY = headerYOffset - 18 -- Start below headers
-    for _, entry in ipairs(entries) do
-        local rowLabel = f:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-        rowLabel:SetPoint("TOPLEFT", 10, rowY)
-        rowLabel:SetText(entry.label)
+        ns.db.streaks.currentUptime = GetTime() - ns.db.streaks.uptimeStart
         
-        local healing = f:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-        healing:SetPoint("TOPLEFT", f, "TOPLEFT", col1X - 20, rowY)
-        healing:SetText("0")
+        local uptimeStr = string.format("%.0fs", ns.db.streaks.currentUptime)
+        root.cells.uptime.now:SetText(colorText("00FF00", uptimeStr))
         
-        local mana = f:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-        mana:SetPoint("TOPLEFT", f, "TOPLEFT", col2X - 20, rowY)
-        mana:SetText("0")
-        
-        table.insert(textWidgets, { key = entry.key, healing = healing, mana = mana })
-        rowY = rowY - 18 -- Increment Y offset for next row
+        -- Update personal best uptime
+        if ns.db.streaks.currentUptime > ns.db.personalBests.longestUptime then
+            ns.db.personalBests.longestUptime = ns.db.streaks.currentUptime
+        end
+    else
+        ns.db.streaks.uptimeStart = 0
+        ns.db.streaks.currentUptime = 0
+        root.cells.uptime.now:SetText(colorText("FF6B6B", "0s"))
     end
+    root.cells.uptime.session:SetText("-")
+    root.cells.uptime.all:SetText("-")
     
-    -- Rate Display - Positioned below stat rows
-    local rateLabel = f:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    rateLabel:SetPoint("TOPLEFT", 10, rowY)
-    rateLabel:SetText("Per Min:")
+    -- Update contribution score bar
+    local score = getContributionScore()
+    root.scoreBar:SetValue(score)
     
-    local healingRate = f:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-    healingRate:SetPoint("TOPLEFT", f, "TOPLEFT", col1X - 20, rowY)
-    healingRate:SetText("0")
+    -- Color bar based on performance
+    local r, g, b = 1, 0, 0
+    if grade.grade == "S" then r, g, b = 1, 0.84, 0
+    elseif grade.grade == "A" then r, g, b = 0, 1, 0
+    elseif grade.grade == "B" then r, g, b = 0, 0.75, 1
+    elseif grade.grade == "C" then r, g, b = 1, 1, 0
+    end
+    root.scoreBar:SetStatusBarColor(r, g, b, 0.8)
     
-    local manaRate = f:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-    manaRate:SetPoint("TOPLEFT", f, "TOPLEFT", col2X - 20, rowY)
-    manaRate:SetText("0")
-    
-    table.insert(textWidgets, { key = "rates", healing = healingRate, mana = manaRate })
-    
-    -- Tooltip for rate display (existing code)
-    local rateTooltipFrame = CreateFrame("Frame", nil, f)
-    rateTooltipFrame:SetSize(50, 20)
-    rateTooltipFrame:SetPoint("TOPLEFT", rateLabel, "TOPLEFT", -2, 2)
-    CreateTooltip(rateTooltipFrame, "Per Minute Rate", "Average healing and mana restoration per minute.")
-    
-    statsFrame = f
+    -- Check for achievements
+    checkAchievements()
+end
+
+UpdateRates = function()
+    local now = GetTime()
+    if ns.db.combat.inCombat then
+        local dt = now - (lastRateTime == 0 and now or lastRateTime)
+        if dt >= 1 then
+            local dh = ns.db.combat.healing - lastHealing
+            local dm = ns.db.combat.mana - lastMana
+            currentHPS = dh / dt
+            currentMPS = dm / dt
+            root.cells.hps.now:SetText(string.format("%.1f", currentHPS))
+            root.cells.mps.now:SetText(string.format("%.1f", currentMPS))
+            lastRateTime = now
+            lastHealing = ns.db.combat.healing
+            lastMana = ns.db.combat.mana
+        end
+    else
+        currentHPS, currentMPS = 0, 0
+        root.cells.hps.now:SetText("0")
+        root.cells.mps.now:SetText("0")
+    end
+    root.cells.hps.session:SetText("-")
+    root.cells.hps.all:SetText("-")
+    root.cells.mps.session:SetText("-")
+    root.cells.mps.all:SetText("-")
+end
+
+--=============================
+-- Stat mutation helpers
+--=============================
+local function AddStat(stat, amount)
+    if not amount or amount <= 0 then return end
+    ns.db.combat[stat] = (ns.db.combat[stat] or 0) + amount
+    ns.db.session[stat] = (ns.db.session[stat] or 0) + amount
+    ns.db.allTime[stat] = (ns.db.allTime[stat] or 0) + amount
     UpdateDisplay()
-    return f
 end
 
-------------------------------
--- 7. Dropdown Menu         --
-------------------------------
-function LWSDropDownMenu_Initialize(frame, level)
-    level = level or 1
-    local info = UIDropDownMenu_CreateInfo()
-    
-    if level == 1 then
-        -- Main menu items (level 1)
-        info.text = "Light & Wisdom Stats Options"
-        info.isTitle = true
-        info.notCheckable = true
-        UIDropDownMenu_AddButton(info, level)
+-- Define ResetCombat function
+ResetCombat = function()
+    -- Show combat summary if significant
+    if ns.db.combat.healing > 100 or ns.db.combat.mana > 50 then
+        local healPots = getHealthPotEquivalent(ns.db.combat.healing)
+        local manaPots = getManaPotEquivalent(ns.db.combat.mana)
+        local grade = getPerformanceGrade(currentHPS + currentMPS * 1.5)
         
-        info.isTitle = false
-        info.disabled = false
-        info.notCheckable = true
-        
-        -- Toggle window option
-        info.text = "Toggle Window"
-        info.func = function() statsFrame:SetShown(not statsFrame:IsShown()) end
-        UIDropDownMenu_AddButton(info, level)
-        
-        -- Lock/unlock window option (now redundant with hover button, but keep for accessibility?)
-        -- Or repurpose/remove. Let's keep it for now.
-        info.text = LWS_DB.locked and "Unlock Window" or "Lock Window" -- Dynamic text
-        info.func = function()
-            -- Call the hover button's OnClick logic to keep things consistent
-            if statsFrame and statsFrame.hoverLockBtn then
-                statsFrame.hoverLockBtn:Click() 
-            end
-            -- Fallback if button doesn't exist for some reason
-            -- LWS_DB.locked = not LWS_DB.locked
-            -- if statsFrame then statsFrame.headerTexture:SetShown(not LWS_DB.locked) end
-            -- print("Light & Wisdom Stats Frame " .. (LWS_DB.locked and "|cFFFF0000Locked|r" or "|cFF00FF00Unlocked|r"))
-        end
-        UIDropDownMenu_AddButton(info, level)
-        
-        -- Reset Stats submenu option (Moved from 'R' button)
-        info.text = "Reset Stats"
-        info.hasArrow = true       -- Indicates this item has a submenu
-        info.notCheckable = true
-        info.value = "RESET_MENU"  -- Value to identify this submenu
-        info.func = nil            -- No function for menu items with submenus
-        UIDropDownMenu_AddButton(info, level)
-
-        -- Add Scale option here? Or keep as slash command only. Keep as slash for now.
-        
-    elseif level == 2 then
-        -- Submenu items (level 2)
-        -- Check which submenu we're showing based on the parent menu value
-        if UIDROPDOWNMENU_MENU_VALUE == "RESET_MENU" then
-            info.text = "Reset Which Stats?" -- Submenu Title
-            info.isTitle = true
-            info.notCheckable = true
-            UIDropDownMenu_AddButton(info, level)
-
-            info.isTitle = false
-            info.notCheckable = true
-            info.hasArrow = false -- These are action items
-            
-            -- Reset Combat Stats option
-            info.text = "Reset Combat Stats"
-            info.func = function()
-                LWS_DB.combat = { healing = 0, mana = 0, startTime = GetTime(), inCombat = LWS_DB.combat.inCombat }
-                LWS_DB.rates = { healing = 0, mana = 0 } -- Also reset rates tied to combat
-                UpdateDisplay()
-                print("|cFF00FF96Light & Wisdom Stats:|r Combat stats reset")
-            end
-            UIDropDownMenu_AddButton(info, level)
-            
-            -- Reset Session Stats option
-            info.text = "Reset Session Stats"
-            info.func = function()
-                LWS_DB.session = { healing = 0, mana = 0, startTime = GetTime() }
-                UpdateDisplay()
-                print("|cFF00FF96Light & Wisdom Stats:|r Session stats reset")
-            end
-            UIDropDownMenu_AddButton(info, level)
-            
-            -- Reset All-Time Stats option
-            info.text = "Reset All-Time Stats"
-            info.func = function()
-                LWS_DB.allTime = { healing = 0, mana = 0 }
-                UpdateDisplay()
-                print("|cFF00FF96Light & Wisdom Stats:|r All-Time stats reset")
-            end
-            UIDropDownMenu_AddButton(info, level)
-        end
-        -- Add other submenus here if needed using elseif UIDROPDOWNMENU_MENU_VALUE == "OTHER_MENU"
+        print(string.format("|cFF00FF96L&W Combat:|r Grade %s - Saved %d heal pots, %d mana pots!", 
+            grade.grade, healPots, manaPots))
     end
+    
+    ns.db.combat.healing = 0
+    ns.db.combat.mana = 0
+    ns.db.combat.startTime = GetTime()
+    ns.db.combat.inCombat = true
+    lastRateTime = 0
+    lastHealing, lastMana = 0, 0
+    currentHPS, currentMPS = 0, 0
+    UpdateDisplay()
 end
 
-------------------------------
--- 8. Combat & Event Hooks  --
-------------------------------
-local eventHandlers = {
-    PLAYER_LOGIN = function()
-        CreateUI()
-        CreateFrame("Frame", "LWSDropDownMenu", UIParent, "UIDropDownMenuTemplate")
-        UIDropDownMenu_Initialize(LWSDropDownMenu, LWSDropDownMenu_Initialize)
-        minimapButton = CreateMinimapButton()
-        UpdateMinimapButtonPosition()
-        
-        -- Debug status message to confirm addon loaded correctly
-        print("|cFF00FF96Light & Wisdom Stats:|r Addon initialized and ready to track")
-    end,
-    
-    COMBAT_LOG_EVENT_UNFILTERED = function()
-        local timestamp, subEvent, _, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, 
-              destGUID, destName, destFlags, destRaidFlags = CombatLogGetCurrentEventInfo()
-        
-        -- Skip processing if not a relevant event (optimization)
-        if not (subEvent == "SPELL_AURA_APPLIED" or 
-                subEvent == "SPELL_AURA_REFRESH" or 
-                subEvent == "SPELL_AURA_REMOVED" or 
-                subEvent == "SPELL_HEAL" or 
-                subEvent == "SPELL_ENERGIZE") then
-            return
+--=============================
+-- Party membership helper
+--=============================
+function ns.IsPartyMember(guid)
+    if not guid then return false end
+    if guid == UnitGUID("player") then return true end
+    if IsInGroup() then
+        for i = 1, GetNumGroupMembers() do
+            local unit = (IsInRaid() and "raid"..i) or ("party"..i)
+            if UnitExists(unit) and guid == UnitGUID(unit) then return true end
         end
-        
-        -- Extract more info from combat log
-        local spellID, spellName, spellSchool, amount, overHeal, absorbed, powerType
-        
-        if subEvent == "SPELL_HEAL" then
-            -- Format for SPELL_HEAL: spellID, spellName, spellSchool, amount, overhealing, absorbed
-            spellID, spellName, spellSchool, amount, overHeal, absorbed = select(12, CombatLogGetCurrentEventInfo())
-        elseif subEvent == "SPELL_ENERGIZE" then
-            -- Format for SPELL_ENERGIZE: spellID, spellName, spellSchool, amount, powerType
-            spellID, spellName, spellSchool, amount, powerType = select(12, CombatLogGetCurrentEventInfo())
-        else
-            -- Format for aura events: spellID, spellName, spellSchool, auraType
-            spellID, spellName, spellSchool = select(12, CombatLogGetCurrentEventInfo())
-        end
-        
-        -- Debug logging for spellIDs during development
-        -- if spellName and (spellName:match("Judgement") or spellName:match("Light") or spellName:match("Wisdom")) then
-        --    print(subEvent, spellID, spellName)
-        -- end
-        
-        -- ===== JUDGEMENT OF LIGHT HEALING DETECTION =====
-        -- Classic Era JoL SpellID: 20343 = Judgement of Light heal proc
-        if subEvent == "SPELL_HEAL" and (spellID == 20343 or spellName == "Judgement of Light") and 
-           IsPartyMember(destGUID) then
-           
-            -- Calculate effective healing by subtracting overheal if it exists
-            local effectiveHealing = amount
-            if overHeal and type(overHeal) == "number" then
-                effectiveHealing = amount - overHeal
-            end
-            
-            if effectiveHealing > 0 then
-                UpdateStats("healing", effectiveHealing)
-                -- Debug for healing detection
-                -- print("JoL heal:", effectiveHealing)
-            end
-            
-        -- ===== JUDGEMENT OF WISDOM MANA RESTORATION DETECTION =====
-        -- Classic Era JoW SpellID: 20268 = Judgement of Wisdom mana proc
-        elseif subEvent == "SPELL_ENERGIZE" and (spellID == 20268 or spellName == "Judgement of Wisdom") and 
-               IsPartyMember(destGUID) and powerType == 0 then -- 0 = mana
-            
-            if amount > 0 then
-                UpdateStats("mana", amount)
-                -- Debug for mana detection
-                -- print("JoW mana:", amount)
-            end
-            
-        -- ===== DEBUFF APPLICATION TRACKING =====
-        elseif subEvent == "SPELL_AURA_APPLIED" or subEvent == "SPELL_AURA_REFRESH" then
-            -- Judgement of Light main rank spell IDs
-            if spellID == 20271 or spellID == 20185 or spellID == 20186 or 
-               spellID == 20344 or spellID == 20345 or spellID == 20346 or
-               (spellName and spellName:match("Judgement of Light")) then
-                LWS_DB.statusDebuffs.light = true
-                ThrottledUpdate()
-                -- Debug for JoL application
-                -- print("JoL applied:", spellID, spellName)
-            -- Judgement of Wisdom main rank spell IDs
-            elseif spellID == 20217 or spellID == 20268 or spellID == 20269 or 
-                   spellID == 20270 or spellID == 20354 or spellID == 20352 or spellID == 20353 or
-                   (spellName and spellName:match("Judgement of Wisdom")) then
-                LWS_DB.statusDebuffs.wisdom = true
-                ThrottledUpdate()
-                -- Debug for JoW application
-                -- print("JoW applied:", spellID, spellName)
-            end
-            
-        -- ===== DEBUFF REMOVAL TRACKING =====
-        elseif subEvent == "SPELL_AURA_REMOVED" then
-            -- Handle Judgement of Light removal
-            if spellID == 20271 or spellID == 20185 or spellID == 20186 or 
-               spellID == 20344 or spellID == 20345 or spellID == 20346 or
-               (spellName and spellName:match("Judgement of Light")) then
-                LWS_DB.statusDebuffs.light = false
-                ThrottledUpdate()
-                -- Debug for JoL removal
-                -- print("JoL removed:", spellID, spellName)
-            -- Handle Judgement of Wisdom removal
-            elseif spellID == 20217 or spellID == 20268 or spellID == 20269 or 
-                   spellID == 20270 or spellID == 20354 or spellID == 20352 or spellID == 20353 or
-                   spellID == 21183 or (spellName and spellName:match("Judgement of Wisdom")) then
-                LWS_DB.statusDebuffs.wisdom = false
-                ThrottledUpdate()
-                -- Debug for JoW removal
-                -- print("JoW removed:", spellID, spellName)
-            -- Handle generic Judgement removal which clears both effects
-            elseif spellID == 20271 or (spellName and spellName == "Judgement") then
-                LWS_DB.statusDebuffs.light = false
-                LWS_DB.statusDebuffs.wisdom = false
-                ThrottledUpdate()
-                -- Debug for general Judgement removal
-                -- print("Judgement removed:", spellID, spellName)
-            end
-        end
-    end,
+    end
+    return false
+end
 
-    PLAYER_REGEN_ENABLED = function() OnCombatEnd() end,
-    PLAYER_REGEN_DISABLED = function() OnCombatStart() end,
-    GROUP_ROSTER_UPDATE = function() UpdateDisplay() end,
-}
+--=============================
+-- Combat log parsing (JoL/JoW)
+--=============================
+local events = CreateFrame("Frame")
 
-frame:SetScript("OnEvent", function(self, event, ...)
-    if eventHandlers[event] then
-        eventHandlers[event](...)
+events:SetScript("OnEvent", function(self, event, ...)
+    if event == "COMBAT_LOG_EVENT_UNFILTERED" then
+        local ts, subevent,
+            _, srcGUID, srcName, _, _,
+            destGUID, destName, _, _,
+            spellID, spellName, _, amount, overheal, _, _, _, _, _, critical, powerType =
+                CombatLogGetCurrentEventInfo()
+
+        if subevent == "SPELL_HEAL" or subevent == "SPELL_PERIODIC_HEAL" then
+            if spellName == "Judgement of Light" and ns.IsPartyMember(destGUID) then
+                local eff = (amount or 0) - (overheal or 0)
+                if eff and eff > 0 then
+                    AddStat("healing", eff)
+                    
+                    -- Track per-player contribution
+                    if not ns.db.raidContribution[destName] then
+                        ns.db.raidContribution[destName] = {healing = 0, mana = 0}
+                    end
+                    ns.db.raidContribution[destName].healing = 
+                        ns.db.raidContribution[destName].healing + eff
+                end
+            end
+
+        elseif subevent == "SPELL_ENERGIZE" then
+            -- Enhanced JoW detection with debug info
+            if ns.db.settings.debugMode and powerType == 0 and amount and amount > 0 then
+                debugPrint("ENERGIZE:", spellName, "Amount:", amount, "PowerType:", powerType, "Target:", destName)
+            end
+            
+            -- Improved JoW detection with multiple spell name variants
+            if isJudgementOfWisdom(spellName) and ns.IsPartyMember(destGUID) and powerType == 0 then
+                debugPrint("JoW mana gain:", amount, "by", destName, "from", spellName)
+                AddStat("mana", amount or 0)
+                
+                -- Track per-player contribution
+                if not ns.db.raidContribution[destName] then
+                    ns.db.raidContribution[destName] = {healing = 0, mana = 0}
+                end
+                ns.db.raidContribution[destName].mana = 
+                    ns.db.raidContribution[destName].mana + (amount or 0)
+            end
+            
+        elseif subevent == "SPELL_AURA_APPLIED" or subevent == "SPELL_AURA_REFRESH" then
+            if spellName == "Judgement of Light" then
+                ns.db.statusDebuffs.light = true
+                UpdateDisplay()
+            elseif isJudgementOfWisdom(spellName) then
+                ns.db.statusDebuffs.wisdom = true
+                UpdateDisplay()
+                
+                -- Show detected spell name for debug purposes
+                if ns.db.settings.debugMode then
+                    debugPrint("JoW applied with name:", spellName)
+                end
+            end
+
+        elseif subevent == "SPELL_AURA_REMOVED" then
+            if spellName == "Judgement of Light" then
+                ns.db.statusDebuffs.light = false
+                UpdateDisplay()
+            elseif isJudgementOfWisdom(spellName) then
+                ns.db.statusDebuffs.wisdom = false
+                UpdateDisplay()
+            end
+        end
+
+    elseif event == "PLAYER_REGEN_DISABLED" then
+        ns.db.combat.inCombat = true
+        if ns.db.combat.startTime == 0 or (GetTime() - ns.db.combat.startTime) > 5 then
+            ResetCombat()
+        end
+
+    elseif event == "PLAYER_REGEN_ENABLED" then
+        ns.db.combat.inCombat = false
+        
+        -- Reset raid contribution tracking for next combat
+        ns.db.raidContribution = {}
     end
 end)
 
--- Register all events
-for event in pairs(eventHandlers) do
-    frame:RegisterEvent(event)
-end
+events:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+events:RegisterEvent("PLAYER_REGEN_DISABLED")
+events:RegisterEvent("PLAYER_REGEN_ENABLED")
 
-------------------------------
--- 9. Slash Command Support --
-------------------------------
+--=============================
+-- Enhanced slash commands
+--=============================
 SLASH_LWS1 = "/lw"
 SlashCmdList["LWS"] = function(msg)
-    local cmd, arg = strsplit(" ", msg:lower(), 2)
-    
-    if cmd == "toggle" then
-        statsFrame:SetShown(not statsFrame:IsShown())
-    elseif cmd == "lock" then
-        LWS_DB.locked = not LWS_DB.locked
-        statsFrame:EnableMouse(not LWS_DB.locked)
-        print("Light & Wisdom Stats Frame " .. (LWS_DB.locked and "|cFFFF0000Locked|r" or "|cFF00FF00Unlocked|r"))
-    elseif cmd == "scale" and arg then
-        local scale = tonumber(arg)
-        if scale and scale >= 0.5 and scale <= 2.0 then
-            LWS_DB.scale = scale
-            statsFrame:SetScale(scale)
-            print("Light & Wisdom Stats Frame Scale set to " .. scale)
-        else
-            print("Scale must be a number between 0.5 and 2.0")
+    msg = (msg or ""):lower()
+    if msg == "reset" then
+        ResetCombat(); UpdateDisplay(); print("|cFF00FF96L&W:|r Combat stats reset.")
+        
+    elseif msg == "stats" then
+        -- Show detailed statistics
+        print("|cFF00FF96Light & Wisdom Statistics|r")
+        print("Session Total: " .. ns.FormatNumber(ns.db.session.healing) .. " healing, " .. 
+              ns.FormatNumber(ns.db.session.mana) .. " mana")
+        
+        local healPots = getHealthPotEquivalent(ns.db.session.healing)
+        local manaPots = getManaPotEquivalent(ns.db.session.mana)
+        print("Resources Saved: " .. healPots .. " heal pots, " .. manaPots .. " mana pots")
+        
+        -- Show top beneficiaries
+        if next(ns.db.raidContribution) then
+            print("Top Beneficiaries (This Combat):")
+            local sorted = {}
+            for name, data in pairs(ns.db.raidContribution) do
+                table.insert(sorted, {name = name, total = data.healing + data.mana * 2})
+            end
+            table.sort(sorted, function(a,b) return a.total > b.total end)
+            for i = 1, math.min(3, #sorted) do
+                print("  " .. i .. ". " .. sorted[i].name .. ": " .. ns.FormatNumber(sorted[i].total))
+            end
         end
-    elseif cmd == "reset" then
-        if arg == "combat" then
-            LWS_DB.combat = { healing = 0, mana = 0, startTime = GetTime(), inCombat = LWS_DB.combat.inCombat }
-        elseif arg == "session" then
-            LWS_DB.session = { healing = 0, mana = 0, startTime = GetTime() }
-        elseif arg == "all" then
-            LWS_DB.allTime = { healing = 0, mana = 0 }
-        else
-            print("Please specify what to reset: combat, session, or all")
+        
+        -- Show achievements
+        print("|cFF00FF96Achievements:|r")
+        for _, ach in ipairs(ACHIEVEMENTS) do
+            local key = ach.name:gsub(" ", "_")
+            local status = ns.db.achievements[key] and "✓" or "✗"
+            print(string.format("  %s %s %s - %s", status, ach.icon, ach.name, ach.desc))
         end
+        
+    elseif msg == "lock" then
+        ns.db.locked = true
+        root:EnableMouse(false)
+        print("|cFF00FF96L&W:|r Frame locked (click-through enabled)")
         UpdateDisplay()
-    elseif cmd == "minimap" then
-        minimapButton:SetShown(not minimapButton:IsShown())
-        print("Minimap button " .. (minimapButton:IsShown() and "shown" or "hidden"))
-    elseif cmd == "help" or cmd == "" then
+        
+    elseif msg == "unlock" then
+        ns.db.locked = false
+        root:EnableMouse(true)
+        print("|cFF00FF96L&W:|r Frame unlocked (interaction enabled)")
+        UpdateDisplay()
+        
+    elseif msg:match("^alpha%s+[%d%.]+$") then
+        local alpha = tonumber(msg:match("alpha%s+([%d%.]+)"))
+        if alpha and alpha >= 0.3 and alpha <= 1.0 then
+            ns.db.alpha = alpha
+            root:SetAlpha(alpha)
+            print(string.format("|cFF00FF96L&W:|r Alpha set to %.1f", alpha))
+        else
+            print("|cFF00FF96L&W:|r Alpha must be between 0.3 and 1.0")
+        end
+        
+    elseif msg == "fade" then
+        ns.db.fadeEnabled = not ns.db.fadeEnabled
+        print("|cFF00FF96L&W:|r Fade " .. (ns.db.fadeEnabled and "enabled" or "disabled"))
+        UpdateDisplay()
+        
+    elseif msg == "debug" then
+        -- Toggle debug mode
+        ns.db.settings.debugMode = not ns.db.settings.debugMode
+        print("|cFF00FF96L&W:|r Debug mode " .. (ns.db.settings.debugMode and "enabled" or "disabled"))
+        if ns.db.settings.debugMode then
+            print("Combat log events for mana restoration will be displayed in chat.")
+        end
+        
+    elseif msg == "hide" then
+        root:Hide()
+    elseif msg == "show" then
+        root:Show()
+    elseif msg:match("^scale%s+[%d%.]+$") then
+        local num = tonumber(msg:match("scale%s+([%d%.]+)"))
+        if num and num >= 0.5 and num <= 2.0 then
+            ns.db.scale = num
+            root:SetScale(num)
+            print("|cFF00FF96L&W:|r Scale set to " .. num)
+        else
+            print("|cFF00FF96L&W:|r Scale must be between 0.5 and 2.0")
+        end
+    else
         print("|cFF00FF96Light & Wisdom Stats Help:|r")
-        print("/lw toggle - Show/hide window")
-        print("/lw lock - Lock/unlock window position")
-        print("/lw scale <number> - Set window scale (e.g., /lw scale 1.2)")
-        print("/lw reset [combat|session|all] - Reset specific counters")
-        print("/lw minimap - Toggle minimap button")
+        print("/lw stats - show detailed statistics & achievements")
+        print("/lw reset - reset current combat")
+        print("/lw lock - lock frame (click-through)")
+        print("/lw unlock - unlock frame")
+        print("/lw alpha <0.3-1.0> - set transparency")
+        print("/lw fade - toggle fade when not hovering")
+        print("/lw debug - toggle debug mode for combat log events")
+        print("/lw show | hide - show or hide window")
+        print("/lw scale <0.5-2.0> - set window scale")
     end
+end
+
+--=============================
+-- OnUpdate for rates
+--=============================
+root:SetScript("OnUpdate", function() UpdateRates() end)
+
+--=============================
+-- Init
+--=============================
+CreateMinimapButton()
+UpdateDisplay()
+print("|cFF00FF96Light & Wisdom Stats:|r Gamified Edition loaded! Type |cFFFFFF00/lw|r for options.")
+
+-- Show achievement status on login
+local achieved = 0
+for _, ach in ipairs(ACHIEVEMENTS) do
+    if ns.db.achievements[ach.name:gsub(" ", "_")] then
+        achieved = achieved + 1
+    end
+end
+if achieved > 0 then
+    print(string.format("|cFF00FF96L&W:|r Achievements: %d/%d unlocked", achieved, #ACHIEVEMENTS))
 end

@@ -288,7 +288,7 @@ function Ranker:OnEventHandler(frame, event, arg1, ...)
       if rankerObjective > maxObtainableRank then
         rankerObjective = lookupData.defaults.rankerObjective
       end
-      local limit = rankerObjective
+      local limit = lookupData.defaults.rankerObjective
       local honorIncrements = lookupData.honorIncrements
       if maxObtainableRank >= 5 and maxObtainableRank < 14 then limit = maxObtainableRank + 1 end
       if maxObtainableRank >= 9 and maxObtainableRank < 13 then limit = maxObtainableRank + 2 end

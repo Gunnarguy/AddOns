@@ -144,8 +144,10 @@ function Auctioneer:_init()
             return;
         end
 
-        -- We're only interested in items that we received
-        if (not GL:iEquals(Details.playerName, GL.User.name)) then
+        -- We're only interested in non bonus loot items that we ourselves received
+        if (Details.isBonusLoot
+            or not GL:iEquals(Details.playerName, GL.User.name)
+        ) then
             return;
         end
 
@@ -243,7 +245,7 @@ function Auctioneer:addToQueue(itemLink, identifier, open)
 
     -- Make sure the item actually exists
     local itemID = GL:getItemIDFromLink(itemLink);
-    if (not itemID or not GL:getItemInfoInstant(itemID)) then
+    if (not itemID or not GL.GetItemInfoInstant(itemID)) then
         return;
     end
 
@@ -698,7 +700,7 @@ end
 ---@param Bid table
 ---@return void
 function Auctioneer:announceBid(Bid)
-    local bidApprovedMessage = (L.CHAT["%s is the highest bidder (%s)"]):format(Bid.Bidder.name, GL:goldToMoney(Bid.bid));
+    local bidApprovedMessage = (L.CHAT["%s is the highest bidder - %s"]):format(Bid.Bidder.name, GL:goldToMoney(Bid.bid));
 
     GL.Ace:CancelTimer(self.BidAnnouncementThrottler);
 

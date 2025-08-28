@@ -9,6 +9,7 @@ local C = LibStub('C_Everywhere').Container
 local Frame = Addon.Frame:NewClass('Inventory')
 Frame.Title = LibStub('AceLocale-3.0'):GetLocale(ADDON).TitleBags
 Frame.ItemGroup = Addon.ContainerItemGroup
+Frame.BagButton = Addon.Bag
 Frame.Bags = Addon.InventoryBags
 Frame.PickupItem = C.PickupContainerItem
 Frame.MainMenuButtons = {
@@ -60,6 +61,14 @@ function Frame:GetItemInfo(bag, slot)
 			item.isPaid = C.IsBattlePayItem and C.IsBattlePayItem(bag, slot)
 		end
 		return item or Addon.None
+	end
+end
+
+function Frame:GetItemQuery(bag, slot, info)
+	if self:IsCached() then
+		return info.hyperlink
+	elseif info.itemID then
+		return {bagID = bag, slotIndex = slot}
 	end
 end
 

@@ -1,7 +1,7 @@
-## Interface: 110100, 110105
+## Interface: 110107
 
 ## Title: MobInfo2 |cFF00D1FFRetail
-## Version: 11.1.5
+## Version: 11.1.7
 ## IconTexture: Interface\CharacterFrame\TemporaryPortrait-Monster
 
 ## Author: ILeClerk
@@ -10,7 +10,7 @@
 ## SavedVariables: MobInfoConfig, MobInfoDB, MI2_ItemNameTable, MI2_CharTable, MI2_ZoneTable, MI2_UnitId2Name, MI2_CurrencyNameTable, MI2_DB, MI2_RecentLoots
 ## Dependencies: 
 ## OptionalDeps: LibStub, LibDeflate, LibSerialize, LibPeriodicTable-3.1, LibPeriodicTable-3.1-Tradeskill, LibDataBroker-1.1, LibDBIcon-1.0, HereBeDragons
-## X-Curse-Packaged-Version: 11.1.5
+## X-Curse-Packaged-Version: 11.1.7
 ## X-Curse-Project-Name: MobInfo2
 ## X-Curse-Project-ID: mobinfo2
 

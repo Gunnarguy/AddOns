@@ -47,7 +47,7 @@ end
 
 --[[ Startup ]]--
 
-function TipCounts:OnEnable()
+function TipCounts:OnLoad()
 	if Addon.sets.countItems then
 		if C_TooltipInfo then
 			TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item,  self.OnItem)
@@ -67,7 +67,7 @@ function TipCounts:OnEnable()
 		
 		self:UnregisterSignal('UPDATE_ALL')
 	else
-		self:RegisterSignal('UPDATE_ALL', 'OnEnable')
+		self:RegisterSignal('UPDATE_ALL', 'OnLoad')
 	end
 end
 

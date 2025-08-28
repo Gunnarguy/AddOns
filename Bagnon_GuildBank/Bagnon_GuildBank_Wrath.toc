@@ -3,9 +3,10 @@
 ## Author: Jaliborc (João Cardoso)
 ## X-License: All Rights Reserved
 ## Category: Bags & Inventory
+## Group: BagBrother
 
 ## Dependencies: Bagnon
-## Interface: 30403
+## Interface: 30404
 ## LoadOnDemand: 1
 
 ..\BagBrother\frames\guild\guild.xml

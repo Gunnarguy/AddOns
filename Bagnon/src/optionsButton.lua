@@ -4,13 +4,12 @@
 --]]
 
 local ADDON, Addon = ...
-local Toggle = Addon.Tipped:NewClass('OptionsToggle', 'Button', ADDON .. 'MenuButtonTemplate')
+local Toggle = Addon.Tipped:NewClass('OptionsToggle', 'Button', ADDON .. 'ButtonTemplate')
 local C = LibStub('C_Everywhere')
 
 function Toggle:New(parent)
 	local b = self:Super(Toggle):New(parent)
 	b.Icon:SetTexture('Interface/Icons/Trade_Engineering')
-	b:RegisterForClicks('anyUp')
 	return b
 end
 

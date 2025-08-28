@@ -39,6 +39,7 @@ local WatchFrameHook = QuestieLoader:ImportModule("WatchFrameHook")
 ---@type l10n
 local l10n = QuestieLoader:ImportModule("l10n")
 
+local GetItemInfo = C_Item.GetItemInfo or GetItemInfo
 local tableRemove = table.remove
 
 local QUEST_LOG_STATES = {
@@ -208,7 +209,7 @@ end
 ---@param questId number
 function _QuestEventHandler:HandleQuestAccepted(questId, isRetry)
     -- We first check the quest objectives and retry in the next QLU event if they are not correct yet
-    local cacheMiss, _ = QuestLogCache.CheckForChanges({ [questId] = true }, false)
+    local cacheMiss, _ = QuestLogCache.CheckForChanges({ [questId] = true })
     if cacheMiss then
         -- if cacheMiss, no need to check changes as only 1 questId
         Questie:Debug(Questie.DEBUG_INFO, "Objectives are not cached yet")
@@ -425,17 +426,25 @@ function _QuestEventHandler:UpdateAllQuests(doRetryWithoutChanges)
     for questId, data in pairs(questLog) do
         if data.state == QUEST_LOG_STATES.QUEST_ACCEPTED then
             questIdsToCheck[questId] = true
-
-            if (not QuestiePlayer.currentQuestlog[questId]) and QuestieDB.QuestPointers[questId] then
-                Questie:Error("Please report this error on Discord or GitHub. questLog of QuestEventHandler contains an accepted quest that is not in the players quest log.", questId)
-            end
         end
     end
 
-    local cacheMiss, changes = QuestLogCache.CheckForChanges(questIdsToCheck, true)
+    local cacheMiss, changes = QuestLogCache.CheckForChanges(questIdsToCheck)
 
     if next(changes) then
         for questId, objIds in pairs(changes) do
+            if (not QuestiePlayer.currentQuestlog[questId]) then
+                -- If quests are not in the cache right after login (e.g. the API is really slow), they are not added to the player's quest log.
+                -- We then add them to the player's quest log so they can be updated.
+                local quest = QuestieDB.GetQuest(questId)
+                if quest then
+                    Questie:Debug(Questie.DEBUG_INFO, "Quest:", questId, "is not in the player's quest log, but is in the questLog of QuestEventHandler")
+                    QuestiePlayer.currentQuestlog[questId] = quest
+                else
+                    Questie:Error("Quest", questId, "is not in the player's quest log and not in the QuestDB. Please report this on Github or Discord!")
+                end
+            end
+
             --Questie:Debug(Questie.DEBUG_INFO, "Quest:", questId, "objectives:", table.concat(objIds, ","), "will be updated")
             Questie:Debug(Questie.DEBUG_INFO, "Quest:", questId, "will be updated")
             QuestieQuest:SetObjectivesDirty(questId)

@@ -4,6 +4,8 @@ local QuestieReputation = QuestieLoader:CreateModule("QuestieReputation")
 local QuestieQuest = QuestieLoader:ImportModule("QuestieQuest")
 ---@type QuestieDB
 local QuestieDB = QuestieLoader:ImportModule("QuestieDB")
+---@type Expansions
+local Expansions = QuestieLoader:ImportModule("Expansions")
 
 local playerReputations = {}
 
@@ -24,8 +26,8 @@ function QuestieReputation:Update(isInit)
     local newFaction = false
 
     for i=1, GetNumFactions() do
-        local name, _, standingId, _, _, barValue, _, _, isHeader, _, _, _, _, factionID, _, _ = GetFactionInfo(i)
-        if not isHeader and factionID then
+        local name, description, standingId, _, _, barValue, _, _, _, _, _, _, _, factionID, _, _ = GetFactionInfo(i)
+        if factionID and description then -- we use description instead of isHeader because some factions are header (e.g. The Tillers)
             local previousValues = playerReputations[factionID]
             if (not previousValues) then
                 --? Reset all autoBlacklisted quests if a faction gets discovered
@@ -146,7 +148,7 @@ function QuestieReputation.GetReputationReward(questId)
         return {}
     end
 
-    if (not Questie.IsCata) then
+    if Expansions.Current <= Expansions.Wotlk then
         return reputationReward
     end
 
@@ -160,7 +162,8 @@ function QuestieReputation.GetReputationReward(questId)
         if entry[2] > 0 then
             reward = reputationRewards[entry[2]] or entry[2]
         elseif entry[2] < 0 then
-            reward = -reputationRewards[-entry[2]] or entry[2]
+            local rewardEntry = reputationRewards[-entry[2]]
+            reward = rewardEntry and -rewardEntry or entry[2]
         end
 
         if reward then

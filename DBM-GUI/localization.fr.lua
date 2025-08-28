@@ -16,10 +16,19 @@ L.OTabWorld							= "Boss mondiaux"--Since there are so many world mods, enough 
 L.OTabScenarios						= "Scénarios"--Future use, will be used for scenarios and delves, likely after there are more than 2 mods (so probably 12.x or later)
 L.OTabPlugins						= "Autre"--Scenarios, PVP, Delves (11.x), Solo/Challenge content (torghast, mage tower, etc)
 L.OTabOptions						= "Options"
+--L.OTabTools							= "Tools"--Such as break timer button, durability checks, latency checks, keystone checks (in future)
 L.OTabAbout							= "À propos"
 
-L.FOLLOWER							= "Sujet"--i.e. the new dungeon type in 10.2.5. I haven't found a translated string yet
-L.STORY					    		= "Histoire"--i.e. the new dungeon type in 11.0.0. I haven't found a translated string yet
+--Main Tab, Tools checks
+--L.Tools_LatencyCheck				= "Latency Check"
+--L.Tools_DurabilityCheck				= "Durability Check"
+--L.Tools_KeystoneCheck				= "Keystone Check"
+
+--L.Tools_BreakTimer					= "Start Break Timer"
+--L.Tools_PizzaTimer					= "Start Generic Timer"
+
+--L.Tools_Duration					= "Duration"
+--L.Tools_Message						= "Timer Message"
 
 L.TabCategory_CURRENT_SEASON		= "Saison en cours"
 
@@ -159,6 +168,11 @@ L.AutoAcceptFriendInvite	= "Acceptation auto des invitations venant d'un ami"
 L.AutoAcceptGuildInvite		= "Acceptation auto des invitations venant d'un membre de la guilde"
 L.Area_Advanced				= "Options avancées"
 L.FakeBW					= "Prétendre utiliser BigWigs lors des vérifications de versions au lieu de DBM (utile pour les guildes qui forcent l'utilisation de BigWigs)"
+--
+L.Area_Tooltip              = "Intégration à l'infobulle"
+L.EnableTooltip             = "Ajouter les statistiques de DBM aux infobulles des boss pris en charge"
+L.EnableTooltipInCombat     = "Afficher les informations de l'infobulle en combat"
+L.EnableTooltipHeader       = "Inclure l’en-tête DBM dans l’infobulle"
 
 -- Panel: Profiles
 L.Panel_Profile				= "Profils"

@@ -105,7 +105,7 @@ function Auctioneer:fillFromInventory(minimumQuality, minimumItemLevel, includeB
         end
 
         -- Exclude projectiles (bullets and arrows)
-        local classID = select(12, GL:getItemInfo(itemID));
+        local classID = select(12, GL.GetItemInfo(itemID));
         if (classID == Enum.ItemClass.Projectile) then
             return;
         end
@@ -1138,9 +1138,9 @@ function Auctioneer:finish(announcePot)
         return;
     end
 
-    local totalPot = GDKPPot:total();
+    local totalPot = GDKPPot:humanTotal();
     if (totalPot) then
-        GL:sendChatMessage((L.CHAT["Multi-auction finished. The pot now holds %s"]):format(GL:goldToMoney(totalPot)), "GROUP");
+        GL:sendChatMessage((L.CHAT["Multi-auction finished. The pot now holds %s"]):format(totalPot), "GROUP");
     end
 end
 

@@ -42,6 +42,11 @@ if (type == "classic") then
 	L["disableOnlyNefRendBelowMaxLevelNumTitle"] = "Ony/Nef/Desgarro nivel mínimo";
 	L["disableOnlyNefRendBelowMaxLevelNumDesc"] = "¿Debajo de qué nivel deberíamos ocultar los iconos Ony/Nef/Desgarro del mapa de la ciudad y el tooltip del botón del minimapa?";
 	L["Rend Log"] = "Desgarro";
+	L["Rend log adjusted"] = "Registro de Desgarro ajustado";
+	L["flashDisableRendTitle"] = "Desactivar destello de Desgarro";
+	L["flashDisableRendDesc"] = "Anular para desactivar todos los eventos de destello del cliente relacionados con Desgarro.";
+	L["soundsFirstYellRendTitle"] = "Beneficio de Desgarro entrante";
+	L["soundsFirstYellRendDesc"] = "Sonido que se reproduce cuando se entrega la cabeza de Desgarro y tienes unos segundos antes de que se active el beneficio (primer grito del PNJ).";
 else
     L["Rallying Cry of the Dragonslayer"] = "Berrido de convocación del matadragones"
 	L["Warchief's Blessing"] = "Bendición del Jefe de Guerra";
@@ -69,6 +74,11 @@ else
 	L["disableOnlyNefRendBelowMaxLevelNumTitle"] = "Ony/Nef/Rend nivel mínimo";
 	L["disableOnlyNefRendBelowMaxLevelNumDesc"] = "¿Debajo de qué nivel deberíamos ocultar los iconos Ony/Nef/Rend del mapa de la ciudad y el tooltip del botón del minimapa?";
 	L["Rend Log"] = "Rend";
+	L["Rend log adjusted"] = "Registro de Rend ajustado";
+	L["flashDisableRendTitle"] = "Desactivar destello de Rend";
+	L["flashDisableRendDesc"] = "Anular para desactivar todos los eventos de destello del cliente relacionados con Rend.";
+	L["soundsFirstYellRendTitle"] = "Beneficio de Rend entrante";
+	L["soundsFirstYellRendDesc"] = "Sonido que se reproduce cuando se entrega la cabeza de Rend y tienes unos segundos antes de que se active el beneficio (primer grito del PNJ).";
 end
 
 --Rend buff aura name.
@@ -254,7 +264,7 @@ L["Resist Fire"] = "Resistir al Fuego"; -- LBRS fire resist buff.
 L["Blessing of Blackfathom"] = "Bendición de Brazanegra";
 
 L["zan"] = "Zandalar";
-L["zanFirstYellMsg"] = "Zandalar realizará en %s segundos.";
+L["zanFirstYellMsg"] = "Zandalar caerá en %s segundos.";
 L["zanBuffDropped"] = "Espíritu de Zandalar (Hakkar) ha realizado.";
 L["singleSongflowerMsg"] = "Cantaflor en %s aparecerá en %s."; -- Songflower at Bloodvenom Post spawns at 1pm.
 L["spawn"] = "Aparición"; --Used in Felwood map marker tooltip (03:46pm spawn).
@@ -1141,3 +1151,46 @@ L["No characters with buffs found."] = "No se encontraron personajes con benefic
 L["Unknown Layer"] = "Capa desconocida";
 
 L["Active"] = "Activo";
+L["noZonesMappedYet"] = "Aún no se han mapeado zonas desde el reinicio del servidor.";
+
+L["flashDisableOnyTitle"] = "Desactivar destello de Ony";
+L["flashDisableOnyDesc"] = "Anular para desactivar todos los eventos de destello del cliente relacionados con Ony/Nef.";
+
+L["flashDisableZanTitle"] = "Desactivar destello de Zan";
+L["flashDisableZanDesc"] = "Anular para desactivar todos los eventos de destello del cliente relacionados con Zandalar.";
+
+L["soundsFirstYellTitle"] = "Otros beneficios entrantes";
+L["soundsFirstYellDesc"] = "Sonido que se reproduce cuando se entregan beneficios de Zandalar/otros y tienes unos segundos antes de que se active el beneficio (primer grito del PNJ).";
+
+L["soundsFirstYellOnyTitle"] = "Beneficio de Ony/Nef entrante";
+L["soundsFirstYellOnyDesc"] = "Sonido que se reproduce cuando se entrega la cabeza de Ony/Nef y tienes unos segundos antes de que se active el beneficio (primer grito del PNJ).";
+
+L["showDisableLayerButtonsTitle"] = "Mostrar botón para desactivar capa"
+L["showDisableLayerButtonsDesc"] = "Muestra el botón para desactivar capa en el marco de temporizadores/capas.";
+
+L["Show Quest Handins Only"] = "Mostrar entregas de misiones";
+L["showQuestHandinsTooltip"] = "Muestra solo entradas del registro al entregar la misión de Desgarro.";
+
+L["resetFramesTitle"] = "Restablecer ventanas";
+L["resetFramesDesc"] = "Haz clic aquí para restablecer todas las posiciones de las ventanas al centro de la pantalla.";
+
+L["buffHasNoCooldown"] = "Este beneficio no activa un tiempo de reutilización";
+L["noCooldown"] = "Sin tiempo de reutilización";
+
+L["Molten Core"] = "Núcleo de Magma";
+L["Onyxia's Lair"] = "Guarida de Onyxia";
+L["Blackwing Lair"] = "Guarida de Alanegra";
+L["Naxxramas"] = "Naxxramas";
+L["Karazhan"] = "Karazhan";
+L["The Shattered Halls"] = "Las Salas Arrasadas";
+L["Serpentshrine Cavern"] = "Caverna Santuario Serpiente";
+L["The Arcatraz"] = "El Arcatraz";
+L["Black Morass"] = "La Ciénaga Negra";
+L["Battle of Mount Hyjal"] = "Batalla del Monte Hyjal";
+L["Black Temple"] = "Templo Oscuro";
+L["Hellfire Citadel"] = "Ciudadela del Fuego Infernal";
+L["Coilfang Reservoir"] = "Reserva Colmillo Torcido";
+L["Shadow Labyrinth"] = "Laberinto de las Sombras";
+L["Auchindoun"] = "Auchindoun";
+L["Tempest Keep"] = "El Castillo de la Tempestad";
+L["Caverns of Time"] = "Cavernas del Tiempo";

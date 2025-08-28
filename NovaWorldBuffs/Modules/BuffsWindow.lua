@@ -17,6 +17,7 @@ NWBbuffListFrame:SetMovable(true);
 NWBbuffListFrame:EnableMouse(true);
 tinsert(UISpecialFrames, "NWBbuffListFrame");
 NWBbuffListFrame:SetPoint("CENTER", UIParent, 20, 120);
+NWBbuffListFrame:SetClampedToScreen(true);
 NWBbuffListFrame:SetBackdrop({bgFile = "Interface\\Buttons\\WHITE8x8",insets = {top = 0, left = 0, bottom = 0, right = 0}});
 NWBbuffListFrame:SetBackdropColor(0,0,0,.6);
 NWBbuffListFrame.CharCount:Hide();
@@ -867,8 +868,8 @@ function NWB:recalcBuffsLineFramesTooltip(obj)
 								line = line .. " ";
 								obj.tooltip.fsCalc:SetText(line);
 							end
-							text = text .. line .. " " .. GetCoinTextureString(v.gold, 10);
-							--text = text .. "\n|c" .. classColor .. k .. "|r " .. GetCoinTextureString(v.gold, 10);
+							text = text .. line .. " " .. C_CurrencyInfo.GetCoinTextureString(v.gold, 10);
+							--text = text .. "\n|c" .. classColor .. k .. "|r " .. C_CurrencyInfo.GetCoinTextureString(v.gold, 10);
 						end
 					end
 				end
@@ -880,7 +881,7 @@ function NWB:recalcBuffsLineFramesTooltip(obj)
 				line = line .. " ";
 				obj.tooltip.fsCalc:SetText(line);
 			end
-			line = line .. " " .. GetCoinTextureString(total, 10);
+			line = line .. " " .. C_CurrencyInfo.GetCoinTextureString(total, 10);
 			obj.tooltip.fs:SetText(text .. line);
 		elseif (type == "char") then
 			if (data.playerName) then
@@ -927,7 +928,7 @@ function NWB:recalcBuffsLineFramesTooltip(obj)
 							.. color2 .. data.totalBagSlots .. "|r";
 				end
 				if (data.gold) then
-					text = text .. "\n" .. color1 .. L["Gold"] .. ":|r " .. color2 .. GetCoinTextureString(data.gold, 10) .. "|r";
+					text = text .. "\n" .. color1 .. L["Gold"] .. ":|r " .. color2 .. C_CurrencyInfo.GetCoinTextureString(data.gold, 10) .. "|r";
 				end
 				local durabilityAverage = data.durabilityAverage or 100;
 				local displayDurability;
@@ -1002,71 +1003,71 @@ function NWB:recalcBuffsLineFramesTooltip(obj)
 				local attunements = "\n\n|cFFFFFF00" .. L["attunements"] .. "|r";
 				local foundAttune;
 				if (data.mcAttune) then
-					attunements = attunements .. "\n  " .. color1 .. "Molten Core|r";
+					attunements = attunements .. "\n  " .. color1 .. L["Molten Core"] .. "|r";
 					foundAttune = true;
 				end
 				if (data.onyAttune) then
-					attunements = attunements .. "\n  " .. color1 .. "Onyxia's Lair|r";
+					attunements = attunements .. "\n  " .. color1 .. L["Onyxia's Lair"] .. "|r";
 					foundAttune = true;
 				end
 				if (data.bwlAttune) then
-					attunements = attunements .. "\n  " .. color1 .. "Blackwing Lair|r";
+					attunements = attunements .. "\n  " .. color1 .. L["Blackwing Lair"] .. "|r";
 					foundAttune = true;
 				end
 				if (data.naxxAttune) then
-					attunements = attunements .. "\n  " .. color1 .. "Naxxramas|r";
+					attunements = attunements .. "\n  " .. color1 .. L["Naxxramas"] .. "|r";
 					foundAttune = true;
 				end
 				if (data.karaAttune) then
-					attunements = attunements .. "\n  " .. color1 .. "Karazhan|r";
+					attunements = attunements .. "\n  " .. color1 .. L["Karazhan"] .. "|r";
 					foundAttune = true;
 				end
 				if (data.shatteredHallsAttune) then
-					attunements = attunements .. "\n  " .. color1 .. "The Shattered Halls|r"; --Key.
+					attunements = attunements .. "\n  " .. color1 .. L["The Shattered Halls"] .. "|r"; --Key.
 					foundAttune = true;
 				end
 				if (data.serpentshrineAttune) then
-					attunements = attunements .. "\n  " .. color1 .. "Serpentshrine Cavern|r";
+					attunements = attunements .. "\n  " .. color1 .. L["Serpentshrine Cavern"] .. "|r";
 					foundAttune = true;
 				end
 				if (data.arcatrazAttune) then
-					attunements = attunements .. "\n  " .. color1 .. "The Arcatraz|r"; --Key.
+					attunements = attunements .. "\n  " .. color1 .. L["The Arcatraz"] .. "|r"; --Key.
 					foundAttune = true;
 				end
 				if (data.blackMorassAttune) then
-					attunements = attunements .. "\n  " .. color1 .. "Black Morass|r";
+					attunements = attunements .. "\n  " .. color1 .. L["Black Morass"] .. "|r";
 					foundAttune = true;
 				end
 				if (data.hyjalAttune) then
-					attunements = attunements .. "\n  " .. color1 .. "Battle of Mount Hyjal|r";
+					attunements = attunements .. "\n  " .. color1 .. L["Battle of Mount Hyjal"] .. "|r";
 					foundAttune = true;
 				end
 				if (data.blackTempleAttune) then
-					attunements = attunements .. "\n  " .. color1 .. "Black Temple|r";
+					attunements = attunements .. "\n  " .. color1 .. L["Black Temple"] .. "|r";
 					foundAttune = true;
 				end
 				if (data.hellfireCitadelAttune) then
-					attunements = attunements .. "\n  " .. color1 .. "Hellfire Citadel|r"; --Key.
+					attunements = attunements .. "\n  " .. color1 .. L["Hellfire Citadel"] .. "|r"; --Key.
 					foundAttune = true;
 				end
 				if (data.coilfangAttune) then
-					attunements = attunements .. "\n  " .. color1 .. "Coilfang Reservoir|r"; --Key.
+					attunements = attunements .. "\n  " .. color1 .. L["Coilfang Reservoir"] .. "|r"; --Key.
 					foundAttune = true;
 				end
 				if (data.shadowLabAttune) then
-					attunements = attunements .. "\n  " .. color1 .. "Shadow Labyrinth|r"; --Key.
+					attunements = attunements .. "\n  " .. color1 .. L["Shadow Labyrinth"] .. "|r"; --Key.
 					foundAttune = true;
 				end
 				if (data.auchindounAttune) then
-					attunements = attunements .. "\n  " .. color1 .. "Auchindoun|r"; --Key.
+					attunements = attunements .. "\n  " .. color1 .. L["Auchindoun"] .. "|r"; --Key.
 					foundAttune = true;
 				end
 				if (data.tempestKeepAttune) then
-					attunements = attunements .. "\n  " .. color1 .. "Tempest Keep|r"; --Key
+					attunements = attunements .. "\n  " .. color1 .. L["Tempest Keep"] .. "|r"; --Key
 					foundAttune = true;
 				end
 				if (data.cavernAttune) then
-					attunements = attunements .. "\n  " .. color1 .. "Caverns of Time|r"; --Key.
+					attunements = attunements .. "\n  " .. color1 .. L["Caverns of Time"] .. "|r"; --Key.
 					foundAttune = true;
 				end
 				if (foundAttune) then

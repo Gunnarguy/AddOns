@@ -1,5 +1,5 @@
 --[=====[
-		## XP MultiBar ver. 11.1.1-final
+		## XP MultiBar ver. 11.1.2-final
 		## XPMultiBar_ReputationApi.lua - module
 		Legacy Reputation API façade module for XPMultiBar addon
 --]=====]

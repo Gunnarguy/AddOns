@@ -248,6 +248,7 @@
 				["0.58:0.65:0.43:0.67:0.51:0.49:0.52:0.22"] = 644, -- Morgan's Vigil, Stormwind, Ironforge, Chillwind Camp
 				["0.58:0.65:0.43:0.67:0.43:0.93"] = 382, -- Morgan's Vigil, Stormwind, Booty Bay
 				["0.58:0.65:0.43:0.67:0.51:0.49:0.70:0.16"] = 701, -- Morgan's Vigil, Stormwind, Ironforge, Light's Hope Chapel
+				["0.58:0.65:0.56:0.70:0.41:0.75:0.43:0.93"] = 378, -- Morgan's Vigil, Lakeshire, Sentinel Hill, Booty Bay
 
 				-- Alliance: Nethergarde Keep (Blasted Lands)
 				["0.61:0.78:0.51:0.75:0.43:0.93"] = 260, -- Nethergarde Keep, Darkshire, Booty Bay
@@ -354,7 +355,7 @@
 				["0.48:0.30:0.51:0.49:0.51:0.57"] = 248, -- Southshore, Ironforge, Thorium Point
 
 				-- Alliance: Stormwind (Elwynn Forest)
-				["0.43:0.67:0.43:0.93"] = 245, -- Stormwind, Booty Bay
+				["0.43:0.67:0.43:0.93"] = 245, -- Stormwind, Booty Bay (Chris O'Conor reported 274)
 				["0.43:0.67:0.41:0.75"] = 78, -- Stormwind, Sentinel Hill (Galleon Brinton reported 102, Eino Virtanen and wy1337@gmx.de reported 113)
 				["0.43:0.67:0.51:0.75"] = 116, -- Stormwind, Darkshire
 				["0.43:0.67:0.61:0.78"] = 176, -- Stormwind, Nethergarde Keep
@@ -637,7 +638,7 @@
 				["0.60:0.81:0.64:0.67:0.40:0.51"] = 480, -- Gadgetzan, Theramore, Nijel's Point
 				["0.60:0.81:0.64:0.67:0.40:0.51:0.39:0.40"] = 600, -- Gadgetzan, Theramore, Nijel's Point, Stonetalon Peak (was 692, changed to 600 by Michael Howat, Ruben Fernandez Orduña and Peter Roach)
 				["0.60:0.81:0.64:0.67:0.61:0.40:0.46:0.40:0.43:0.25"] = 688, -- Gadgetzan, Theramore, Talrendis Point, Astranaar, Auberdine
-				["0.60:0.81:0.64:0.67:0.61:0.40:0.46:0.40:0.43:0.25:0.42:0.16"] = 772, -- Gadgetzan, Theramore, Talrendis Point, Astranaar, Auberdine, Rut'theran Village
+				["0.60:0.81:0.64:0.67:0.61:0.40:0.46:0.40:0.43:0.25:0.42:0.16"] = 772, -- Gadgetzan, Theramore, Talrendis Point, Astranaar, Auberdine, Rut'theran Village (Aylin Shokri reported 811)
 				["0.60:0.81:0.64:0.67:0.40:0.51:0.43:0.25:0.42:0.16"] = 847, -- Gadgetzan, Theramore, Nijel's Point, Auberdine, Rut'theran Village
 				["0.60:0.81:0.64:0.67:0.61:0.40:0.53:0.26"] = 671, -- Gadgetzan, Theramore, Talrendis Point, Talonbranch Glade
 				["0.60:0.81:0.64:0.67:0.61:0.40:0.65:0.23:0.55:0.21"] = 688, -- Gadgetzan, Theramore, Talrendis Point, Everlook, Moonglade
@@ -940,6 +941,7 @@
 				["0.53:0.26:0.61:0.40:0.46:0.40"] = 434, -- Talonbranch Glade, Talrendis Point, Astranaar
 				["0.53:0.26:0.43:0.25:0.31:0.69:0.48:0.70"] = 815, -- Talonbranch Glade, Auberdine, Feathermoon, Thalanaar
 				["0.53:0.26:0.43:0.25:0.64:0.67:0.60:0.81"] = 1016, -- Talonbranch Glade, Auberdine, Theramore, Gadgetzan
+				["0.53:0.26:0.43:0.25:0.64:0.67:0.48:0.70"] = 1021, -- Talonbranch Glade, Auberdine, Theramore, Thalanaar
 
 				-- Alliance: Talrendis Point (Azshara)
 				["0.61:0.40:0.61:0.55:0.64:0.67:0.60:0.81"] = 391, -- Talrendis Point, Ratchet, Theramore, Gadgetzan
@@ -1013,7 +1015,7 @@
 				["0.48:0.70:0.64:0.67:0.40:0.51:0.43:0.25:0.53:0.26"] = 965, -- Thalanaar, Theramore, Nijel's Point, Auberdine, Talonbranch Glade
 
 				-- Alliance: Theramore (Dustwallow Marsh)
-				["0.64:0.67:0.60:0.81"] = 157, -- Theramore, Gadgetzan
+				["0.64:0.67:0.60:0.81"] = 157, -- Theramore, Gadgetzan (Darius Does it All reported 184)
 				["0.64:0.67:0.60:0.81:0.50:0.76"] = 261, -- Theramore, Gadgetzan, Marshal's Refuge
 				["0.64:0.67:0.48:0.70"] = 162, -- Theramore, Thalanaar (Le Mage reported 181)
 				["0.64:0.67:0.60:0.81:0.50:0.76:0.42:0.79"] = 354, -- Theramore, Gadgetzan, Marshal's Refuge, Cenarion Hold

@@ -2,7 +2,7 @@
 ## Title: Ranker
 ## Notes: Your helper through the Classic Era honor system.
 ## Author: GrumpyPlayers (also known as <SG>Soul)
-## Version: 2025.04.19.01
+## Version: 2025.05.25.01
 
 ## SavedVariables: rankerData, rankerVersion, rankerOptions
 ## SavedVariablesPerCharacter: rankerObjective, rankerLimit

@@ -120,7 +120,7 @@ function Auction:_initializeQueue()
     -- We're not allowed to populate the queue
     if (not Auctioneer:allowedToBroadcast()
         or (GL.User.isInGroup
-            and GetLootMethod() == "master"
+            and GL.GetLootMethod() == "master"
             and not GL.User.isMasterLooter
         )
     ) then
@@ -545,7 +545,7 @@ function Auction:sanitize(Instance)
     end
 
     --[[ Make sure the item ID is valid ]]
-    SanitizedAuction.itemID = GL:getItemInfoInstant(Instance.itemID);
+    SanitizedAuction.itemID = GL.GetItemInfoInstant(Instance.itemID);
     if (not tonumber(SanitizedAuction.itemID)) then
         GL:xd("Auction:sanitize step 4 failed, contact support!");
         return false;
@@ -1156,7 +1156,7 @@ function Auction:announceStart(itemLink, minimumBid, minimumIncrement, duration,
     end
 
     local itemID = GL:getItemIDFromLink(itemLink) or 0;
-    if (itemID < 1 or not GL:getItemInfoInstant(itemID)) then
+    if (itemID < 1 or not GL.GetItemInfoInstant(itemID)) then
         self.waitingForStart = false;
         GL:warning(L["Invalid data provided for GDKP auction start!"]);
         return false;
@@ -1462,7 +1462,7 @@ function Auction:start(CommMessage)
         -- Announce auction start and stop
         if (self:startedByMe()) then
             if (Settings:get("GDKP.announceAuctionStart")) then
-                local announceMessage = (L.CHAT["Bid on %s. Minimum is %s, increment is %s. Use raid chat!"]):format(
+                local announceMessage = (L.CHAT["Bid on %s. Minimum is %s - increment is %s. Use raid chat!"]):format(
                     Details.link,
                     GL:goldToMoney(minimumBid),
                     GL:goldToMoney(minimumIncrement)

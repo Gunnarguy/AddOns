@@ -1,5 +1,5 @@
 --[=====[
-		## XP MultiBar ver. 11.1.1-final
+		## XP MultiBar ver. 11.1.2-final
 		## XPMultiBar_ReputationInfo.lua - module
 		Reputation info module for XPMultiBar addon
 --]=====]

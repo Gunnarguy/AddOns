@@ -3,19 +3,14 @@
 	All Rights Reserved
 --]]
 
-if not REAGENTBANK_CONTAINER then
+local DepositIntoBank = LibStub('C_Everywhere').Bank.AutoDepositItemsIntoBank
+if not DepositIntoBank and not DepositReagentBank then
 	return
 end
 
 local ADDON, Addon = (...):match('%w+'), _G[(...):match('%w+')]
 local L = LibStub('AceLocale-3.0'):GetLocale(ADDON)
 local DepositButton = Addon.Tipped:NewClass('DepositButton', 'Button', true)
-
-function DepositButton:New(...)
-	local b = self:Super(DepositButton):New(...)
-	b:RegisterForClicks('anyUp')
-	return b
-end
 
 function DepositButton:OnClick(button)
 	if button == 'RightButton' then
@@ -32,12 +27,16 @@ function DepositButton:OnClick(button)
 				end, 'bankAutoDepositReagents')
 		end)
 	else
-		if Addon.sets.depositReagents and IsReagentBankUnlocked() then
-			DepositReagentBank()
+		if Addon.sets.depositReagents then
+			if not IsReagentBankUnlocked then
+				DepositIntoBank(Enum.BankType.Character)
+			elseif IsReagentBankUnlocked() then
+				DepositReagentBank()
+			end
 		end
 
-		if Addon.sets.depositAccount then
-			C_Bank.AutoDepositItemsIntoBank(2)
+		if Addon.sets.depositAccount and DepositIntoBank then
+			DepositIntoBank(Enum.BankType.Account)
 		end
 
 		PlaySound(SOUNDKIT.UI_BAG_SORTING_01)

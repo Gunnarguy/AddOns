@@ -40,7 +40,18 @@ function NWB:checkEventStatus(event, type, subEvent, channel)
 	end]]
 	--Other specific events.
 	--NWB:debug("event check", event, type, subEvent, channel);
-	if (event == "sendGuildMsg") then
+	if (event == "doWarning") then
+		--doWarning are all timer countdown msgs.
+		if (type == "rend") then
+			--Only show rend timer warnings if there's only 1 layer on classic era, rend layer detection is too broken now.
+			if (NWB:GetLayerCount() < 2) then
+				return true;
+			end
+			return;
+		else
+			return true;
+		end
+	elseif (event == "sendGuildMsg") then
 		--NWB:debug("guild msg check", type, subEvent, channel);
 		--Blanket match all guild chat events attached to a buff type.
 		if (type == "rend") then
@@ -59,6 +70,7 @@ function NWB:checkEventStatus(event, type, subEvent, channel)
 		--Some of these guild msgs basically match the event types below that would send a guild msg.
 		--This is so the sender can ignore those events ineeded even if the player that saw the event isn;t up to date with the addon version.
 		--type here can also be used to pass a an extra arg for the "sendGuildMsg" event.
+		--There are only 1 and 10 minute guild msgs.
 		if (subEvent == "timer1" or subEvent == "timer10") then
 			return NWB:checkEventStatus("guildTimerMsg", type);
 		elseif (subEvent == "guildCommand") then
@@ -1050,7 +1062,7 @@ function NWB:setRendBuff(source, sender, zoneID, GUID, isAllianceAndLayered)
 					return;
 				end
 			else
-				if (GUID) then
+				if (GUID and NWB.isClassic) then
 					if (not NWB.data.layers[zoneID]) then
 						NWB:createNewLayer(zoneID, GUID);
 					end
@@ -1173,7 +1185,7 @@ function NWB:setOnyBuff(source, sender, zoneID, GUID, isSapped)
 			count = count + 1;
 		end
 		if (count <= NWB.limitLayerCount) then
-			if (not NWB.data.layers[zoneID]) then
+			if (zoneID and not NWB.data.layers[zoneID] and NWB.isClassic) then
 				NWB:createNewLayer(zoneID, GUID);
 			end
 			if (NWB.data.layers[zoneID]) then
@@ -1264,7 +1276,7 @@ function NWB:setNefBuff(source, sender, zoneID, GUID)
 			count = count + 1;
 		end
 		if (count <= NWB.limitLayerCount) then
-			if (not NWB.data.layers[zoneID]) then
+			if (zoneID and not NWB.data.layers[zoneID] and NWB.isClassic) then
 				NWB:createNewLayer(zoneID, GUID);
 			end
 			if (NWB.data.layers[zoneID]) then
@@ -1651,4 +1663,51 @@ function NWB:doHandIn(id, layer, sender)
 	end
 end
 
---/run NWB:sendBigWigs(14, "[NWB] Rallying Cry of the Dragonslayer", "ony");
+--Places where timers are displayed on the UI check this now so we can check the rend log for adjustments.
+--Regular timer funcs that don't need to display stuff still use the old regular timers.
+--All this is doing is changing what's displayed to the user based on people with the addon handing in rend buffs.
+function NWB:getRendTimer(layer)
+	if (NWB.isLayered) then
+		if (NWB:GetLayerCount() == 1) then
+			return NWB.data.layers[layer].rendTimer
+		end
+		if (layer and NWB.data.layers[layer]) then
+			local handinsOnly = {}
+			local count = 0;
+			table.sort(NWB.data.timerLog, function(a, b) return a.timestamp > b.timestamp end);
+			for k, v in ipairs(NWB.data.timerLog) do
+				if (v.type == "q") then
+					count = count + 1;
+				    table.insert(handinsOnly, v);
+				    if (count == 10) then
+						break;
+					end
+				end
+			end
+			for k, v in ipairs(handinsOnly) do
+				if (v.layerID == layer and v.type == "q" and v.timestamp > (GetServerTime() - NWB.rendCooldownTime)) then
+					--Timstamp returned is when it dropped not when it resets.
+					return v.timestamp + 15, true; --Seems to be 13 seconds between quets handin and drop, so add 15 seconds for 2 seconds leeway.
+				end
+			end
+			--Return 0  and show no timer if it this layer closely matches another layers timer log entry? This would mean it's very likely a false timer.
+			local timestamp = NWB.data.layers[layer].rendTimer;
+			if (timestamp) then
+				--13ish seconds difference between handin time and actual buff drop time.
+				timestamp = timestamp - 13;
+				for k, v in ipairs(handinsOnly) do
+					--5 second leeway.
+					if (v.timestamp > (timestamp - 20) and v.timestamp < (timestamp + 20) and GetServerTime() - v.timestamp < 43200) then
+						return 0;
+					end
+				end
+			end
+			--Lastly return the normally recorded timer that's usually inaccurate since the api changes anyway.
+			return NWB.data.layers[layer].rendTimer
+		else
+		 	return 0;
+		end
+	else
+		return NWB.data.rendTimer;
+	end
+end

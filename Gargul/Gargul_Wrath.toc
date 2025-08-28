@@ -1,19 +1,20 @@
-## Interface: 30403
-## Title: Gargul |c00967FD2v7.6.24|r
-## Title-deDE: Gargul |c00967FD2v7.6.24|r
-## Title-esES: Gargul |c00967FD2v7.6.24|r
-## Title-esMX: Gargul |c00967FD2v7.6.24|r
-## Title-frFR: Gargul |c00967FD2v7.6.24|r
-## Title-itIT: Gargul |c00967FD2v7.6.24|r
-## Title-koKR: Gargul |c00967FD2v7.6.24|r
-## Title-ptBR: Gargul |c00967FD2v7.6.24|r
-## Title-ruRU: Gargul |c00967FD2v7.6.24|r
-## Title-zhCN: Gargul |c00967FD2v7.6.24|r
-## Title-zhTW: Gargul |c00967FD2v7.6.24|r
+## Interface: 30404
+## Title: Gargul |c00967FD2v7.6.39|r
+## Title-deDE: Gargul |c00967FD2v7.6.39|r
+## Title-esES: Gargul |c00967FD2v7.6.39|r
+## Title-esMX: Gargul |c00967FD2v7.6.39|r
+## Title-frFR: Gargul |c00967FD2v7.6.39|r
+## Title-itIT: Gargul |c00967FD2v7.6.39|r
+## Title-koKR: Gargul |c00967FD2v7.6.39|r
+## Title-ptBR: Gargul |c00967FD2v7.6.39|r
+## Title-ruRU: Gargul |c00967FD2v7.6.39|r
+## Title-zhCN: Gargul |c00967FD2v7.6.39|r
+## Title-zhTW: Gargul |c00967FD2v7.6.39|r
 ## Notes: Loot addon that supports GDKP, softres sr, thatsmybis tmb, auto looting, +1 tracking and much more
 ## IconTexture: Interface\AddOns\Gargul\Assets\Buttons\minimap
+## OptionalDeps: LibStub, CallbackHandler-1.0, LibSharedMedia-3.0, LibDeflate, LibSerialize, Masque, LibCustomGlow, ChatThrottleLib
 ## Author: Zhorax - Firemaw
-## Version: 7.6.24
+## Version: 7.6.39
 ## DefaultState: enabled
 ## SavedVariables: GargulDB
 ## X-Donate: https://www.patreon.com/gargul
@@ -24,7 +25,8 @@
 # Libraries
 libraries.xml
 
-# Bootstrapper
+# Bootstrap
+Utils/shims.lua
 bootstrap.lua
 
 # Localizations
@@ -40,14 +42,17 @@ Data/Localizations/tw.lua
 Data/Localizations/chat.lua
 
 # Data objects
+Data/Data.lua
 Data/Constants.lua
 Data/DefaultSettings.lua
 Data/ItemLinks.lua
 Data/NormalModeHardModeLinks.lua
 Data/ArtTextureID.lua
 
+# Helpers
+Utils/helpers.lua
+
 # Class objects
-Classes/Helpers.lua
 Classes/Events.lua
 Classes/JSON.lua
 Classes/Base64.lua
@@ -88,7 +93,7 @@ Classes/CommMessage.lua
 Classes/RaidGroups.lua
 Classes/DroppedLootLedger.lua
 
-# Interface objects
+# UI objects
 Interface/AceGUIWidget-LibScrollingTable.lua
 Interface/Interface.lua
 Interface/Award/Award.lua

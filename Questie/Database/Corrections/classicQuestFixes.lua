@@ -76,9 +76,6 @@ function QuestieQuestFixes:Load()
         [30] = {
             [questKeys.extraObjectives] = {{{[zoneIDs.MOONGLADE]={{36.5,41.7}}}, Questie.ICON_TYPE_EVENT, l10n("Combine the Pendant halves at the Shrine of Remulos.")}},
         },
-        [32] = { -- Rise of the Silithid
-            [questKeys.nextQuestInChain] = 4494,
-        },
         [33] = {
             [questKeys.preQuestSingle] = {},
         },
@@ -130,6 +127,10 @@ function QuestieQuestFixes:Load()
         [214] = {
             [questKeys.preQuestSingle] = {155}, -- wotlkDB has prequest wrong data
         },
+        [217] = {
+            [questKeys.preQuestSingle] = {},
+            [questKeys.preQuestGroup] = {263,267},
+        },
         [219] = {
             [questKeys.triggerEnd] = {"Escort Corporal Keeshan back to Redridge", {[zoneIDs.REDRIDGE_MOUNTAINS]={{33.36,48.7}}}},
         },
@@ -159,6 +160,7 @@ function QuestieQuestFixes:Load()
         },
         [287] = {
             [questKeys.preQuestSingle] = {},
+            [questKeys.breadcrumbs] = {420},
         },
         [308] = {
             [questKeys.exclusiveTo] = {311}, -- distracting jarven can't be completed once you get the followup
@@ -181,8 +183,13 @@ function QuestieQuestFixes:Load()
         [353] = {
             [questKeys.preQuestSingle] = {}, -- #2364
         },
+        [363] = {
+            [questKeys.nextQuestInChain] = 364,
+            [questKeys.breadcrumbForQuestId] = 364, -- #882
+        },
         [364] = {
             [questKeys.preQuestSingle] = {}, -- #882
+            [questKeys.breadcrumbs] = {363},
         },
         [367] = {
             [questKeys.requiredRaces] = raceIDs.ALL_HORDE, -- #888
@@ -211,16 +218,19 @@ function QuestieQuestFixes:Load()
             [questKeys.exclusiveTo] = {413}, -- cant complete rejolds new brew if you do shimmer stout (see issue 567)
         },
         [420] = {
-            [questKeys.exclusiveTo] = {287}, -- senir's observations part 2 becomes unavailable if you have completed frostmane hold
+            [questKeys.nextQuestInChain] = 287,
+            [questKeys.breadcrumbForQuestId] = 287,
         },
         [427] = {
             [questKeys.preQuestSingle] = {},
         },
         [428] = {
-            [questKeys.exclusiveTo] = {429}, -- lost deathstalkers breadcrumb
+            [questKeys.nextQuestInChain] = 429,
+            [questKeys.breadcrumbForQuestId] = 429,
         },
         [429] = {
             [questKeys.preQuestSingle] = {}, -- #1843
+            [questKeys.breadcrumbs] = {428},
         },
         [431] = { -- candles of beckoning
             [questKeys.preQuestSingle] = {366}, -- #638
@@ -246,6 +256,7 @@ function QuestieQuestFixes:Load()
         },
         [455] = {
             [questKeys.preQuestSingle] = {}, -- #1858
+            [questKeys.breadcrumbs] = {468},
         },
         [463] = {
             [questKeys.exclusiveTo] = {276}, --greenwarden cant be completed if you have trampling paws
@@ -261,7 +272,8 @@ function QuestieQuestFixes:Load()
             [questKeys.exclusiveTo] = {466}, -- #2066
         },
         [468] = {
-            [questKeys.exclusiveTo] = {455}, -- #1858
+            [questKeys.nextQuestInChain] = 455, -- #1858
+            [questKeys.breadcrumbForQuestId] = 455,
         },
         [473] = {
             [questKeys.preQuestSingle] = {455}, -- #809
@@ -397,6 +409,13 @@ function QuestieQuestFixes:Load()
         [742] = {
             [questKeys.exclusiveTo] = {235,6382,6383},
         },
+        [752] = {
+            [questKeys.breadcrumbForQuestId] = 753,
+        },
+        [753] = {
+            [questKeys.preQuestSingle] = {},
+            [questKeys.breadcrumbs] = {752},
+        },
         [754] = {
             [questKeys.triggerEnd] = {"Cleanse the Winterhoof Water Well", {[zoneIDs.MULGORE]={{53.61, 66.2}}}},
         },
@@ -409,6 +428,10 @@ function QuestieQuestFixes:Load()
         [769] = {
             [questKeys.preQuestSingle] = {},
             [questKeys.requiredSkill] = {165,10},
+        },
+        [788] = {
+            [questKeys.preQuestSingle] = {},
+            [questKeys.breadcrumbs] = {4641}, -- #1956
         },
         [793] = {
             [questKeys.requiredSourceItems] = {4843,4844,4845},
@@ -699,7 +722,7 @@ function QuestieQuestFixes:Load()
             [questKeys.startedBy] = {nil,{21015,21016},nil}, -- #1574
         },
         [1270] = {
-            [questKeys.triggerEnd] = {"Help Stinky find Bogbean Leaves", {[zoneIDs.DUSTWALLOW_MARSH]={{48,24}}}},
+            [questKeys.triggerEnd] = {"Help Stinky find Bogbean Leaves", {[zoneIDs.DUSTWALLOW_MARSH]={{48.87,24.58}}}},
         },
         [1271] = {
             [questKeys.preQuestGroup] = {1222,1204},
@@ -792,6 +815,15 @@ function QuestieQuestFixes:Load()
         },
         [1448] = {
             [questKeys.triggerEnd] = {"Search for the Temple of Atal'Hakkar", {[zoneIDs.SWAMP_OF_SORROWS]={{70.2,45.2},{66.6,48.1},{73.6,48.1},{64.9,53.3},{75.4,53.3},{66.6,58.4},{73.6,58.4},{70.2,60.5}}}},
+        },
+        [1462] = {
+            [questKeys.objectivesText] = {},
+        },
+        [1463] = {
+            [questKeys.objectivesText] = {},
+        },
+        [1464] = {
+            [questKeys.objectivesText] = {},
         },
         [1470] = {
             [questKeys.exclusiveTo] = {1485}, -- #999
@@ -1019,7 +1051,7 @@ function QuestieQuestFixes:Load()
             [questKeys.preQuestSingle] = {},
         },
         [1919] = { -- Report to Jennea
-            [questKeys.startedBy] = {{328,7312}},
+            [questKeys.startedBy] = {{328,1228,7312}},
         },
         [1920] = {
             [questKeys.preQuestSingle] = {}, -- #1328
@@ -1178,6 +1210,12 @@ function QuestieQuestFixes:Load()
         },
         [2845] = {
             [questKeys.triggerEnd] = {"Take Shay Leafrunner to Rockbiter's camp", {[zoneIDs.FERALAS]={{42.33,21.85}}}},
+        },
+        [2847] = {
+            [questKeys.requiredSkill] = {profKeys.LEATHERWORKING,200},
+        },
+        [2854] = {
+            [questKeys.requiredSkill] = {profKeys.LEATHERWORKING,200},
         },
         [2861] = {
             [questKeys.startedBy] = {{4568,5144,5497,5885},nil,nil}, -- #1152
@@ -1528,6 +1566,9 @@ function QuestieQuestFixes:Load()
         [4144] = {
             [questKeys.specialFlags] = specialFlags.REPEATABLE, -- #1590
         },
+        [4146] = { -- Zapper Fuel
+            [questKeys.zoneOrSort] = zoneIDs.UN_GORO_CRATER,
+        },
         [4181] = {
             [questKeys.requiredSpecialization] = specKeys.ENGINEERING,
         },
@@ -1584,11 +1625,14 @@ function QuestieQuestFixes:Load()
         [4491] = {
             [questKeys.triggerEnd] = {"Escort Ringo to Spraggle Frock at Marshal's Refuge", {[zoneIDs.UN_GORO_CRATER]={{43.71,8.29}}}},
         },
+        [4492] = {
+            [questKeys.triggerEnd] = {"Escort Ringo to Spraggle Frock at Marshal's Refuge", {[zoneIDs.UN_GORO_CRATER]={{43.71,8.29}}}}, -- needed for deDE blizzard spaghetti #2432
+        },
         [4493] = { -- March of the Silithid
             [questKeys.preQuestSingle] = {162,4267},
         },
         [4494] = {
-            [questKeys.preQuestSingle] = {32,7732},
+            [questKeys.preQuestSingle] = {7732},
         },
         [4496] = {
             [questKeys.preQuestSingle] = {4493,4494},
@@ -1641,7 +1685,7 @@ function QuestieQuestFixes:Load()
         },
         [4641] = {
             [questKeys.requiredRaces] = raceIDs.ALL_HORDE, -- #877
-            [questKeys.exclusiveTo] = {788}, -- #1956
+            [questKeys.breadcrumbForQuestId] = 788, -- #1956
         },
         [4726] = {
             [questKeys.extraObjectives] = {{nil, Questie.ICON_TYPE_INTERACT, l10n("Use the Draco-Incarcinatrix 900 and defeat the dragonkin."), 0, {{"monster",7047},{"monster",7048}},{"monster",7049}}},
@@ -1669,7 +1713,7 @@ function QuestieQuestFixes:Load()
             [questKeys.requiredSourceItems] = {12300,12323},
             [questKeys.startedBy] = {{10299}},
             [questKeys.finishedBy] = {{10299}},
-            [questKeys.extraObjectives] = {{nil, Questie.ICON_TYPE_OBJECT, l10n("Beat Emberstrife till his will is broken, then place the Unforged Seal of Ascension before him and use the Orb of Draconic Energy."), 0, {{"monster", 10321}}},
+            [questKeys.extraObjectives] = {{nil, Questie.ICON_TYPE_INTERACT, l10n("Beat Emberstrife till his will is broken, then place the Unforged Seal of Ascension before him and use the Orb of Draconic Energy."), 0, {{"monster", 10321}}},
 			                               {nil, Questie.ICON_TYPE_OBJECT, l10n("Use the Flames of the Black Flight over it to create the Seal."), 0, {{"object", 175321}}},
 			},
         },
@@ -1727,6 +1771,9 @@ function QuestieQuestFixes:Load()
                                            {nil, Questie.ICON_TYPE_OBJECT, l10n("Use it to instantly kill one nearby ogre."),0,{{"object", 175584}}},
             },
         },
+        [4882] = {
+            [questKeys.preQuestSingle] = {4741},
+        },
         [4901] = {
             [questKeys.triggerEnd] = {"Discover the secret of the Altar of Elune", {[zoneIDs.WINTERSPRING]={{64.85,63.73}}}},
         },
@@ -1765,6 +1812,7 @@ function QuestieQuestFixes:Load()
         },
         [5057] = {
             [questKeys.requiredRaces] = raceIDs.ALL_HORDE,
+            [questKeys.objectivesText] = {},
         },
         [5059] = {
             [questKeys.preQuestSingle] = {5058}, -- #922
@@ -1775,7 +1823,8 @@ function QuestieQuestFixes:Load()
         [5063] = {
             [questKeys.specialFlags] = specialFlags.REPEATABLE, -- #1335
         },
-        [5067] = {
+        [5067] = { -- Leggings of Arcana
+            [questKeys.questLevel] = 60,
             [questKeys.specialFlags] = specialFlags.REPEATABLE, -- #1335
         },
         [5068] = {
@@ -1927,7 +1976,7 @@ function QuestieQuestFixes:Load()
             [questKeys.preQuestSingle] = {5401,5503,5405},
         },
         [5526] = {
-            [questKeys.zoneOrSort] = zoneIDs.DIRE_MAUL,
+            [questKeys.zoneOrSort] = zoneIDs.MOONGLADE,
             [questKeys.requiredSourceItems] = {18501},
         },
         [5561] = {
@@ -1991,6 +2040,7 @@ function QuestieQuestFixes:Load()
         },
         [5676] = {
             [questKeys.exclusiveTo] = {5677,5678},
+            [questKeys.objectivesText] = {},
         },
         [5677] = {
             [questKeys.exclusiveTo] = {5676,5678},
@@ -2006,6 +2056,9 @@ function QuestieQuestFixes:Load()
             [questKeys.objectivesText] = {"Speak to High Priestess Laurena in Stormwind."},
             [questKeys.exclusiveTo] = {5676,5677},
             [questKeys.zoneOrSort] = sortKeys.PRIEST,
+        },
+        [5679] = {
+            [questKeys.objectivesText] = {},
         },
         [5713] = {
             [questKeys.triggerEnd] = {"Protect Aynasha", {[zoneIDs.DARKSHORE]={{45.87,90.42}}}},
@@ -2284,10 +2337,12 @@ function QuestieQuestFixes:Load()
             [questKeys.triggerEnd] = {"Take Silverwing Outpost.", {[zoneIDs.ASHENVALE]={{64.65,75.35}}}},
         },
         [6562] = {
-            [questKeys.exclusiveTo] = {6563}, -- #1826
+            [questKeys.breadcrumbForQuestId] = 6563,
+            [questKeys.nextQuestInChain] = 6563, -- #1826
         },
         [6563] = {
             [questKeys.preQuestSingle] = {}, -- #1826
+            [questKeys.breadcrumbs] = {6562},
         },
         [6566] = {
             [questKeys.triggerEnd] = {"Thrall's Tale", {[zoneIDs.ORGRIMMAR]={{31.78,37.81}}}},
@@ -2307,11 +2362,16 @@ function QuestieQuestFixes:Load()
         [6609] = {
             [questKeys.exclusiveTo] = {6607}, -- #1154
         },
+        [6610] = {
+            [questKeys.breadcrumbs] = {6611,6612}, -- #2070
+        },
         [6611] = {
-            [questKeys.exclusiveTo] = {6610}, -- #2070
+            [questKeys.breadcrumbForQuestId] = 6610, -- #2070
+            [questKeys.nextQuestInChain] = 6610,
         },
         [6612] = {
-            [questKeys.exclusiveTo] = {6610}, -- #2070
+            [questKeys.breadcrumbForQuestId] = 6610, -- #2070
+            [questKeys.nextQuestInChain] = 6610,
         },
         [6622] = {
             [questKeys.triggerEnd] = {"15 Patients Saved!", {[zoneIDs.DUSTWALLOW_MARSH]={{67.79,49.06}}}},
@@ -2362,6 +2422,9 @@ function QuestieQuestFixes:Load()
         },
         [6762] = {
             [questKeys.preQuestSingle] = {1015,1019,1047,6761},
+        },
+        [6804] = {
+            [questKeys.extraObjectives] = {{nil, Questie.ICON_TYPE_INTERACT, l10n("Use the Aspect of Neptulon."), 0, {{"monster", 8519},{"monster", 8520},{"monster", 8521},{"monster", 8522}}}},
         },
         [6861] = {
             [questKeys.objectivesText] = {},
@@ -2598,9 +2661,9 @@ function QuestieQuestFixes:Load()
             [questKeys.objectivesText] = {"Bring Darkreaver's Head to Sagorne Creststrider in the Valley of Wisdom, Orgrimmar."},
             [questKeys.objectives] = {nil,nil,{{18880,nil}},nil},
             [questKeys.sourceItemId] = 18746,
-            [questKeys.zoneOrSort] = 1637,
+            [questKeys.zoneOrSort] = -82,
             [questKeys.exclusiveTo] = {8258}, -- 8258 after Phase 4
-            [questKeys.childQuests] = {7669},
+            [questKeys.preQuestSingle] = {7667},
         },
         [7669] = { --#1449
             [questKeys.name] = "Again Into the Great Ossuary",
@@ -2610,9 +2673,9 @@ function QuestieQuestFixes:Load()
             [questKeys.questLevel] = 60,
             [questKeys.requiredRaces] = raceIDs.ALL_HORDE,
             [questKeys.requiredClasses] = classIDs.SHAMAN,
-            [questKeys.zoneOrSort] = -141,
+            [questKeys.zoneOrSort] = -82,
             [questKeys.specialFlags] = specialFlags.REPEATABLE,
-            [questKeys.parentQuest] = 8258,
+            [questKeys.preQuestSingle] = {7668,8258},
         },
         [7670] = { -- #1432
             [questKeys.name] = "Lord Grayson Shadowbreaker",
@@ -2626,6 +2689,9 @@ function QuestieQuestFixes:Load()
             [questKeys.nextQuestInChain] = 7637,
             [questKeys.exclusiveTo] = {7638},
             [questKeys.zoneOrSort] = -141,
+        },
+        [7736] = {
+            [questKeys.objectivesText] = {},
         },
         [7782] = { -- The Lord of Blackrock
             [questKeys.startedBy] = {{1748}},
@@ -2707,6 +2773,87 @@ function QuestieQuestFixes:Load()
         [8044] = {
             [questKeys.name] = "The Rage of Mugamba",
         },
+        [8053] = {
+            [questKeys.zoneOrSort] = zoneIDs.ZUL_GURUB,
+        },
+        [8054] = {
+            [questKeys.zoneOrSort] = zoneIDs.ZUL_GURUB,
+        },
+        [8055] = {
+            [questKeys.zoneOrSort] = zoneIDs.ZUL_GURUB,
+        },
+        [8056] = {
+            [questKeys.zoneOrSort] = zoneIDs.ZUL_GURUB,
+        },
+        [8057] = {
+            [questKeys.zoneOrSort] = zoneIDs.ZUL_GURUB,
+        },
+        [8058] = {
+            [questKeys.zoneOrSort] = zoneIDs.ZUL_GURUB,
+        },
+        [8059] = {
+            [questKeys.zoneOrSort] = zoneIDs.ZUL_GURUB,
+        },
+        [8060] = {
+            [questKeys.zoneOrSort] = zoneIDs.ZUL_GURUB,
+        },
+        [8061] = {
+            [questKeys.zoneOrSort] = zoneIDs.ZUL_GURUB,
+        },
+        [8062] = {
+            [questKeys.zoneOrSort] = zoneIDs.ZUL_GURUB,
+        },
+        [8063] = {
+            [questKeys.zoneOrSort] = zoneIDs.ZUL_GURUB,
+        },
+        [8064] = {
+            [questKeys.zoneOrSort] = zoneIDs.ZUL_GURUB,
+        },
+        [8065] = {
+            [questKeys.zoneOrSort] = zoneIDs.ZUL_GURUB,
+        },
+        [8066] = {
+            [questKeys.zoneOrSort] = zoneIDs.ZUL_GURUB,
+        },
+        [8067] = {
+            [questKeys.zoneOrSort] = zoneIDs.ZUL_GURUB,
+        },
+        [8068] = {
+            [questKeys.zoneOrSort] = zoneIDs.ZUL_GURUB,
+        },
+        [8069] = {
+            [questKeys.zoneOrSort] = zoneIDs.ZUL_GURUB,
+        },
+        [8070] = {
+            [questKeys.zoneOrSort] = zoneIDs.ZUL_GURUB,
+        },
+        [8071] = {
+            [questKeys.zoneOrSort] = zoneIDs.ZUL_GURUB,
+        },
+        [8072] = {
+            [questKeys.zoneOrSort] = zoneIDs.ZUL_GURUB,
+        },
+        [8073] = {
+            [questKeys.zoneOrSort] = zoneIDs.ZUL_GURUB,
+        },
+        [8074] = {
+            [questKeys.zoneOrSort] = zoneIDs.ZUL_GURUB,
+        },
+        [8075] = {
+            [questKeys.zoneOrSort] = zoneIDs.ZUL_GURUB,
+        },
+        [8076] = {
+            [questKeys.zoneOrSort] = zoneIDs.ZUL_GURUB,
+        },
+        [8077] = {
+            [questKeys.zoneOrSort] = zoneIDs.ZUL_GURUB,
+        },
+        [8078] = {
+            [questKeys.zoneOrSort] = zoneIDs.ZUL_GURUB,
+        },
+        [8079] = {
+            [questKeys.zoneOrSort] = zoneIDs.ZUL_GURUB,
+        },
         [8105] = {
             [questKeys.specialFlags] = 0,
         },
@@ -2755,54 +2902,99 @@ function QuestieQuestFixes:Load()
         },
         [8166] = {
             [questKeys.specialFlags] = 0,
+            [questKeys.requiredMaxLevel] = 49,
         },
         [8167] = {
             [questKeys.specialFlags] = 0,
+            [questKeys.requiredMaxLevel] = 39,
         },
         [8168] = {
             [questKeys.specialFlags] = 0,
+            [questKeys.requiredMaxLevel] = 29,
         },
         [8169] = {
             [questKeys.specialFlags] = 0,
+            [questKeys.requiredMaxLevel] = 49,
         },
         [8170] = {
             [questKeys.specialFlags] = 0,
+            [questKeys.requiredMaxLevel] = 39,
         },
         [8171] = {
             [questKeys.specialFlags] = 0,
+            [questKeys.requiredMaxLevel] = 29,
+        },
+        [8181] = {
+            [questKeys.zoneOrSort] = zoneIDs.ZUL_GURUB,
         },
         [8183] = { -- The Heart of Hakkar
             [questKeys.zoneOrSort] = zoneIDs.ZUL_GURUB,
         },
         [8184] = {
             [questKeys.requiredClasses] = classIDs.WARRIOR,
+            [questKeys.objectivesText] = {},
         },
         [8185] = {
             [questKeys.requiredClasses] = classIDs.PALADIN,
+            [questKeys.objectivesText] = {},
         },
         [8186] = {
             [questKeys.requiredClasses] = classIDs.ROGUE,
+            [questKeys.objectivesText] = {},
         },
         [8187] = {
             [questKeys.requiredClasses] = classIDs.HUNTER,
+            [questKeys.objectivesText] = {},
         },
         [8188] = {
             [questKeys.requiredClasses] = classIDs.SHAMAN,
+            [questKeys.objectivesText] = {},
         },
         [8189] = {
             [questKeys.requiredClasses] = classIDs.MAGE,
+            [questKeys.objectivesText] = {},
         },
         [8190] = {
             [questKeys.requiredClasses] = classIDs.WARLOCK,
+            [questKeys.objectivesText] = {},
         },
         [8191] = {
             [questKeys.requiredClasses] = classIDs.PRIEST,
+            [questKeys.objectivesText] = {},
         },
         [8192] = {
             [questKeys.requiredClasses] = classIDs.DRUID,
+            [questKeys.objectivesText] = {},
+        },
+        [8195] = {
+            [questKeys.zoneOrSort] = zoneIDs.ZUL_GURUB,
+        },
+        [8196] = {
+            [questKeys.zoneOrSort] = zoneIDs.ZUL_GURUB,
+        },
+        [8201] = {
+            [questKeys.zoneOrSort] = zoneIDs.ZUL_GURUB,
+        },
+        [8227] = {
+            [questKeys.zoneOrSort] = zoneIDs.ZUL_GURUB,
         },
         [8233] = {
             [questKeys.startedBy] = {{918,3328,4163,4583,5165}},
+        },
+        [8238] = {
+            [questKeys.zoneOrSort] = zoneIDs.ZUL_GURUB,
+        },
+        [8239] = {
+            [questKeys.zoneOrSort] = zoneIDs.ZUL_GURUB,
+        },
+        [8240] = {
+            [questKeys.zoneOrSort] = zoneIDs.ZUL_GURUB,
+        },
+        [8243] = {
+            [questKeys.zoneOrSort] = zoneIDs.ZUL_GURUB,
+        },
+        [8246] = {
+            [questKeys.zoneOrSort] = zoneIDs.ZUL_GURUB,
         },
         [8250] = {
             [questKeys.startedBy] = {{331,3047,4567,7311,7312}},
@@ -2815,7 +3007,6 @@ function QuestieQuestFixes:Load()
         },
         [8258] = {
             [questKeys.exclusiveTo] = {7668}, -- 7668 before Phase 4
-            [questKeys.childQuests] = {7669},
         },
         [8262] = {
             [questKeys.requiredMinRep] = {509,3000},
@@ -2905,8 +3096,11 @@ function QuestieQuestFixes:Load()
         [8361] = {
             [questKeys.extraObjectives] = {{nil, Questie.ICON_TYPE_EVENT, l10n("Summon a Templar using a full Twilight set."),0,{{"object", 180456},{"object", 180518},{"object", 180529},{"object", 180544},{"object", 180549},{"object", 180564},}}},
         },
+        [8363] = { -- Abyssal Signets
+            [questKeys.requiredMinRep] = {609,3000},
+        },
         [8367] = { -- For Great Honor
-            [questKeys.zoneOrSort] = sortKeys.BATTLEGROUND,
+            [questKeys.zoneOrSort] = sortKeys.ORGRIMMAR,
         },
         [8368] = { -- Battle of Warsong Gulch
             [questKeys.exclusiveTo] = {8426,8427,8428,8429,8430},
@@ -2917,7 +3111,7 @@ function QuestieQuestFixes:Load()
             [questKeys.requiredMaxLevel] = 29,
         },
         [8371] = { -- Concerted Efforts
-            [questKeys.zoneOrSort] = sortKeys.BATTLEGROUND,
+            [questKeys.zoneOrSort] = sortKeys.IRONFORGE,
         },
         [8372] = { -- Fight for Warsong Gulch
             [questKeys.exclusiveTo] = {8399,8400,8401,8402,8403},
@@ -2929,20 +3123,34 @@ function QuestieQuestFixes:Load()
         [8374] = { -- Claiming Arathi Basin
             [questKeys.requiredMaxLevel] = 29,
         },
+        [8375] = { -- Remember Alterac Valley!
+            [questKeys.zoneOrSort] = zoneIDs.ALTERAC_VALLEY,
+        },
+        [8383] = { -- Remember Alterac Valley!
+            [questKeys.zoneOrSort] = zoneIDs.ALTERAC_VALLEY,
+            [questKeys.objectivesText] = {},
+        },
         [8384] = { -- Claiming Arathi Basin
             [questKeys.requiredMaxLevel] = 29,
         },
         [8385] = { -- Concerted Efforts
-            [questKeys.zoneOrSort] = sortKeys.BATTLEGROUND,
+            [questKeys.zoneOrSort] = sortKeys.IRONFORGE,
         },
         [8386] = { -- Fight for Warsong Gulch
             [questKeys.requiredMaxLevel] = 19,
+            [questKeys.objectivesText] = {},
+        },
+        [8387] = { -- Invaders of Alterac Valley
+            [questKeys.zoneOrSort] = zoneIDs.ALTERAC_VALLEY,
+            [questKeys.objectivesText] = {},
         },
         [8388] = { -- For Great Honor
-            [questKeys.zoneOrSort] = sortKeys.BATTLEGROUND,
+            [questKeys.zoneOrSort] = sortKeys.ORGRIMMAR,
+            [questKeys.objectivesText] = {},
         },
         [8389] = { -- Battle of Warsong Gulch
             [questKeys.requiredMaxLevel] = 19,
+            [questKeys.objectivesText] = {},
         },
         [8390] = { -- Conquering Arathi Basin
             [questKeys.requiredMaxLevel] = 29,
@@ -2950,10 +3158,12 @@ function QuestieQuestFixes:Load()
         [8391] = { -- Claiming Arathi Basin
             [questKeys.preQuestSingle] = {8374,8393},
             [questKeys.requiredMaxLevel] = 39,
+            [questKeys.objectivesText] = {},
         },
         [8392] = { -- Claiming Arathi Basin
             [questKeys.preQuestSingle] = {8374,8393,8394},
             [questKeys.requiredMaxLevel] = 49,
+            [questKeys.objectivesText] = {},
         },
         [8393] = { -- Claiming Arathi Basin
             [questKeys.exclusiveTo] = {8374,8394,8395,8396},
@@ -2970,11 +3180,13 @@ function QuestieQuestFixes:Load()
         [8396] = { -- Claiming Arathi Basin
             [questKeys.exclusiveTo] = {8374,8393,8394,8395},
         },
-        [8397] = { -- Fight for Warsong Gulch
+        [8397] = { -- Claiming Arathi Basin
             [questKeys.preQuestSingle] = {8374,8393,8394,8395},
+            [questKeys.objectivesText] = {},
         },
-        [8398] = { -- Fight for Warsong Gulch
+        [8398] = { -- Claiming Arathi Basin
             [questKeys.preQuestSingle] = {8374,8393,8394,8395,8396},
+            [questKeys.objectivesText] = {},
         },
         [8399] = { -- Fight for Warsong Gulch
             [questKeys.exclusiveTo] = {8372,8400,8401,8402,8403},
@@ -2998,21 +3210,26 @@ function QuestieQuestFixes:Load()
         [8404] = { -- Fight for Warsong Gulch
             [questKeys.preQuestSingle] = {8372,8399},
             [questKeys.requiredMaxLevel] = 29,
+            [questKeys.objectivesText] = {},
         },
         [8405] = { -- Fight for Warsong Gulch
             [questKeys.preQuestSingle] = {8372,8399,8400},
             [questKeys.requiredMaxLevel] = 39,
+            [questKeys.objectivesText] = {},
         },
         [8406] = { -- Fight for Warsong Gulch
             [questKeys.preQuestSingle] = {8372,8399,8400,8401},
             [questKeys.requiredMaxLevel] = 49,
+            [questKeys.objectivesText] = {},
         },
         [8407] = { -- Fight for Warsong Gulch
             [questKeys.preQuestSingle] = {8372,8399,8400,8401,8402},
             [questKeys.requiredMaxLevel] = 59,
+            [questKeys.objectivesText] = {},
         },
         [8408] = { -- Fight for Warsong Gulch
             [questKeys.preQuestSingle] = {8372,8399,8400,8401,8402,8403},
+            [questKeys.objectivesText] = {},
         },
         [8410] = {
             [questKeys.exclusiveTo] = {8411}, -- other preQuestSingle
@@ -3058,21 +3275,26 @@ function QuestieQuestFixes:Load()
         [8431] = { -- Battle of Warsong Gulch
             [questKeys.preQuestSingle] = {8368,8426},
             [questKeys.requiredMaxLevel] = 29,
+            [questKeys.objectivesText] = {},
         },
         [8432] = { -- Battle of Warsong Gulch
             [questKeys.preQuestSingle] = {8368,8426,8427},
             [questKeys.requiredMaxLevel] = 39,
+            [questKeys.objectivesText] = {},
         },
         [8433] = { -- Battle of Warsong Gulch
             [questKeys.preQuestSingle] = {8368,8426,8427,8428},
             [questKeys.requiredMaxLevel] = 49,
+            [questKeys.objectivesText] = {},
         },
         [8434] = { -- Battle of Warsong Gulch
             [questKeys.preQuestSingle] = {8368,8426,8427,8428,8429},
             [questKeys.requiredMaxLevel] = 59,
+            [questKeys.objectivesText] = {},
         },
         [8435] = { -- Battle of Warsong Gulch
             [questKeys.preQuestSingle] = {8368,8426,8427,8428,8429,8430},
+            [questKeys.objectivesText] = {},
         },
         [8436] = { -- Conquering Arathi Basin
             [questKeys.exclusiveTo] = {8370,8437,8438,8439},
@@ -3093,13 +3315,16 @@ function QuestieQuestFixes:Load()
         [8441] = { -- Conquering Arathi Basin
             [questKeys.preQuestSingle] = {8370,8436,8437},
             [questKeys.requiredMaxLevel] = 49,
+            [questKeys.objectivesText] = {},
         },
         [8442] = { -- Conquering Arathi Basin
             [questKeys.preQuestSingle] = {8370,8436,8437,8438},
             [questKeys.requiredMaxLevel] = 59,
+            [questKeys.objectivesText] = {},
         },
         [8443] = { -- Conquering Arathi Basin
             [questKeys.preQuestSingle] = {8370,8436,8437,8438,8439},
+            [questKeys.objectivesText] = {},
         },
         [8447] = {
             [questKeys.triggerEnd] = {"Waking Legends.",{[zoneIDs.MOONGLADE]={{40.0,48.6}}}},
@@ -4034,11 +4259,13 @@ function QuestieQuestFixes:Load()
             [questKeys.requiredRaces] = raceIDs.NONE,
             [questKeys.specialFlags] = specialFlags.REPEATABLE,
         },
-        [9415] = {
+        [9415] = { -- Report to Marshal Bluewall
             [questKeys.exclusiveTo] = {},
+            [questKeys.nextQuestInChain] = 0,
         },
-        [9416] = {
+        [9416] = { -- Report to General Kirika
             [questKeys.exclusiveTo] = {},
+            [questKeys.nextQuestInChain] = 0,
         },
         [9419] = { -- Scouring the Desert
             [questKeys.preQuestSingle] = {},

@@ -10,27 +10,18 @@ local AddonName = ...
 ---@class OptionsPrivate
 local OptionsPrivate = select(2, ...)
 OptionsPrivate.changelog = {
-  versionString = '5.19.9',
-  dateString = '2025-04-25',
-  fullChangeLogUrl = 'https://github.com/WeakAuras/WeakAuras2/compare/5.19.8...5.19.9',
+  versionString = '5.20.2',
+  dateString = '2025-08-15',
+  fullChangeLogUrl = 'https://github.com/WeakAuras/WeakAuras2/compare/5.20.1...5.20.2',
   highlightText = [==[
-Bump .toc files]==],  commitText = [==[InfusOnWoW (4):
+bugfix release for some broken textures]==],  commitText = [==[Pewtro (2):
 
-- Bump .toc files
-- Icon: If OmniCC or ElvUI are installed hide blizzard cooldown numbers
-- Currency trigger: Add type checking to guard against unexpected data
-- Update Discord List
+- Re-export the .blp files
+- Add Celestial Dungeon load option instance type
 
-Stanzilla (2):
+emptyrivers (1):
 
-- Update WeakAurasModelPaths from wago.tools
-- Update WeakAurasModelPaths from wago.tools
-
-mrbuds (3):
-
-- Unit Characteristics trigger: add creature type & family (Retail only)
-- Textute Atlas Picker: use C_Texture.GetAtlasElements on Retail
-- TSUHelper: hide __changed from pairs()
+- some more difficulty ids
 
 ]==]
 }

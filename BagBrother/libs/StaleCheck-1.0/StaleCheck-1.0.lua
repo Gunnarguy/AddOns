@@ -15,7 +15,7 @@ GNU General Public License for more details.
 This file is part of StaleCheck.
 ]]--
 
-local Lib = LibStub:NewLibrary('StaleCheck-1.0', 1)
+local Lib = LibStub:NewLibrary('StaleCheck-1.0', 3)
 if not Lib then
 	return
 elseif not Lib.registry then
@@ -34,11 +34,11 @@ end
 
 local function popup(text, addon, icon, who, version)
     print(format('|cffff0000' .. text:gsub('|c%x%x%x%x%x%x%x%x', '|cffffffff'):gsub('|n', ' ') .. '|r', addon, who, version))
-    xpcall(function()
+    pcall(function()
         LibStub('Sushi-3.2').Popup {
 			text = format(text, addon, who, version), button1 = OKAY,
 			icon = icon or C_AddOns.GetAddOnMetadata(addon, 'icontexture') }
-    end, nop)
+    end)
 end
 
 
@@ -89,16 +89,18 @@ end
 
 function Lib:CheckForUpdates(addon, sets, icon)
 	local installed = C_AddOns.GetAddOnMetadata(addon, 'version')
-    if int(installed) >= nextExpansion then
+	local ours = int(installed)
+
+    if ours >= nextExpansion then
         return popup(invalidBuild, addon, icon)
 	else
 		local latest = sets.latest
-		if latest and latest.id and GetServerTime() >= (latest.cooldown or 0) then
+		if latest and latest.id and int(latest.id) > ours and GetServerTime() >= (latest.cooldown or 0) then
 			popup(outOfDate, addon, icon, latest.who, latest.id)
 			sets.latest = {cooldown = GetServerTime() + 7 * 24 * 60 * 60}
 		end
 
-		Lib.registry[addon] = {sets = sets, queue = {}, installed = installed}
+		Lib.registry[addon] = {sets = sets, queue = {}, installed = installed, istest = installed:find('[ab]')}
 		sets.latest = sets.latest or {}
     end
 end
@@ -150,8 +152,10 @@ end
 
 function Lib:Broadcast()
 	for addon, handler in pairs(Lib.registry) do
-		for channel in pairs(handler.queue) do
-			C_ChatInfo.SendAddonMessage('Stale-1.0', strjoin('|', addon, handler.installed), channel)
+		if not handler.istest then
+			for channel in pairs(handler.queue) do
+				C_ChatInfo.SendAddonMessage('Stale-1.0', strjoin('|', addon, handler.installed), channel)
+			end
 		end
 
 		wipe(handler.queue)
