@@ -1,0 +1,8 @@
+## Interface: 11507
+## Title: |cff00ff00Spirit Appreciation|r
+## Notes: Shows your spirit's contribution to mana regeneration with appreciation messages
+## Author: GitHub Copilot
+## Version: 1.0
+## SavedVariables: SpiritAppreciationDB
+
+SpiritAppreciation.lua
